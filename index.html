@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智慧單字小考官 v10.0 (資料永存版)</title>
+    <title>智慧單字小考官 v12.0 (貼心助教版)</title>
     <style>
         /* --- 🎨 1. 色彩與字體設定 --- */
         :root {
@@ -14,7 +14,7 @@
             --accent: #f5b041;   /* 活潑黃 */
             --danger: #ec7063;   /* 柔和紅 */
             --success: #27ae60;  /* 綠色 */
-            --backup: #8e44ad;   /* 紫色 (備份用) */
+            --backup: #8e44ad;   /* 紫色 */
             --text-main: #2c3e50;
             --text-light: #95a5a6;
             --radius-box: 20px;
@@ -45,6 +45,7 @@
             display: flex;
             flex-direction: column;
             border: 4px solid #fff;
+            position: relative; /* 給 Modal 定位用 */
         }
 
         header {
@@ -54,9 +55,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         h1 { margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
+
+        .nav-group { display: flex; gap: 10px; }
 
         .nav-btn {
             background: rgba(255,255,255,0.25);
@@ -67,8 +72,8 @@
             cursor: pointer;
             font-size: 1rem;
             font-weight: bold;
-            margin-left: 10px;
             transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
         }
         .nav-btn:hover { background: rgba(255,255,255,0.4); transform: translateY(-2px); }
 
@@ -149,27 +154,26 @@
             padding: 30px 20px; text-align: center;
         }
 
-        .word-display { 
-            font-size: 5rem; font-weight: 900; color: var(--primary-dark); 
-            margin: 0 0 15px 0; line-height: 1.1; 
-        }
-        
+        .word-row, .sentence-row { display: flex; align-items: center; justify-content: center; gap: 15px; }
+        .word-display { font-size: 4.5rem; font-weight: 900; color: var(--primary-dark); line-height: 1.1; }
         .sentence-display { 
-            font-size: 1.8rem; font-weight: 500; color: #555; 
+            font-size: 1.6rem; font-weight: 500; color: #555; 
             margin-top: 10px; font-style: normal; 
-            background: #f8f9fa; padding: 20px; border-radius: 12px; line-height: 1.5; 
+            background: #f8f9fa; padding: 20px; border-radius: 12px; line-height: 1.5; text-align: left;
         }
 
-        .timer-wrapper {
-            display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 100px;
+        .btn-speak {
+            background: #eaf2f8; border: none; color: var(--primary); width: 50px; height: 50px;
+            border-radius: 50%; cursor: pointer; font-size: 1.5rem; display: flex; align-items: center;
+            justify-content: center; transition: 0.2s; flex-shrink: 0;
         }
+        .btn-speak:hover { background: var(--primary); color: white; transform: scale(1.1); }
 
+        .timer-wrapper { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 100px; }
         .timer-btn {
-            width: 90px; height: 90px;
-            background: white; border: 5px solid var(--accent); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 2.5rem; font-weight: 900; color: var(--accent);
-            cursor: pointer; box-shadow: 0 6px 0 #d68910; transition: 0.1s; position: relative;
+            width: 90px; height: 90px; background: white; border: 5px solid var(--accent); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: 900;
+            color: var(--accent); cursor: pointer; box-shadow: 0 6px 0 #d68910; transition: 0.1s; position: relative;
         }
         .timer-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #d68910; }
         .timer-btn:hover { background: #fef9e7; }
@@ -179,19 +183,15 @@
 
         .mistake-label { text-align: center; color: var(--danger); font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; }
         
-        .student-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px;
-        }
-
+        .student-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px; }
         .btn-student {
-            aspect-ratio: 1/1; background: white; border: 2px solid #e5e8e8;
-            border-radius: 15px; cursor: pointer; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 4px 0 #e5e8e8;
+            aspect-ratio: 1/1; background: white; border: 2px solid #e5e8e8; border-radius: 15px;
+            cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: 0.2s; box-shadow: 0 4px 0 #e5e8e8;
         }
         .avatar { font-size: 3rem; margin-bottom: 0px; }
         .name { font-weight: 900; color: #7f8c8d; font-size: 1.5rem; }
         .btn-student:hover { transform: translateY(-2px); }
-        .btn-student:active { transform: translateY(2px); box-shadow: none; }
         .btn-student.marked-wrong { background: var(--danger); border-color: #c0392b; box-shadow: 0 4px 0 #c0392b; }
         .btn-student.marked-wrong .name { color: white; }
 
@@ -206,37 +206,59 @@
 
         .error-box { background: #fadbd8; color: #922b21; padding: 15px; border-radius: 12px; display: none; margin-bottom: 20px; text-align: center; border: 2px solid #e6b0aa; }
         
-        /* --- 📥 下載與備份區域 --- */
+        /* --- 📥 下載與備份 --- */
         .data-management-area {
             background: #eaf2f8; border: 2px solid #a9cce3; padding: 25px;
             border-radius: 15px; margin-bottom: 30px; display: flex; flex-direction: column; gap: 15px;
             align-items: center;
         }
-
         .btn-download {
             background: var(--success); color: white; border: none; padding: 12px 30px;
             font-size: 1.2rem; font-weight: 800; border-radius: 50px; cursor: pointer;
             box-shadow: 0 5px 0 #1e8449; transition: all 0.2s; display: inline-flex; align-items: center; gap: 10px; width: 100%; max-width: 300px; justify-content: center;
         }
         .btn-download:hover { background: #2ecc71; transform: translateY(-2px); box-shadow: 0 7px 0 #1e8449; }
-        .btn-download:active { transform: translateY(4px); box-shadow: none; }
-
         .btn-backup {
             background: var(--backup); color: white; border: none; padding: 12px 30px;
             font-size: 1.1rem; font-weight: 800; border-radius: 50px; cursor: pointer;
             box-shadow: 0 5px 0 #6c3483; transition: all 0.2s; display: inline-flex; align-items: center; gap: 10px; width: 100%; max-width: 300px; justify-content: center;
         }
         .btn-backup:hover { background: #9b59b6; transform: translateY(-2px); box-shadow: 0 7px 0 #6c3483; }
-        .btn-backup:active { transform: translateY(4px); box-shadow: none; }
-
         .btn-clear {
             background: transparent; color: var(--danger); border: 2px solid var(--danger);
-            padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold;
-            font-size: 0.9rem;
+            padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 0.9rem;
         }
         .btn-clear:hover { background: #fceae9; }
-        
         .area-label { font-size: 0.9rem; font-weight: bold; color: #546e7a; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- 📖 彈跳說明書 (Modal) --- */
+        .modal {
+            display: none; position: fixed; z-index: 100; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto;
+            background-color: rgba(0,0,0,0.5); /* 半透明黑底 */
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid #888;
+            width: 90%; max-width: 700px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .close-btn {
+            color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;
+        }
+        .close-btn:hover { color: #000; }
+        
+        .help-section { margin-bottom: 25px; border-bottom: 1px dashed #eee; padding-bottom: 15px; }
+        .help-title { font-size: 1.2rem; color: var(--primary-dark); font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .help-text { font-size: 1rem; line-height: 1.6; color: #555; }
+        .help-tag { background: #eee; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
 
     </style>
 </head>
@@ -248,15 +270,16 @@
             <span style="font-size:2rem;">🐝</span>
             <h1>智慧單字小考官</h1>
         </div>
-        <div>
+        <div class="nav-group">
             <button class="nav-btn" onclick="showScreen('setupScreen')">🏠 首頁</button>
             <button class="nav-btn" onclick="showHistory()">📊 紀錄</button>
+            <button class="nav-btn" style="border-color:#f1c40f; color:#f1c40f;" onclick="openHelp()">❓ 說明</button>
         </div>
     </header>
 
     <div id="setupScreen" class="screen active">
         <div id="loadError" class="error-box">
-            <strong>⚠️ 找不到 words.js</strong><br>請確認檔案位置。
+            <strong>⚠️ 找不到 words.js</strong><br>請確認該檔案是否與此網頁在同一資料夾內。
         </div>
         <div id="statusMsg" style="text-align:center; color:#999; margin-bottom:20px;">資料載入中...</div>
 
@@ -291,8 +314,14 @@
         
         <div class="card-container">
             <div class="flash-card">
-                <div class="word-display" id="displayWord">...</div>
-                <div class="sentence-display" id="displaySentence">...</div>
+                <div class="word-row">
+                    <div class="word-display" id="displayWord">...</div>
+                    <button class="btn-speak" onclick="speakText('word')" title="唸單字">🔊</button>
+                </div>
+                <div class="sentence-row">
+                    <div class="sentence-display" id="displaySentence">...</div>
+                    <button class="btn-speak" onclick="speakText('sentence')" title="唸例句">🔊</button>
+                </div>
             </div>
             
             <div class="timer-wrapper">
@@ -301,7 +330,7 @@
             </div>
         </div>
 
-        <div class="mistake-label">👇 誰答錯了？點擊按鈕標記：</div>
+        <div class="mistake-label">👇 誰答錯了？點擊按鈕標記 (變紅色)：</div>
         
         <div class="student-grid">
             <div class="btn-student" id="btn-s1" onclick="toggleStudent(1)"><span class="avatar">🐃</span><span class="name">1</span></div>
@@ -319,25 +348,15 @@
         
         <div class="data-management-area">
             <div class="area-label">📂 資料匯出與備份</div>
-            
-            <button class="btn-download" onclick="exportToCSV()">
-                <span>📥</span> 匯出 Excel 報表
-            </button>
+            <button class="btn-download" onclick="exportToCSV()"><span>📥</span> 匯出 Excel 報表</button>
             <div style="font-size:0.85rem; color:#666;">(用途：下載表格，用 Excel 開啟查看)</div>
-
             <hr style="width:80%; border:0; border-top:1px dashed #ccc; margin:10px 0;">
-
             <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-                <button class="btn-backup" onclick="backupData()">
-                    <span>💾</span> 下載備份檔 (JSON)
-                </button>
-                <button class="btn-backup" style="background:#34495e; box-shadow:0 5px 0 #2c3e50;" onclick="document.getElementById('fileInput').click()">
-                    <span>📂</span> 匯入備份檔
-                </button>
+                <button class="btn-backup" onclick="backupData()"><span>💾</span> 下載備份檔 (JSON)</button>
+                <button class="btn-backup" style="background:#34495e; box-shadow:0 5px 0 #2c3e50;" onclick="document.getElementById('fileInput').click()"><span>📂</span> 匯入備份檔</button>
                 <input type="file" id="fileInput" style="display:none" onchange="restoreData(this)">
             </div>
             <div style="font-size:0.85rem; color:#666;">(用途：換電腦時，可將舊電腦的紀錄帶過來)</div>
-            
             <button class="btn-clear" onclick="clearHistory()">🗑️ 清空所有紀錄</button>
         </div>
 
@@ -353,11 +372,63 @@
                 </select>
                 <div id="studentStatsTable" class="table-container"></div>
             </div>
-
             <div style="background:#f9f9f9; padding:20px; border-radius:15px;">
                 <div class="section-title" style="font-size:1rem;">🚨 全班最常錯單字 TOP 50</div>
                 <div id="globalStatsTable" class="table-container"></div>
             </div>
+        </div>
+    </div>
+</div>
+
+<div id="helpModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeHelp()">&times;</span>
+        <h2 style="color:var(--primary); text-align:center;">📖 使用說明指南</h2>
+        
+        <div class="help-section">
+            <div class="help-title">🎯 這是什麼？</div>
+            <div class="help-text">
+                這是一個幫老師省力的「數位聽寫小幫手」。您不需要手動改考卷，只要在螢幕上點選，系統就會自動記錄學生的錯字，並幫您整理成表格。
+            </div>
+        </div>
+
+        <div class="help-section">
+            <div class="help-title">⚡ 快速上手三步驟</div>
+            <div class="help-text">
+                <ol style="margin:0; padding-left:20px;">
+                    <li><strong>選範圍</strong>：在首頁勾選今天要考的單元 (例如：單元 1)。</li>
+                    <li><strong>開始考</strong>：按下「開始測驗」，系統會顯示單字。您可以點 🔊 讓電腦唸出來，也可以自己唸。</li>
+                    <li><strong>記錯題</strong>：如果學生答錯，請點擊他的 <strong>動物按鈕</strong> (變紅色 = 記住錯誤)。如果大家都對，直接按「下一題」。</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <div class="help-title">💾 關於紀錄與存檔 (重要！)</div>
+            <div class="help-text">
+                <ul>
+                    <li><strong>自動儲存</strong>：測驗結束後，紀錄會自動存在這台電腦的瀏覽器裡。</li>
+                    <li><strong>換電腦怎麼辦？</strong>：
+                        <br>1. 在舊電腦按 <span class="help-tag">💾 下載備份檔</span>。
+                        <br>2. 把檔案傳到新電腦。
+                        <br>3. 在新電腦按 <span class="help-tag">📂 匯入備份檔</span>，紀錄就過來了！</li>
+                    <li><strong>備課使用</strong>：建議定期按 <span class="help-tag">📥 匯出 Excel 報表</span>，方便您做教學分析。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="help-section" style="border:none;">
+            <div class="help-title">🔧 困難排解 (FAQ)</div>
+            <div class="help-text">
+                <strong>Q: 為什麼沒聲音？</strong><br>
+                A: 請檢查電腦喇叭是否開啟，或瀏覽器是否靜音。手機請解除靜音模式。<br><br>
+                <strong>Q: 畫面顯示「找不到 words.js」？</strong><br>
+                A: 請確認您下載的 <code>words.js</code> 檔案，是否跟這個網頁放在同一個資料夾內。
+            </div>
+        </div>
+
+        <div style="text-align:center;">
+            <button class="btn-big" style="width:auto; padding:10px 30px; font-size:1.2rem;" onclick="closeHelp()">我懂了！開始使用</button>
         </div>
     </div>
 </div>
@@ -367,18 +438,13 @@
     let db = [];
     let testList = [];
     let currentIndex = 0;
-    
     let timerValue = 8;
     let timerInterval = null;
     let isTimerRunning = false;
 
     window.onload = function() {
-        if (typeof masterWordList !== 'undefined') {
-            db = masterWordList;
-            initApp();
-        } else {
-            if(document.getElementById('loadError').style.display === 'none') handleMissingFile();
-        }
+        if (typeof masterWordList !== 'undefined') { db = masterWordList; initApp(); } 
+        else { if(document.getElementById('loadError').style.display === 'none') handleMissingFile(); }
     };
 
     function handleMissingFile() {
@@ -394,13 +460,20 @@
         const sessions = [...new Set(db.map(x => x.session))].sort((a,b)=>a-b);
         const grid = document.getElementById('sessionGrid');
         grid.innerHTML = '';
-        
         sessions.forEach(s => {
             const label = document.createElement('label');
             label.className = 'session-btn';
             label.innerHTML = `<input type="checkbox" value="${s}" class="sess-cb"> 單元 ${s}`;
             grid.appendChild(label);
         });
+    }
+
+    // --- 說明視窗控制 ---
+    function openHelp() { document.getElementById('helpModal').style.display = 'block'; }
+    function closeHelp() { document.getElementById('helpModal').style.display = 'none'; }
+    // 點擊視窗外部也可關閉
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('helpModal')) { closeHelp(); }
     }
 
     function showScreen(id) {
@@ -414,7 +487,6 @@
             if(!isNaN(val)) cb.checked = (val >= start && val <= end);
         });
     }
-
     function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
 
     function startTest() {
@@ -434,10 +506,16 @@
         loadCard();
     }
 
-    // --- 計時器邏輯 ---
-    function toggleTimer() {
-        if(isTimerRunning) { resetTimer(); } else { startTimer(); }
+    function speakText(type) {
+        const item = testList[currentIndex];
+        let text = (type === 'word') ? item.word : item.sentence;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US'; 
+        utterance.rate = 0.8;     
+        window.speechSynthesis.speak(utterance);
     }
+
+    function toggleTimer() { if(isTimerRunning) { resetTimer(); } else { startTimer(); } }
 
     function startTimer() {
         if(isTimerRunning) return;
@@ -445,7 +523,6 @@
         timerValue = 8;
         updateTimerDisplay();
         document.getElementById('timerBtn').classList.add('ticking');
-
         timerInterval = setInterval(() => {
             timerValue--;
             updateTimerDisplay();
@@ -459,13 +536,10 @@
     }
 
     function resetTimer() {
-        clearInterval(timerInterval);
-        isTimerRunning = false;
-        timerValue = 8;
+        clearInterval(timerInterval); isTimerRunning = false; timerValue = 8;
         document.getElementById('timerBtn').innerText = "8";
         document.getElementById('timerBtn').classList.remove('ticking');
     }
-
     function updateTimerDisplay() { document.getElementById('timerBtn').innerText = timerValue; }
 
     function playDing() {
@@ -492,67 +566,45 @@
         for(let i=1; i<=5; i++) document.getElementById(`btn-s${i}`).classList.remove('marked-wrong');
     }
 
-    function toggleStudent(id) {
-        document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong');
-    }
+    function toggleStudent(id) { document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong'); }
 
     function nextWord() {
         const currentWord = testList[currentIndex];
         const date = new Date().toLocaleDateString('zh-TW');
-
         for(let i=1; i<=5; i++) {
             const btn = document.getElementById(`btn-s${i}`);
-            if (btn.classList.contains('marked-wrong')) {
-                saveMistake(i, currentWord, date);
-            }
+            if (btn.classList.contains('marked-wrong')) { saveMistake(i, currentWord, date); }
         }
-
         currentIndex++;
-        if(currentIndex < testList.length) {
-            loadCard();
-        } else {
-            alert("🎉 測驗完成！資料已儲存。");
-            showHistory(); 
-        }
+        if(currentIndex < testList.length) { loadCard(); } 
+        else { alert("🎉 測驗完成！資料已儲存。"); showHistory(); }
     }
 
     function saveMistake(sid, wordObj, date) {
         let history = JSON.parse(localStorage.getItem('spellingHistory')) || [];
-        history.push({
-            student: sid,
-            word: wordObj.word,
-            session: wordObj.session,
-            sentence: wordObj.sentence,
-            date: date
-        });
+        history.push({ student: sid, word: wordObj.word, session: wordObj.session, sentence: wordObj.sentence, date: date });
         localStorage.setItem('spellingHistory', JSON.stringify(history));
     }
 
     function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
 
     function showHistory() {
-        showScreen('historyScreen');
-        renderStudentHistory();
-        renderGlobalStats();
+        showScreen('historyScreen'); renderStudentHistory(); renderGlobalStats();
     }
 
     function renderStudentHistory() {
         const sid = parseInt(document.getElementById('historyStudentSelect').value);
         const history = getHistory().filter(h => h.student === sid);
         const container = document.getElementById('studentStatsTable');
-        
         if(history.length === 0) { container.innerHTML = "<p style='color:#999; text-align:center; padding:20px;'>無錯題紀錄，太棒了！</p>"; return; }
-
         let counts = {};
         history.forEach(h => {
             if(!counts[h.word]) counts[h.word] = { count:0, session: h.session };
             counts[h.word].count++;
         });
-
         let sorted = Object.keys(counts).map(key => {
             return { word: key, count: counts[key].count, session: counts[key].session };
         }).sort((a,b) => b.count - a.count);
-
         let html = `<table><tr><th>次數</th><th>單字</th><th>單元</th></tr>`;
         sorted.forEach(item => {
             html += `<tr><td><span class="badge">${item.count} 次</span></td><td style="font-weight:bold; color:var(--text-main);">${item.word}</td><td>S${item.session}</td></tr>`;
@@ -565,14 +617,11 @@
         const history = getHistory();
         const container = document.getElementById('globalStatsTable');
         if(history.length === 0) { container.innerHTML = "<p style='color:#999; text-align:center; padding:20px;'>無資料</p>"; return; }
-
         let counts = {};
         history.forEach(h => { if(!counts[h.word]) counts[h.word] = 0; counts[h.word]++; });
-
         let sorted = Object.keys(counts).map(key => {
             return { word: key, count: counts[key] };
         }).sort((a,b) => b.count - a.count).slice(0, 50);
-
         let html = `<table><tr><th>總錯誤</th><th>單字</th></tr>`;
         sorted.forEach(item => {
              html += `<tr><td><span class="badge" style="background:var(--primary);">${item.count} 人次</span></td><td style="font-weight:bold;">${item.word}</td></tr>`;
@@ -598,11 +647,9 @@
         document.body.removeChild(link);
     }
 
-    // --- 備份與還原功能 ---
     function backupData() {
         const history = getHistory();
         if(history.length === 0) { alert("沒有資料可備份"); return; }
-        
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(history));
         const link = document.createElement("a");
         link.href = dataStr;
@@ -615,29 +662,21 @@
     function restoreData(input) {
         const file = input.files[0];
         if(!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                // 簡單檢查格式
                 if(Array.isArray(data) && data.length > 0 && data[0].hasOwnProperty('student')) {
-                    // 合併資料 (不重複) - 這裡做簡單合併
                     const current = getHistory();
                     const combined = current.concat(data);
-                    
                     localStorage.setItem('spellingHistory', JSON.stringify(combined));
                     alert(`成功匯入 ${data.length} 筆資料！`);
                     showHistory();
-                } else {
-                    alert("檔案格式錯誤，請確認這是否為本系統的備份檔。");
-                }
-            } catch(err) {
-                alert("無法讀取檔案。");
-            }
+                } else { alert("檔案格式錯誤，請確認這是否為本系統的備份檔。"); }
+            } catch(err) { alert("無法讀取檔案。"); }
         };
         reader.readAsText(file);
-        input.value = ''; // 重置 input 以便重複選擇同一檔案
+        input.value = ''; 
     }
 
     function clearHistory() {
