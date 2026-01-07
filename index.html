@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧單字小考官 v7.4</title>
+    <style>
+        /* --- 🎨 1. 色彩與字體設定 --- */
+        :root {
+            --bg-color: #FFFbf0; /* 溫暖的奶油色 */
+            --card-bg: #ffffff;
+            --primary: #5dade2;  /* 柔和藍 */
+            --primary-dark: #3498db;
+            --accent: #f5b041;   /* 活潑黃 */
+            --danger: #ec7063;   /* 柔和紅 */
+            --success: #27ae60;  /* 綠色 */
+            --text-main: #2c3e50;
+            --text-light: #95a5a6;
+            --radius-box: 20px;
+            --radius-btn: 50px;
+            --shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Varela Round', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* --- 📦 2. 容器與排版 --- */
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: var(--radius-box);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 4px solid #fff;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 8px 20px;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.4); transform: translateY(-2px); }
+
+        .screen { padding: 40px; display: none; }
+        .screen.active { display: block; animation: popIn 0.3s ease-out; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+
+        /* --- ⚙️ 設定畫面 --- */
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            border-left: 5px solid var(--accent);
+            padding-left: 10px;
+            font-weight: bold;
+        }
+
+        .session-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .session-btn {
+            background: #f4f6f7;
+            border: 2px solid #e5e8e8;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: #7f8c8d;
+            transition: 0.2s;
+            position: relative;
+        }
+        .session-btn input { position: absolute; opacity: 0; cursor: pointer; }
+        .session-btn:has(input:checked) {
+            background: #eaf2f8;
+            border-color: var(--primary);
+            color: var(--primary-dark);
+            box-shadow: 0 4px 10px rgba(93, 173, 226, 0.2);
+        }
+
+        .quick-select-bar { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn-pill {
+            padding: 8px 16px; background: #fff; border: 2px solid var(--text-light);
+            border-radius: var(--radius-btn); color: var(--text-main); cursor: pointer;
+            font-size: 0.9rem; font-weight: bold;
+        }
+        .btn-pill:hover { background: #f2f4f4; }
+
+        select {
+            width: 100%; padding: 15px; border-radius: 12px;
+            border: 2px solid #d5dbdb; font-size: 1.1rem;
+            background: white; color: var(--text-main); cursor: pointer;
+        }
+
+        .btn-big {
+            width: 100%; padding: 20px; background: var(--primary); color: white;
+            font-size: 1.5rem; font-weight: 800; border: none; border-radius: 15px;
+            cursor: pointer; box-shadow: 0 5px 0 #2874a6; transition: 0.1s; margin-top: 20px;
+        }
+        .btn-big:active { transform: translateY(5px); box-shadow: none; }
+        .btn-big:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
+
+        /* --- 📝 測驗畫面 --- */
+        .progress-text { text-align: right; font-size: 1.2rem; color: var(--text-light); margin-bottom: 20px; }
+
+        .flash-card {
+            background: #fff; border: 3px dashed #d5dbdb; border-radius: 20px;
+            padding: 30px 20px; text-align: center; margin-bottom: 30px;
+        }
+
+        .word-display { 
+            font-size: 5rem; font-weight: 900; color: var(--primary-dark); 
+            margin: 0 0 15px 0; line-height: 1.1; 
+        }
+        
+        .sentence-display { 
+            font-size: 1.8rem; font-weight: 500; color: #555; 
+            margin-top: 10px; font-style: normal; 
+            background: #f8f9fa; padding: 20px; border-radius: 12px; line-height: 1.5; 
+        }
+
+        .mistake-label { text-align: center; color: var(--danger); font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; }
+        
+        .student-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px;
+        }
+
+        .btn-student {
+            aspect-ratio: 1/1; background: white; border: 2px solid #e5e8e8;
+            border-radius: 15px; cursor: pointer; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; transition: 0.2s; box-shadow: 0 4px 0 #e5e8e8;
+        }
+        
+        .avatar { font-size: 3rem; margin-bottom: 0px; }
+        .name { font-weight: 900; color: #7f8c8d; font-size: 1.5rem; }
+
+        .btn-student:hover { transform: translateY(-2px); }
+        .btn-student:active { transform: translateY(2px); box-shadow: none; }
+
+        .btn-student.marked-wrong {
+            background: var(--danger); border-color: #c0392b; box-shadow: 0 4px 0 #c0392b;
+        }
+        .btn-student.marked-wrong .name { color: white; }
+
+        .btn-next { background: var(--accent); box-shadow: 0 5px 0 #d68910; }
+
+        /* --- 📊 報表表格 --- */
+        /* 增加表格容器的高度限制與捲軸 */
+        .table-container {
+            max-height: 400px; /* 限制高度 */
+            overflow-y: auto;  /* 加上垂直捲軸 */
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #eaf2f8; color: var(--primary-dark); padding: 12px; text-align: left; position: sticky; top: 0; } /* 標題固定 */
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 1rem; }
+        .badge { background: var(--danger); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
+
+        .error-box { background: #fadbd8; color: #922b21; padding: 15px; border-radius: 12px; display: none; margin-bottom: 20px; text-align: center; border: 2px solid #e6b0aa; }
+        
+        /* --- 📥 下載區域優化 --- */
+        .download-area {
+            background: #e9f7ef;
+            border: 2px solid #a9dfbf;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* 全新的強力下載按鈕 */
+        .btn-download {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #1e8449; /* 立體深綠色陰影 */
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-download:hover {
+            background: #2ecc71;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 #1e8449;
+        }
+
+        .btn-download:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn-clear {
+            background: transparent;
+            color: var(--danger);
+            border: 2px solid var(--danger);
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        .btn-clear:hover { background: #fceae9; }
+
+        .download-hint {
+            font-size: 1rem;
+            color: #27ae60;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:2rem;">🐝</span>
+            <h1>智慧單字小考官</h1>
+        </div>
+        <div>
+            <button class="nav-btn" onclick="showScreen('setupScreen')">🏠 首頁</button>
+            <button class="nav-btn" onclick="showHistory()">📊 紀錄</button>
+        </div>
+    </header>
+
+    <div id="setupScreen" class="screen active">
+        <div id="loadError" class="error-box">
+            <strong>⚠️ 找不到 words.js</strong><br>
+            請確認檔案位置，或重新下載。
+        </div>
+        <div id="statusMsg" style="text-align:center; color:#999; margin-bottom:20px;">資料載入中...</div>
+
+        <div class="section-title">步驟 1：選擇測驗範圍</div>
+        
+        <div class="session-panel">
+            <div class="quick-select-bar">
+                <button class="btn-pill" onclick="selectRange(1,5)">單元 1 ~ 5</button>
+                <button class="btn-pill" onclick="selectRange(6,10)">單元 6 ~ 10</button>
+                <button class="btn-pill" onclick="selectRange(11,16)">單元 11 ~ 16</button>
+                <button class="btn-pill" onclick="selectRange(1,16)">全部 (1-16)</button>
+                <button class="btn-pill" onclick="clearSelection()" style="color:var(--danger); border-color:var(--danger);">清除</button>
+            </div>
+            
+            <div id="sessionGrid" class="session-grid"></div>
+        </div>
+
+        <div class="section-title">步驟 2：題數設定</div>
+        <select id="wordCount">
+            <option value="5">5 題 (暖身)</option>
+            <option value="10" selected>10 題 (標準)</option>
+            <option value="20">20 題 (進階)</option>
+            <option value="30">30 題 (高手)</option>
+            <option value="50">50 題 (總複習)</option>
+        </select>
+
+        <button id="startBtn" class="btn-big" onclick="startTest()" disabled>開始測驗 ▶</button>
+    </div>
+
+    <div id="testScreen" class="screen">
+        <div class="progress-text">
+            第 <strong id="currentNum" style="color:var(--primary); font-size:1.5rem;">1</strong> 題 / 共 <span id="totalNum">10</span> 題
+        </div>
+        
+        <div class="flash-card">
+            <div class="word-display" id="displayWord">...</div>
+            <div class="sentence-display" id="displaySentence">...</div>
+        </div>
+
+        <div class="mistake-label">👇 誰答錯了？點擊按鈕標記：</div>
+        
+        <div class="student-grid">
+            <div class="btn-student" id="btn-s1" onclick="toggleStudent(1)">
+                <span class="avatar">🐃</span><span class="name">1</span>
+            </div>
+            <div class="btn-student" id="btn-s2" onclick="toggleStudent(2)">
+                <span class="avatar">🦫</span><span class="name">2</span>
+            </div>
+            <div class="btn-student" id="btn-s3" onclick="toggleStudent(3)">
+                <span class="avatar">🦥</span><span class="name">3</span>
+            </div>
+            <div class="btn-student" id="btn-s4" onclick="toggleStudent(4)">
+                <span class="avatar">🦛</span><span class="name">4</span>
+            </div>
+            <div class="btn-student" id="btn-s5" onclick="toggleStudent(5)">
+                <span class="avatar">🐨</span><span class="name">5</span>
+            </div>
+        </div>
+
+        <button class="btn-big btn-next" onclick="nextWord()">下一題 ➡</button>
+    </div>
+
+    <div id="historyScreen" class="screen">
+        <h2 style="text-align:center; color:var(--primary);">📊 班級錯題分析</h2>
+        
+        <div class="download-area">
+            <button class="btn-download" onclick="exportToCSV()">
+                <span>📥</span> 匯出錯題紀錄 (Excel)
+            </button>
+            <div class="download-hint">💡 點擊上方綠色按鈕，即可將全班錯題下載為表格。</div>
+            <br>
+            <button class="btn-clear" onclick="clearHistory()">🗑️ 清空所有紀錄</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
+            <div style="background:#f9f9f9; padding:20px; border-radius:15px;">
+                <div class="section-title" style="font-size:1rem;">🧑‍🎓 學生錯題排行榜</div>
+                <select id="historyStudentSelect" onchange="renderStudentHistory()" style="margin-bottom:10px; padding:10px;">
+                    <option value="1">🐃 1號 (水牛)</option>
+                    <option value="2">🦫 2號 (水豚)</option>
+                    <option value="3">🦥 3號 (樹懶)</option>
+                    <option value="4">🦛 4號 (河馬)</option>
+                    <option value="5">🐨 5號 (無尾熊)</option>
+                </select>
+                <div id="studentStatsTable" class="table-container"></div>
+            </div>
+
+            <div style="background:#f9f9f9; padding:20px; border-radius:15px;">
+                <div class="section-title" style="font-size:1rem;">🚨 全班最常錯單字 TOP 50</div>
+                <div id="globalStatsTable" class="table-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="words.js" onerror="handleMissingFile()"></script>
+<script>
+    let db = [];
+    let testList = [];
+    let currentIndex = 0;
+
+    window.onload = function() {
+        if (typeof masterWordList !== 'undefined') {
+            db = masterWordList;
+            initApp();
+        } else {
+            if(document.getElementById('loadError').style.display === 'none') handleMissingFile();
+        }
+    };
+
+    function handleMissingFile() {
+        document.getElementById('loadError').style.display = 'block';
+        document.getElementById('statusMsg').style.display = 'none';
+    }
+
+    function initApp() {
+        document.getElementById('statusMsg').innerText = `✅ 載入成功！共 ${db.length} 個單字`;
+        document.getElementById('statusMsg').style.color = 'var(--success)';
+        document.getElementById('startBtn').disabled = false;
+        
+        const sessions = [...new Set(db.map(x => x.session))].sort((a,b)=>a-b);
+        const grid = document.getElementById('sessionGrid');
+        grid.innerHTML = '';
+        
+        sessions.forEach(s => {
+            const label = document.createElement('label');
+            label.className = 'session-btn';
+            label.innerHTML = `<input type="checkbox" value="${s}" class="sess-cb"> 單元 ${s}`;
+            grid.appendChild(label);
+        });
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function selectRange(start, end) {
+        document.querySelectorAll('.sess-cb').forEach(cb => {
+            const val = parseInt(cb.value);
+            if(!isNaN(val)) cb.checked = (val >= start && val <= end);
+        });
+    }
+
+    function clearSelection() {
+        document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false);
+    }
+
+    function startTest() {
+        const cbs = document.querySelectorAll('.sess-cb:checked');
+        const sids = Array.from(cbs).map(cb => isNaN(parseInt(cb.value)) ? cb.value : parseInt(cb.value));
+        
+        if(sids.length === 0) { alert("請至少選擇一個單元！"); return; }
+
+        const pool = db.filter(i => sids.includes(i.session));
+        const count = parseInt(document.getElementById('wordCount').value);
+        
+        testList = [...pool].sort(() => 0.5 - Math.random()).slice(0, count);
+
+        if(testList.length === 0) { alert("該範圍沒有單字。"); return; }
+
+        currentIndex = 0;
+        showScreen('testScreen');
+        document.getElementById('totalNum').innerText = testList.length;
+        loadCard();
+    }
+
+    function loadCard() {
+        const item = testList[currentIndex];
+        document.getElementById('currentNum').innerText = currentIndex + 1;
+        document.getElementById('displayWord').innerText = item.word;
+        document.getElementById('displaySentence').innerText = item.sentence;
+        
+        for(let i=1; i<=5; i++) document.getElementById(`btn-s${i}`).classList.remove('marked-wrong');
+    }
+
+    function toggleStudent(id) {
+        document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong');
+    }
+
+    function nextWord() {
+        const currentWord = testList[currentIndex];
+        const date = new Date().toLocaleDateString('zh-TW');
+
+        for(let i=1; i<=5; i++) {
+            const btn = document.getElementById(`btn-s${i}`);
+            if (btn.classList.contains('marked-wrong')) {
+                saveMistake(i, currentWord, date);
+            }
+        }
+
+        currentIndex++;
+        if(currentIndex < testList.length) {
+            loadCard();
+        } else {
+            alert("🎉 測驗完成！資料已儲存。");
+            showHistory();
+        }
+    }
+
+    function saveMistake(sid, wordObj, date) {
+        let history = JSON.parse(localStorage.getItem('spellingHistory')) || [];
+        history.push({
+            student: sid,
+            word: wordObj.word,
+            session: wordObj.session,
+            sentence: wordObj.sentence,
+            date: date
+        });
+        localStorage.setItem('spellingHistory', JSON.stringify(history));
+    }
+
+    function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
+
+    function showHistory() {
+        showScreen('historyScreen');
+        renderStudentHistory();
+        renderGlobalStats();
+    }
+
+    function renderStudentHistory() {
+        const sid = parseInt(document.getElementById('historyStudentSelect').value);
+        const history = getHistory().filter(h => h.student === sid);
+        const container = document.getElementById('studentStatsTable');
+        
+        if(history.length === 0) { container.innerHTML = "<p style='color:#999; text-align:center; padding:20px;'>無錯題紀錄，太棒了！</p>"; return; }
+
+        let counts = {};
+        history.forEach(h => {
+            if(!counts[h.word]) counts[h.word] = { count:0, session: h.session };
+            counts[h.word].count++;
+        });
+
+        let sorted = Object.keys(counts).map(key => {
+            return { word: key, count: counts[key].count, session: counts[key].session };
+        }).sort((a,b) => b.count - a.count);
+
+        let html = `<table><tr><th>次數</th><th>單字</th><th>單元</th></tr>`;
+        sorted.forEach(item => {
+            html += `<tr>
+                <td><span class="badge">${item.count} 次</span></td>
+                <td style="font-weight:bold; color:var(--text-main);">${item.word}</td>
+                <td>S${item.session}</td>
+            </tr>`;
+        });
+        html += "</table>";
+        container.innerHTML = html;
+    }
+
+    function renderGlobalStats() {
+        const history = getHistory();
+        const container = document.getElementById('globalStatsTable');
+        
+        if(history.length === 0) { container.innerHTML = "<p style='color:#999; text-align:center; padding:20px;'>無資料</p>"; return; }
+
+        let counts = {};
+        history.forEach(h => { if(!counts[h.word]) counts[h.word] = 0; counts[h.word]++; });
+
+        // 修改為 TOP 50
+        let sorted = Object.keys(counts).map(key => {
+            return { word: key, count: counts[key] };
+        }).sort((a,b) => b.count - a.count).slice(0, 50);
+
+        let html = `<table><tr><th>總錯誤</th><th>單字</th></tr>`;
+        sorted.forEach(item => {
+             html += `<tr><td><span class="badge" style="background:var(--primary);">${item.count} 人次</span></td><td style="font-weight:bold;">${item.word}</td></tr>`;
+        });
+        html += "</table>";
+        container.innerHTML = html;
+    }
+
+    function exportToCSV() {
+        const history = getHistory();
+        if(history.length === 0) { alert("沒有資料可下載"); return; }
+        
+        const names = {1:"水牛", 2:"水豚", 3:"樹懶", 4:"河馬", 5:"無尾熊"};
+
+        let csv = "data:text/csv;charset=utf-8,\uFEFF日期,學生,代號,單元,單字,例句\n";
+        history.forEach(r => {
+            let sent = r.sentence ? r.sentence.replace(/,/g, "，") : "";
+            csv += `${r.date},${names[r.student]},${r.student},${r.session},${r.word},${sent}\n`;
+        });
+        
+        const link = document.createElement("a");
+        link.href = encodeURI(csv);
+        link.download = "學生錯題紀錄.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function clearHistory() {
+        if(confirm("確定要刪除所有紀錄嗎？")) {
+            localStorage.removeItem('spellingHistory');
+            showHistory();
+        }
+    }
+</script>
+
+</body>
+</html>
