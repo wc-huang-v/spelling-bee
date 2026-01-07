@@ -3,471 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v14.0 (自動朗讀版)</title>
+    <title>智慧單字小考官 v15.0 (入口分流版)</title>
     <style>
-        /* --- 🎨 1. 色彩與字體設定 --- */
+        /* --- 🎨 色彩與變數 --- */
         :root {
-            --bg-color: #FFFbf0; /* 溫暖的奶油色 */
+            --bg-color: #FFFbf0;
             --card-bg: #ffffff;
-            --primary: #5dade2;  /* 柔和藍 */
-            --primary-dark: #3498db;
-            --accent: #f5b041;   /* 活潑黃 */
-            --danger: #ec7063;   /* 柔和紅 */
-            --success: #27ae60;  /* 綠色 */
-            --backup: #8e44ad;   /* 紫色 */
+            --primary: #5dade2;  /* 老師藍 */
+            --student: #48c9b0;  /* 學生綠 */
+            --accent: #f5b041;
+            --danger: #ec7063;
+            --success: #27ae60;
             --text-main: #2c3e50;
-            --text-light: #95a5a6;
             --radius-box: 20px;
             --radius-btn: 50px;
             --shadow: 0 8px 20px rgba(0,0,0,0.08);
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            font-family: 'Microsoft JhengHei', 'Varela Round', 'Segoe UI', sans-serif;
+            font-family: 'Microsoft JhengHei', 'Varela Round', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin: 0; padding: 15px;
+            display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
         }
 
-        /* --- 📦 2. 容器與排版 --- */
-        .app-container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--card-bg);
-            border-radius: var(--radius-box);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            display: flex;
+        /* --- 🚪 入口大廳樣式 (Landing Page) --- */
+        #landing-page {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 100%; max-width: 600px; margin-top: 5vh; gap: 30px; animation: fadeIn 0.5s;
+        }
+
+        .landing-card {
+            background: white; width: 100%; padding: 40px 20px;
+            border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center; cursor: pointer; transition: 0.2s;
+            border: 4px solid transparent; position: relative; overflow: hidden;
+        }
+        
+        /* 老師卡片樣式 */
+        .card-teacher { border-color: var(--primary); }
+        .card-teacher:hover { background: #eaf2f8; transform: translateY(-5px); }
+        .card-teacher .icon { font-size: 4rem; margin-bottom: 10px; display: block; }
+        .card-teacher h2 { color: var(--primary); margin: 0; font-size: 1.8rem; }
+        .card-teacher p { color: #7f8c8d; margin-top: 5px; }
+
+        /* 學生卡片樣式 */
+        .card-student { border-color: var(--student); }
+        .card-student:hover { background: #e8f8f5; transform: translateY(-5px); }
+        .card-student .icon { font-size: 4rem; margin-bottom: 10px; display: block; }
+        .card-student h2 { color: var(--student); margin: 0; font-size: 1.8rem; }
+        .card-student p { color: #7f8c8d; margin-top: 5px; }
+
+        .app-title { font-size: 2.2rem; font-weight: 900; color: var(--text-main); margin-bottom: 10px; text-align: center; }
+        .app-subtitle { color: #7f8c8d; text-align: center; margin-bottom: 20px; }
+
+        /* --- 👩‍🏫 老師版應用程式容器 --- */
+        #teacher-app {
+            display: none; /* 預設隱藏 */
+            width: 100%; max-width: 900px;
+            background: var(--card-bg); border-radius: var(--radius-box);
+            box-shadow: var(--shadow); overflow: hidden;
+            border: 2px solid #fff; min-height: 85vh;
             flex-direction: column;
-            border: 2px solid #fff;
-            min-height: 85vh;
+            animation: slideIn 0.3s;
         }
 
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Header 優化 --- */
         header {
-            background: var(--primary);
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
+            background: var(--primary); color: white; padding: 15px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; }
+        .header-title { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: bold; }
+        
+        /* 導航按鈕群組 */
+        .nav-group { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        .nav-group { display: flex; gap: 8px; flex-wrap: wrap; }
-
+        /* 優化後的按鈕 */
         .nav-btn {
-            background: rgba(255,255,255,0.25);
-            border: 1px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.2); 
+            border: 1px solid rgba(255,255,255,0.3);
             color: white;
-            padding: 6px 12px;
-            border-radius: var(--radius-btn);
+            padding: 8px 16px;
+            border-radius: 8px; /* 稍微方一點，像標籤 */
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: bold;
+            display: flex; align-items: center; gap: 6px; /* 圖標與文字間距 */
             transition: 0.2s;
-            display: flex; align-items: center; gap: 5px; text-decoration: none;
+            text-decoration: none;
         }
+        .nav-btn:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
         .nav-btn:active { transform: scale(0.95); }
+        
+        /* 特別按鈕顏色區隔 */
+        .btn-home { border-bottom: 3px solid #AED6F1; } /* 藍底線 */
+        .btn-record { border-bottom: 3px solid #ABEBC6; } /* 綠底線 */
+        .btn-help { border-bottom: 3px solid #F9E79F; color: #FFF; } /* 黃底線 */
+        .btn-exit { background: rgba(0,0,0,0.2); font-size: 0.85rem; margin-left: 10px; }
 
-        .screen { padding: 20px; display: none; flex: 1; }
-        .screen.active { display: block; animation: popIn 0.3s ease-out; }
-        @keyframes popIn { 0% { opacity: 0; transform: scale(0.98); } 100% { opacity: 1; transform: scale(1); } }
+        /* --- 內容區塊 --- */
+        .screen { padding: 25px; display: none; flex: 1; }
+        .screen.active { display: block; animation: fadeIn 0.3s; }
 
-        /* --- ⚙️ 設定畫面 --- */
-        .section-title {
-            font-size: 1.1rem;
-            color: var(--primary-dark);
-            margin-bottom: 10px;
-            border-left: 4px solid var(--accent);
-            padding-left: 10px;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-
-        .session-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-            gap: 8px;
-            margin-bottom: 20px;
-            max-height: 180px;
-            overflow-y: auto;
-            padding: 2px;
-        }
-
-        .session-btn {
-            background: #f4f6f7;
-            border: 1px solid #e5e8e8;
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: bold;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            position: relative;
-        }
-        .session-btn input { position: absolute; opacity: 0; cursor: pointer; }
-        .session-btn:has(input:checked) {
-            background: #eaf2f8;
-            border-color: var(--primary);
-            color: var(--primary-dark);
-            box-shadow: 0 2px 5px rgba(93, 173, 226, 0.2);
-        }
-
+        /* 設定區與測驗區 (沿用之前的設計) */
+        .section-title { font-size: 1.1rem; color: var(--primary-dark); margin: 15px 0 10px; border-left: 4px solid var(--accent); padding-left: 10px; font-weight: bold; }
+        .session-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; max-height: 180px; overflow-y: auto; }
+        .session-btn { background: #f4f6f7; border: 1px solid #e5e8e8; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; font-weight: bold; color: #7f8c8d; position: relative; }
+        .session-btn input { position: absolute; opacity: 0; }
+        .session-btn:has(input:checked) { background: #eaf2f8; border-color: var(--primary); color: var(--primary-dark); box-shadow: 0 2px 5px rgba(93,173,226,0.2); }
+        
         .quick-select-bar { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-        .btn-pill {
-            padding: 8px 12px; background: #fff; border: 1px solid var(--text-light);
-            border-radius: var(--radius-btn); color: var(--text-main); cursor: pointer;
-            font-size: 0.85rem; font-weight: bold; flex-grow: 1; text-align: center;
-        }
-        .btn-pill:active { background: #f2f4f4; }
-
-        select {
-            width: 100%; padding: 12px; border-radius: 12px;
-            border: 1px solid #d5dbdb; font-size: 1rem;
-            background: white; color: var(--text-main); cursor: pointer;
-        }
-
-        .btn-big {
-            width: 100%; padding: 15px; background: var(--primary); color: white;
-            font-size: 1.3rem; font-weight: 800; border: none; border-radius: 15px;
-            cursor: pointer; box-shadow: 0 4px 0 #2874a6; transition: 0.1s; margin-top: 20px;
-        }
-        .btn-big:active { transform: translateY(4px); box-shadow: none; }
-        .btn-big:disabled { background: #bdc3c7; box-shadow: none; cursor: not-allowed; }
-
-        /* --- 📝 測驗畫面 --- */
-        .progress-text { text-align: right; font-size: 1rem; color: var(--text-light); margin-bottom: 10px; }
-
-        .card-container { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
-
-        .flash-card {
-            flex-grow: 1;
-            background: #fff; border: 2px dashed #d5dbdb; border-radius: 15px;
-            padding: 20px 10px; text-align: center;
-            width: 100%; position: relative;
-        }
-
-        .word-row, .sentence-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .btn-pill { padding: 8px 12px; background: #fff; border: 1px solid #bdc3c7; border-radius: 50px; color: var(--text-main); cursor: pointer; font-weight: bold; flex-grow: 1; }
+        .btn-pill:active { background: #eee; }
+        select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #bdc3c7; font-size: 1rem; }
         
-        .word-display { 
-            font-size: clamp(2.5rem, 8vw, 5rem); 
-            font-weight: 900; color: var(--primary-dark); line-height: 1.1; 
-            word-break: break-word;
-        }
+        .btn-big { width: 100%; padding: 15px; background: var(--primary); color: white; font-size: 1.3rem; font-weight: 800; border: none; border-radius: 15px; cursor: pointer; box-shadow: 0 4px 0 #2874a6; margin-top: 20px; }
+        .btn-big:disabled { background: #ccc; box-shadow: none; }
+
+        /* 測驗卡片 */
+        .card-container { display: flex; gap: 15px; margin-bottom: 20px; align-items: flex-start; }
+        .flash-card { flex-grow: 1; background: #fff; border: 2px dashed #d5dbdb; border-radius: 15px; padding: 20px 10px; text-align: center; }
+        .word-display { font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 900; color: var(--primary-dark); margin-bottom: 10px; }
+        .sentence-display { font-size: clamp(1rem, 4vw, 1.6rem); color: #555; background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: left; }
         
-        .sentence-display { 
-            font-size: clamp(1rem, 4vw, 1.6rem); 
-            font-weight: 500; color: #555; 
-            background: #f8f9fa; padding: 15px; border-radius: 10px; line-height: 1.4; text-align: left;
-            width: 100%;
-        }
-
-        /* 主動朗讀按鈕 */
-        .btn-auto-speak {
-            background: var(--accent); color: white; border: none;
-            padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 1.1rem;
-            cursor: pointer; box-shadow: 0 4px 0 #d68910; margin-bottom: 15px;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-auto-speak:active { transform: translateY(3px); box-shadow: none; }
-
-        /* 小喇叭按鈕 */
-        .btn-speak-small {
-            background: #eaf2f8; border: none; color: var(--primary); width: 35px; height: 35px;
-            border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center;
-            justify-content: center; flex-shrink: 0;
-        }
-        .btn-speak-small:active { transform: scale(0.9); background: var(--primary); color: white; }
-
         .timer-wrapper { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 80px; }
-        .timer-btn {
-            width: 70px; height: 70px; background: white; border: 4px solid var(--accent); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: 900;
-            color: var(--accent); cursor: pointer; box-shadow: 0 4px 0 #d68910; transition: 0.1s;
-        }
-        .timer-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #d68910; }
-        .timer-btn.ticking { color: var(--danger); border-color: var(--danger); box-shadow: 0 4px 0 #c0392b; animation: pulse 1s infinite; }
+        .timer-btn { width: 70px; height: 70px; background: white; border: 4px solid var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: 900; color: var(--accent); cursor: pointer; }
+        .timer-btn.ticking { color: var(--danger); border-color: var(--danger); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        .timer-label { font-size: 0.8rem; font-weight: bold; color: var(--text-light); }
 
-        .mistake-label { text-align: center; color: var(--danger); font-weight: bold; margin-bottom: 10px; font-size: 1rem; }
-        
-        .student-grid { 
-            display: grid; gap: 10px; margin-bottom: 20px;
-            grid-template-columns: repeat(5, 1fr); 
-        }
-
-        .btn-student {
-            background: white; border: 2px solid #e5e8e8; border-radius: 12px;
-            cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: 0.1s; box-shadow: 0 3px 0 #e5e8e8; padding: 10px 0; height: auto; aspect-ratio: 1/1;
-        }
-        .avatar { font-size: 2.5rem; margin-bottom: 0px; }
-        .name { font-weight: 900; color: #7f8c8d; font-size: 1.2rem; }
-        .btn-student:active { transform: translateY(3px); box-shadow: none; }
-        .btn-student.marked-wrong { background: var(--danger); border-color: #c0392b; box-shadow: 0 3px 0 #c0392b; }
+        /* 學生按鈕 */
+        .student-grid { display: grid; gap: 10px; grid-template-columns: repeat(5, 1fr); margin-bottom: 20px; }
+        .btn-student { background: white; border: 2px solid #e5e8e8; border-radius: 12px; cursor: pointer; padding: 10px 0; display: flex; flex-direction: column; align-items: center; aspect-ratio: 1/1; justify-content: center; }
+        .btn-student.marked-wrong { background: var(--danger); border-color: #c0392b; color: white; }
         .btn-student.marked-wrong .name { color: white; }
+        .avatar { font-size: 2.5rem; } .name { font-weight: 900; color: #7f8c8d; font-size: 1.2rem; }
+        
+        /* 朗讀與功能按鈕 */
+        .btn-auto-speak { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; margin-bottom: 10px; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-speak-small { background: #eaf2f8; border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; margin-left: 10px; }
 
-        .btn-next { background: var(--accent); box-shadow: 0 4px 0 #d68910; }
-
+        /* RWD */
         @media (max-width: 600px) {
-            .app-container { border-radius: 0; border: none; box-shadow: none; height: 100vh; }
-            .screen { padding: 15px; }
-            h1 { font-size: 1.1rem; }
             .card-container { flex-direction: column; }
             .timer-wrapper { flex-direction: row; width: 100%; justify-content: center; margin-top: -10px; }
-            .timer-btn { width: 60px; height: 60px; font-size: 1.5rem; border-width: 3px; }
-            .timer-label { margin-left: 10px; }
             .student-grid { grid-template-columns: repeat(3, 1fr); }
-            .btn-big { font-size: 1.2rem; padding: 12px; }
-            .word-display { font-size: 3rem; }
+            .nav-btn { padding: 6px 10px; font-size: 0.85rem; }
+            .nav-group { width: 100%; justify-content: space-between; margin-top: 10px; }
+            header { justify-content: center; }
         }
 
-        /* --- 📊 報表 & 管理區 --- */
-        .table-container { max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; min-width: 300px; }
-        th { background: #eaf2f8; color: var(--primary-dark); padding: 10px; text-align: left; position: sticky; top: 0; font-size: 0.9rem; }
-        td { padding: 10px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-        .badge { background: var(--danger); color: white; padding: 3px 6px; border-radius: 8px; font-size: 0.75rem; font-weight: bold; }
-
-        .error-box { background: #fadbd8; color: #922b21; padding: 10px; border-radius: 8px; display: none; margin-bottom: 15px; text-align: center; border: 1px solid #e6b0aa; font-size: 0.9rem; }
+        /* 報表區 */
+        .data-area { background: #eaf2f8; padding: 15px; border-radius: 15px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-dl { background: var(--success); color: white; border: none; padding: 10px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; }
         
-        .data-management-area {
-            background: #eaf2f8; border: 2px solid #a9cce3; padding: 20px;
-            border-radius: 15px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;
-            align-items: center;
-        }
-        .btn-download, .btn-backup { width: 100%; max-width: 100%; font-size: 1rem; padding: 12px; border:none; border-radius:30px; cursor:pointer; font-weight:bold; color:white; }
-        .btn-download { background: var(--success); box-shadow:0 4px 0 #1e8449; }
-        .btn-backup { background: var(--backup); box-shadow:0 4px 0 #6c3483; }
-        .area-label { font-size: 0.85rem; font-weight: bold; color: #546e7a; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .btn-clear { background: transparent; color: var(--danger); border: 2px solid var(--danger); padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
-
-        /* --- 📖 Modal --- */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
-        .modal-content { background-color: #fff; margin: 10% auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 600px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; max-height: 80vh; overflow-y: auto; }
-        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .help-section { margin-bottom: 20px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
-        .help-title { font-size: 1.1rem; color: var(--primary-dark); font-weight: bold; margin-bottom: 8px; }
-        .help-text { font-size: 0.95rem; line-height: 1.5; color: #555; }
-        .help-tag { background: #eee; padding: 2px 5px; border-radius: 4px; font-weight: bold; font-size: 0.85rem; }
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .modal-content { background-color: #fff; margin: 10% auto; padding: 25px; width: 90%; max-width: 600px; border-radius: 20px; max-height: 80vh; overflow-y: auto; position: relative; }
+        .close-btn { float: right; font-size: 28px; cursor: pointer; }
 
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <header>
-        <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:1.8rem;">🐝</span>
-            <h1>智慧小考官</h1>
-        </div>
-        <div class="nav-group">
-            <button class="nav-btn" onclick="showScreen('setupScreen')">🏠</button>
-            <button class="nav-btn" onclick="showHistory()">📊</button>
-            <button class="nav-btn" style="border-color:#f1c40f; color:#f1c40f;" onclick="openHelp()">❓</button>
-            <a href="student.html" class="nav-btn" style="text-decoration:none; color:white; background:#48c9b0; border:none;">🎓 學生區</a>
-        </div>
-    </header>
-
-    <div id="setupScreen" class="screen active">
-        <div id="loadError" class="error-box"><strong>⚠️ 找不到 words.js</strong><br>請確認檔案位置。</div>
-        <div id="statusMsg" style="text-align:center; color:#999; margin-bottom:15px; font-size:0.9rem;">資料載入中...</div>
-
-        <div class="section-title">1. 選擇範圍</div>
-        <div class="session-panel">
-            <div class="quick-select-bar">
-                <button class="btn-pill" onclick="selectRange(1,5)">1~5</button>
-                <button class="btn-pill" onclick="selectRange(6,10)">6~10</button>
-                <button class="btn-pill" onclick="selectRange(11,16)">11~16</button>
-                <button class="btn-pill" onclick="selectRange(1,16)">全部</button>
-                <button class="btn-pill" onclick="clearSelection()" style="color:var(--danger); border-color:var(--danger); flex-grow:0;">清除</button>
-            </div>
-            <div id="sessionGrid" class="session-grid"></div>
+    <div id="landing-page">
+        <div>
+            <div class="app-title">🐝 智慧單字小考官</div>
+            <div class="app-subtitle">Smart Spelling Bee Assistant</div>
         </div>
 
-        <div class="section-title">2. 題數</div>
-        <select id="wordCount">
-            <option value="5">5 題 (暖身)</option>
-            <option value="10" selected>10 題 (標準)</option>
-            <option value="20">20 題 (進階)</option>
-            <option value="30">30 題 (高手)</option>
-            <option value="50">50 題 (總複習)</option>
-        </select>
+        <div class="landing-card card-teacher" onclick="enterTeacherMode()">
+            <span class="icon">👩‍🏫</span>
+            <h2>我是老師</h2>
+            <p>Teacher Mode</p>
+            <div style="font-size:0.9rem; margin-top:10px; color:#aaa;">(測驗控制、錯題紀錄、班級管理)</div>
+        </div>
 
-        <button id="startBtn" class="btn-big" onclick="startTest()" disabled>開始測驗 ▶</button>
+        <div class="landing-card card-student" onclick="enterStudentMode()">
+            <span class="icon">🎒</span>
+            <h2>我是學生</h2>
+            <p>Student Mode</p>
+            <div style="font-size:0.9rem; margin-top:10px; color:#aaa;">(自主練習、聽寫挑戰、單字卡)</div>
+        </div>
     </div>
 
-    <div id="testScreen" class="screen">
-        <div class="progress-text">第 <strong id="currentNum" style="color:var(--primary); font-size:1.2rem;">1</strong> / <span id="totalNum">10</span> 題</div>
-        
-        <div class="card-container">
-            <div class="flash-card">
-                <div style="text-align:center;">
-                    <button class="btn-auto-speak" onclick="playQuestionSequence()">
-                        🔊 播放題目 (字-句-字)
-                    </button>
-                </div>
 
-                <div class="word-row">
-                    <div class="word-display" id="displayWord">...</div>
-                    <button class="btn-speak-small" onclick="speakText('word')">🔊</button>
+    <div id="teacher-app">
+        <header>
+            <div class="header-title">
+                <span>👩‍🏫</span>
+                <span>測驗控制台</span>
+            </div>
+            <div class="nav-group">
+                <button class="nav-btn btn-home" onclick="showScreen('setupScreen')">
+                    <span>🏠</span> 測驗首頁
+                </button>
+                <button class="nav-btn btn-record" onclick="showHistory()">
+                    <span>📊</span> 班級紀錄
+                </button>
+                <button class="nav-btn btn-help" onclick="openHelp()">
+                    <span>❓</span> 使用說明
+                </button>
+                <button class="nav-btn btn-exit" onclick="exitTeacherMode()">
+                    🚪 回入口
+                </button>
+            </div>
+        </header>
+
+        <div id="setupScreen" class="screen active">
+            <div id="loadError" style="display:none; color:red; text-align:center; padding:10px;">⚠️ 找不到 words.js</div>
+            
+            <div class="section-title">1. 選擇範圍</div>
+            <div class="session-panel">
+                <div class="quick-select-bar">
+                    <button class="btn-pill" onclick="selectRange(1,5)">1~5</button>
+                    <button class="btn-pill" onclick="selectRange(6,10)">6~10</button>
+                    <button class="btn-pill" onclick="selectRange(11,16)">11~16</button>
+                    <button class="btn-pill" onclick="selectRange(1,16)">全部</button>
+                    <button class="btn-pill" onclick="clearSelection()" style="color:var(--danger); border-color:var(--danger); flex-grow:0;">清除</button>
                 </div>
-                <div class="sentence-row">
-                    <div class="sentence-display" id="displaySentence">...</div>
-                    <button class="btn-speak-small" onclick="speakText('sentence')">🔊</button>
+                <div id="sessionGrid" class="session-grid"></div>
+            </div>
+
+            <div class="section-title">2. 題數設定</div>
+            <select id="wordCount">
+                <option value="5">5 題 (暖身)</option>
+                <option value="10" selected>10 題 (標準)</option>
+                <option value="20">20 題 (進階)</option>
+                <option value="30">30 題 (高手)</option>
+                <option value="50">50 題 (總複習)</option>
+            </select>
+
+            <button id="startBtn" class="btn-big" onclick="startTest()" disabled>開始測驗 ▶</button>
+        </div>
+
+        <div id="testScreen" class="screen">
+            <div class="progress-text">第 <strong id="currentNum" style="color:var(--primary);">1</strong> / <span id="totalNum">10</span> 題</div>
+            
+            <div class="card-container">
+                <div class="flash-card">
+                    <button class="btn-auto-speak" onclick="playQuestionSequence()">🔊 播放題目 (字-句-字)</button>
+                    
+                    <div style="display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
+                        <div class="word-display" id="displayWord">...</div>
+                        <button class="btn-speak-small" onclick="speakText('word')">🔊</button>
+                    </div>
+                    
+                    <div style="display:flex; align-items:center; justify-content:center;">
+                        <div class="sentence-display" id="displaySentence">...</div>
+                        <button class="btn-speak-small" onclick="speakText('sentence')">🔊</button>
+                    </div>
                 </div>
+                
+                <div class="timer-wrapper">
+                    <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">8</button>
+                    <div style="font-size:0.8rem; color:#aaa; font-weight:bold;">倒數</div>
+                </div>
+            </div>
+
+            <div class="mistake-label">👇 誰答錯了？點擊標記 (變紅色)：</div>
+            <div class="student-grid">
+                <div class="btn-student" id="btn-s1" onclick="toggleStudent(1)"><span class="avatar">🐃</span><span class="name">1</span></div>
+                <div class="btn-student" id="btn-s2" onclick="toggleStudent(2)"><span class="avatar">🦫</span><span class="name">2</span></div>
+                <div class="btn-student" id="btn-s3" onclick="toggleStudent(3)"><span class="avatar">🦥</span><span class="name">3</span></div>
+                <div class="btn-student" id="btn-s4" onclick="toggleStudent(4)"><span class="avatar">🦛</span><span class="name">4</span></div>
+                <div class="btn-student" id="btn-s5" onclick="toggleStudent(5)"><span class="avatar">🐨</span><span class="name">5</span></div>
+            </div>
+
+            <button class="btn-big btn-next" onclick="nextWord()">下一題 ➡</button>
+        </div>
+
+        <div id="historyScreen" class="screen">
+            <div class="data-area">
+                <button class="btn-dl" onclick="exportToCSV()">📥 匯出 Excel 報表</button>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-dl" style="background:#8e44ad;" onclick="backupData()">💾 備份</button>
+                    <button class="btn-dl" style="background:#34495e;" onclick="document.getElementById('fileInput').click()">📂 匯入</button>
+                    <input type="file" id="fileInput" style="display:none" onchange="restoreData(this)">
+                </div>
+                <button style="background:transparent; border:1px solid var(--danger); color:var(--danger); padding:8px; border-radius:20px; cursor:pointer;" onclick="clearHistory()">🗑️ 清空紀錄</button>
             </div>
             
-            <div class="timer-wrapper">
-                <button class="timer-btn" id="timerBtn" onclick="toggleTimer()">8</button>
-                <div class="timer-label">倒數</div>
-            </div>
-        </div>
-
-        <div class="mistake-label">👇 誰答錯了？點擊標記：</div>
-        
-        <div class="student-grid">
-            <div class="btn-student" id="btn-s1" onclick="toggleStudent(1)"><span class="avatar">🐃</span><span class="name">1</span></div>
-            <div class="btn-student" id="btn-s2" onclick="toggleStudent(2)"><span class="avatar">🦫</span><span class="name">2</span></div>
-            <div class="btn-student" id="btn-s3" onclick="toggleStudent(3)"><span class="avatar">🦥</span><span class="name">3</span></div>
-            <div class="btn-student" id="btn-s4" onclick="toggleStudent(4)"><span class="avatar">🦛</span><span class="name">4</span></div>
-            <div class="btn-student" id="btn-s5" onclick="toggleStudent(5)"><span class="avatar">🐨</span><span class="name">5</span></div>
-        </div>
-
-        <button class="btn-big btn-next" onclick="nextWord()">下一題 ➡</button>
-    </div>
-
-    <div id="historyScreen" class="screen">
-        <h2 style="text-align:center; color:var(--primary); margin-bottom:15px;">📊 錯題中心</h2>
-        
-        <div class="data-management-area">
-            <div class="area-label">資料管理</div>
-            <button class="btn-download" onclick="exportToCSV()">📥 匯出 Excel</button>
-            <div style="display:flex; gap:10px; width:100%;">
-                <button class="btn-backup" onclick="backupData()">💾 下載備份</button>
-                <button class="btn-backup" onclick="document.getElementById('fileInput').click()" style="background:#34495e; box-shadow:0 4px 0 #2c3e50;">📂 匯入備份</button>
-                <input type="file" id="fileInput" style="display:none" onchange="restoreData(this)">
-            </div>
-            <button class="btn-clear" onclick="clearHistory()">🗑️ 清空紀錄</button>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:20px;">
-            <div style="background:#f9f9f9; padding:15px; border-radius:15px;">
-                <div class="section-title" style="margin-top:0;">🧑‍🎓 學生排行榜</div>
-                <select id="historyStudentSelect" onchange="renderStudentHistory()" style="margin-bottom:10px;">
-                    <option value="1">🐃 1號 (水牛)</option>
-                    <option value="2">🦫 2號 (水豚)</option>
-                    <option value="3">🦥 3號 (樹懶)</option>
-                    <option value="4">🦛 4號 (河馬)</option>
-                    <option value="5">🐨 5號 (無尾熊)</option>
-                </select>
-                <div id="studentStatsTable" class="table-container"></div>
-            </div>
-            <div style="background:#f9f9f9; padding:15px; border-radius:15px;">
-                <div class="section-title" style="margin-top:0;">🚨 常錯單字 TOP 50</div>
-                <div id="globalStatsTable" class="table-container"></div>
+            <div style="display:flex; flex-direction:column; gap:20px;">
+                <div style="background:#f9f9f9; padding:15px; border-radius:15px;">
+                    <h3 style="margin:0 0 10px 0; font-size:1rem;">🧑‍🎓 學生排行榜</h3>
+                    <select id="historyStudentSelect" onchange="renderStudentHistory()" style="width:100%; padding:10px; margin-bottom:10px;">
+                        <option value="1">🐃 1號</option><option value="2">🦫 2號</option><option value="3">🦥 3號</option><option value="4">🦛 4號</option><option value="5">🐨 5號</option>
+                    </select>
+                    <div id="studentStatsTable" class="table-container"></div>
+                </div>
+                <div style="background:#f9f9f9; padding:15px; border-radius:15px;">
+                    <h3 style="margin:0 0 10px 0; font-size:1rem;">🚨 常錯單字 TOP 50</h3>
+                    <div id="globalStatsTable" class="table-container"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="helpModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeHelp()">&times;</span>
-        <h2 style="color:var(--primary); text-align:center;">📖 使用指南</h2>
-        <div class="help-section"><div class="help-title">🎯 功能介紹</div><div class="help-text">數位聽寫小幫手，提供自動朗讀、錯題統計功能。</div></div>
-        <div class="help-section"><div class="help-title">⚡ 操作流程</div><div class="help-text">1. 選範圍、開始測驗。<br>2. 點擊 <strong>🔊 播放題目</strong> (字-句-字)。<br>3. 學生答錯點擊動物頭像。<br>4. 全對直接下一題。</div></div>
-        <div class="help-section" style="border:none;"><div class="help-title">💾 備份與還原</div><div class="help-text">資料存在當前裝置。換電腦前請先<span class="help-tag">下載備份</span>，再到新電腦<span class="help-tag">匯入</span>。</div></div>
-        <div style="text-align:center;"><button class="btn-big" style="width:auto; padding:10px 30px; font-size:1rem; margin-top:0;" onclick="closeHelp()">OK！</button></div>
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeHelp()">&times;</span>
+            <h2 style="color:var(--primary); text-align:center;">📖 教師操作指南</h2>
+            <div class="help-section"><div class="help-title">🎯 如何使用</div><p>1. 勾選單元範圍。<br>2. 開始測驗，按下「播放題目」自動唸字。<br>3. 點擊答錯學生的頭像。<br>4. 測驗結束自動統計。</p></div>
+            <div class="help-section" style="border:none;"><div class="help-title">💾 關於存檔</div><p>資料存在這台電腦。若要換電腦，請先「備份」再「匯入」。</p></div>
+            <div style="text-align:center;"><button class="btn-big" style="width:auto; padding:10px 30px; margin:0;" onclick="closeHelp()">OK</button></div>
+        </div>
     </div>
-</div>
 
-<script src="words.js" onerror="handleMissingFile()"></script>
+<script src="words.js" onerror="document.getElementById('loadError').style.display='block'"></script>
 <script>
+    // --- 入口邏輯 ---
+    function enterTeacherMode() {
+        document.getElementById('landing-page').style.display = 'none';
+        document.getElementById('teacher-app').style.display = 'flex';
+        // 如果還沒初始化，這時載入
+        if(typeof masterWordList !== 'undefined' && db.length === 0) {
+            db = masterWordList; initApp();
+        }
+    }
+    function enterStudentMode() { window.location.href = "student.html"; }
+    function exitTeacherMode() {
+        document.getElementById('teacher-app').style.display = 'none';
+        document.getElementById('landing-page').style.display = 'flex';
+        showScreen('setupScreen'); // 重置回設定頁
+    }
+
+    // --- 老師版邏輯 ---
     let db = [], testList = [], currentIndex = 0;
     let timerValue = 8, timerInterval = null, isTimerRunning = false;
 
-    window.onload = function() { if (typeof masterWordList !== 'undefined') { db = masterWordList; initApp(); } else { if(document.getElementById('loadError').style.display === 'none') handleMissingFile(); } };
-    function handleMissingFile() { document.getElementById('loadError').style.display = 'block'; document.getElementById('statusMsg').style.display = 'none'; }
+    // 預載 (若直接重整)
+    window.onload = function() { if (typeof masterWordList !== 'undefined') db = masterWordList; }
+
     function initApp() {
-        document.getElementById('statusMsg').innerText = `✅ 載入 ${db.length} 單字`; document.getElementById('statusMsg').style.color = 'var(--success)'; document.getElementById('startBtn').disabled = false;
+        document.getElementById('startBtn').disabled = false;
         const sessions = [...new Set(db.map(x => x.session))].sort((a,b)=>a-b);
         const grid = document.getElementById('sessionGrid'); grid.innerHTML = '';
         sessions.forEach(s => { grid.innerHTML += `<label class="session-btn"><input type="checkbox" value="${s}" class="sess-cb"> U${s}</label>`; });
     }
+
+    // 畫面切換
+    function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
     function openHelp() { document.getElementById('helpModal').style.display = 'block'; }
     function closeHelp() { document.getElementById('helpModal').style.display = 'none'; }
-    window.onclick = function(e) { if (e.target == document.getElementById('helpModal')) closeHelp(); }
-    function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    
+    // 選取功能
     function selectRange(s, e) { document.querySelectorAll('.sess-cb').forEach(cb => { const v = parseInt(cb.value); if(!isNaN(v)) cb.checked = (v >= s && v <= e); }); }
     function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
-    
+
+    // 測驗流程
     function startTest() {
         const cbs = document.querySelectorAll('.sess-cb:checked');
         const sids = Array.from(cbs).map(cb => isNaN(parseInt(cb.value)) ? cb.value : parseInt(cb.value));
-        if(sids.length === 0) { alert("請選擇單元！"); return; }
+        if(sids.length === 0) { alert("請選擇單元"); return; }
         const pool = db.filter(i => sids.includes(i.session));
         if(pool.length === 0) { alert("無單字"); return; }
         testList = [...pool].sort(() => 0.5 - Math.random()).slice(0, parseInt(document.getElementById('wordCount').value));
         currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
-    }
-
-    // --- 發音功能 ---
-    function speakText(type) {
-        const item = testList[currentIndex];
-        const text = (type === 'word') ? item.word : item.sentence;
-        speak(text);
-    }
-
-    // 核心功能：單字-例句-單字
-    function playQuestionSequence() {
-        const item = testList[currentIndex];
-        window.speechSynthesis.cancel(); // 停止先前的發音
-        
-        const u1 = new SpeechSynthesisUtterance(item.word); u1.lang = 'en-US'; u1.rate = 0.8;
-        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.lang = 'en-US'; u2.rate = 0.8;
-        const u3 = new SpeechSynthesisUtterance(item.word); u3.lang = 'en-US'; u3.rate = 0.8;
-
-        window.speechSynthesis.speak(u1);
-        window.speechSynthesis.speak(u2);
-        window.speechSynthesis.speak(u3);
-    }
-
-    function speak(text) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.8;
-        window.speechSynthesis.speak(u);
-    }
-
-    function toggleTimer() { if(isTimerRunning) resetTimer(); else startTimer(); }
-    function startTimer() {
-        if(isTimerRunning) return; isTimerRunning = true; timerValue = 8; updateTimerDisplay();
-        document.getElementById('timerBtn').classList.add('ticking');
-        timerInterval = setInterval(() => {
-            timerValue--; updateTimerDisplay();
-            if(timerValue <= 0) { clearInterval(timerInterval); playDing(); isTimerRunning = false; document.getElementById('timerBtn').classList.remove('ticking'); }
-        }, 1000);
-    }
-    function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; document.getElementById('timerBtn').innerText = "8"; document.getElementById('timerBtn').classList.remove('ticking'); }
-    function updateTimerDisplay() { document.getElementById('timerBtn').innerText = timerValue; }
-    function playDing() {
-        const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; 
-        const ctx = new AC(); const osc = ctx.createOscillator(); const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination); osc.type = "sine";
-        osc.frequency.setValueAtTime(1200, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.5);
-        gain.gain.setValueAtTime(0.5, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-        osc.start(); osc.stop(ctx.currentTime + 0.5);
     }
 
     function loadCard() {
@@ -477,12 +378,54 @@
         document.getElementById('displaySentence').innerText = item.sentence;
         for(let i=1; i<=5; i++) document.getElementById(`btn-s${i}`).classList.remove('marked-wrong');
     }
+
+    // 朗讀
+    function speakText(type) {
+        const item = testList[currentIndex];
+        speak(type === 'word' ? item.word : item.sentence);
+    }
+    function playQuestionSequence() {
+        const item = testList[currentIndex];
+        window.speechSynthesis.cancel();
+        speak(item.word); speak(item.sentence); speak(item.word);
+    }
+    function speak(text) {
+        const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.8;
+        window.speechSynthesis.speak(u);
+    }
+
+    // 計時器
+    function toggleTimer() { if(isTimerRunning) resetTimer(); else startTimer(); }
+    function startTimer() {
+        if(isTimerRunning) return; isTimerRunning = true; timerValue = 8;
+        document.getElementById('timerBtn').innerText = timerValue;
+        document.getElementById('timerBtn').classList.add('ticking');
+        timerInterval = setInterval(() => {
+            timerValue--; document.getElementById('timerBtn').innerText = timerValue;
+            if(timerValue <= 0) { clearInterval(timerInterval); playDing(); isTimerRunning = false; document.getElementById('timerBtn').classList.remove('ticking'); }
+        }, 1000);
+    }
+    function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; document.getElementById('timerBtn').innerText = "8"; document.getElementById('timerBtn').classList.remove('ticking'); }
+    function playDing() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(1200, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime+0.5);
+        gain.gain.setValueAtTime(0.5, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime+0.5);
+        osc.start(); osc.stop(ctx.currentTime+0.5);
+    }
+
+    // 答錯標記
     function toggleStudent(id) { document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong'); }
     function nextWord() {
-        const w = testList[currentIndex]; const d = new Date().toLocaleDateString('zh-TW');
-        for(let i=1; i<=5; i++) { if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) saveMistake(i, w, d); }
-        currentIndex++; if(currentIndex < testList.length) loadCard(); else { alert("測驗結束！"); showHistory(); }
+        const item = testList[currentIndex]; const date = new Date().toLocaleDateString('zh-TW');
+        for(let i=1; i<=5; i++) {
+            if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) saveMistake(i, item, date);
+        }
+        currentIndex++; if(currentIndex < testList.length) loadCard(); else { alert("測驗結束"); showHistory(); }
     }
+
+    // 資料存取
     function saveMistake(sid, w, d) {
         let h = JSON.parse(localStorage.getItem('spellingHistory')) || [];
         h.push({ student: sid, word: w.word, session: w.session, sentence: w.sentence, date: d });
@@ -495,44 +438,47 @@
         const sid = parseInt(document.getElementById('historyStudentSelect').value);
         const h = getHistory().filter(x => x.student === sid);
         const c = document.getElementById('studentStatsTable');
-        if(h.length === 0) { c.innerHTML = "<p style='color:#999;text-align:center;padding:10px;'>無紀錄</p>"; return; }
-        let counts = {}; h.forEach(x => { if(!counts[x.word]) counts[x.word]={count:0,s:x.session}; counts[x.word].count++; });
-        let s = Object.keys(counts).map(k => ({w:k, ...counts[k]})).sort((a,b)=>b.count-a.count);
-        let html = `<table><tr><th>次</th><th>字</th><th>U</th></tr>`;
-        s.forEach(i => { html += `<tr><td><span class="badge">${i.count}</span></td><td style="font-weight:bold;">${i.w}</td><td>${i.s}</td></tr>`; });
-        c.innerHTML = html + "</table>";
+        if(h.length===0){c.innerHTML="<p style='text-align:center;color:#999'>無紀錄</p>";return;}
+        let counts={}; h.forEach(x=>{if(!counts[x.word])counts[x.word]={c:0,s:x.session};counts[x.word].c++;});
+        let s = Object.keys(counts).map(k=>({w:k,...counts[k]})).sort((a,b)=>b.c-a.c);
+        let html="<table><tr><th>次</th><th>字</th><th>U</th></tr>";
+        s.forEach(i=>{html+=`<tr><td><span class="badge">${i.c}</span></td><td>${i.w}</td><td>${i.s}</td></tr>`});
+        c.innerHTML = html+"</table>";
     }
     function renderGlobalStats() {
         const h = getHistory(); const c = document.getElementById('globalStatsTable');
-        if(h.length === 0) { c.innerHTML = "<p style='color:#999;text-align:center;padding:10px;'>無資料</p>"; return; }
-        let counts = {}; h.forEach(x => { if(!counts[x.word]) counts[x.word]=0; counts[x.word]++; });
-        let s = Object.keys(counts).map(k => ({w:k, c:counts[k]})).sort((a,b)=>b.c-a.c).slice(0,50);
-        let html = `<table><tr><th>錯</th><th>字</th></tr>`;
-        s.forEach(i => { html += `<tr><td><span class="badge" style="background:var(--primary);">${i.c}</span></td><td style="font-weight:bold;">${i.w}</td></tr>`; });
-        c.innerHTML = html + "</table>";
+        if(h.length===0){c.innerHTML="<p style='text-align:center;color:#999'>無紀錄</p>";return;}
+        let counts={}; h.forEach(x=>{if(!counts[x.word])counts[x.word]=0;counts[x.word]++;});
+        let s = Object.keys(counts).map(k=>({w:k,c:counts[k]})).sort((a,b)=>b.c-a.c).slice(0,50);
+        let html="<table><tr><th>錯</th><th>字</th></tr>";
+        s.forEach(i=>{html+=`<tr><td><span class="badge" style="background:var(--primary)">${i.c}</span></td><td>${i.w}</td></tr>`});
+        c.innerHTML = html+"</table>";
     }
+
+    // 匯出/備份
     function exportToCSV() {
-        const h = getHistory(); if(h.length === 0) { alert("無資料"); return; }
-        const n = {1:"水牛", 2:"水豚", 3:"樹懶", 4:"河馬", 5:"無尾熊"};
+        const h = getHistory(); if(h.length===0){alert("無資料");return;}
+        const n = {1:"水牛",2:"水豚",3:"樹懶",4:"河馬",5:"無尾熊"};
         let csv = "data:text/csv;charset=utf-8,\uFEFF日期,學生,代號,單元,單字,例句\n";
-        h.forEach(r => { csv += `${r.date},${n[r.student]},${r.student},${r.session},${r.word},${(r.sentence||"").replace(/,/g,"，")}\n`; });
-        const a = document.createElement("a"); a.href = encodeURI(csv); a.download = "錯題紀錄.csv"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        h.forEach(r => { csv+=`${r.date},${n[r.student]},${r.student},${r.session},${r.word},${(r.sentence||"").replace(/,/g,"，")}\n` });
+        const a = document.createElement("a"); a.href=encodeURI(csv); a.download="錯題紀錄.csv"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
     function backupData() {
-        const h = getHistory(); if(h.length === 0) { alert("無資料"); return; }
-        const a = document.createElement("a"); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(h));
-        a.download = "spelling_backup.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        const h = getHistory(); if(h.length===0){alert("無資料");return;}
+        const a = document.createElement("a"); a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(h));
+        a.download="spelling_backup.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
     function restoreData(input) {
         const f = input.files[0]; if(!f) return;
         const r = new FileReader();
         r.onload = function(e) {
             try { const d = JSON.parse(e.target.result);
-                if(Array.isArray(d)) { localStorage.setItem('spellingHistory', JSON.stringify(getHistory().concat(d))); alert("匯入成功！"); showHistory(); }
-            } catch(err) { alert("檔案錯誤"); }
-        }; r.readAsText(f); input.value = '';
+                if(Array.isArray(d)) { localStorage.setItem('spellingHistory', JSON.stringify(getHistory().concat(d))); alert("匯入成功"); showHistory(); }
+            } catch(e){ alert("檔案錯誤"); }
+        }; r.readAsText(f); input.value='';
     }
-    function clearHistory() { if(confirm("確定刪除？")) { localStorage.removeItem('spellingHistory'); showHistory(); } }
+    function clearHistory(){ if(confirm("確定清空?")) { localStorage.removeItem('spellingHistory'); showHistory(); } }
+
 </script>
 </body>
 </html>
