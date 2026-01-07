@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生練習區 v2.6</title>
+    <title>學生練習區 v2.8</title>
     <style>
         /* --- 🎨 學生版配色 --- */
         :root {
@@ -35,20 +35,22 @@
             border: 4px solid #fff; min-height: 85vh; position: relative;
         }
 
-        /* Header */
+        /* Header 調整：容納更多按鈕 */
         header {
-            background: var(--primary); color: white; padding: 15px 10px;
+            background: var(--primary); color: white; padding: 12px 10px;
             font-size: 1.1rem; font-weight: 900;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 4px solid var(--primary-dark);
         }
 
+        .header-right { display: flex; gap: 8px; }
+
         .nav-btn {
             background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); 
-            color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; 
-            font-size: 0.9rem; font-weight:bold; transition: 0.2s;
+            color: white; padding: 6px 10px; border-radius: 20px; cursor: pointer; 
+            font-size: 0.85rem; font-weight:bold; transition: 0.2s;
             text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
-            min-width: 80px;
+            min-width: 60px;
         }
         .nav-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.4); }
 
@@ -84,6 +86,8 @@
         .mode-quiz { border-color: var(--action); }
         .mode-quiz .icon-box { background: var(--action); color: white; }
         .icon-box { width: 60px; height: 60px; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 2rem; flex-shrink: 0; }
+        .mode-info h3 { margin: 0; font-size: 1.3rem; color: var(--text-main); }
+        .mode-info p { margin: 5px 0 0; color: var(--text-light); font-size: 0.9rem; }
         
         .btn-mistake {
             background: #fff; border: 2px solid #e74c3c; color: #e74c3c;
@@ -149,28 +153,29 @@
         .grid-item.viewed { background-color: white; border-color: var(--primary); color: var(--primary-dark); box-shadow: 0 4px 0 var(--primary); position: relative; }
         .grid-item.viewed::after { content: "✨"; position: absolute; top: 5px; right: 5px; font-size: 0.8rem; }
 
-        /* --- 🆕 總結複習區樣式 --- */
+        /* 總結複習區 */
         .summary-container { max-height: 50vh; overflow-y: auto; margin: 20px 0; border: 1px solid #eee; border-radius: 15px; }
-        .summary-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 15px; border-bottom: 1px solid #f0f0f0; background: #fff;
-        }
+        .summary-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid #f0f0f0; background: #fff; }
         .summary-item:last-child { border-bottom: none; }
         .s-word { font-size: 1.2rem; font-weight: bold; color: #555; }
         .s-status { font-size: 1.2rem; margin-right: 10px; }
-        .s-btn-audio {
-            width: 35px; height: 35px; border-radius: 50%; background: #eafaf1; border: none;
-            color: var(--primary); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
-        }
+        .s-btn-audio { width: 35px; height: 35px; border-radius: 50%; background: #eafaf1; border: none; color: var(--primary); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
         .s-btn-audio:active { background: var(--primary); color: white; }
 
-        /* Modal */
+        /* Modal (共用樣式) */
         .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background-color: #fff; margin: 15% auto; padding: 25px; width: 90%; max-width: 500px; border-radius: 20px; max-height: 70vh; overflow-y: auto; position: relative; border: 4px solid #e74c3c; }
+        .modal-content { background-color: #fff; margin: 15% auto; padding: 25px; width: 90%; max-width: 500px; border-radius: 20px; max-height: 70vh; overflow-y: auto; position: relative; border: 4px solid var(--primary); }
+        /* 錯題本用紅色框 */
+        #mistakeModal .modal-content { border-color: #e74c3c; } 
+        
         .close-btn { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
         .mistake-list { list-style: none; padding: 0; }
         .mistake-item { border-bottom: 1px dashed #eee; padding: 10px 0; display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; color: #555; }
         .mistake-count { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.9rem; }
+
+        /* 說明書內容 */
+        .help-h3 { color: var(--primary-dark); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; margin-top: 15px; }
+        .help-p { color: #555; line-height: 1.6; font-size: 0.95rem; margin: 0; }
 
     </style>
 </head>
@@ -178,9 +183,12 @@
 
 <div class="app-container">
     <header>
-        <a href="index.html" class="nav-btn">🚪 回入口</a>
+        <a href="index.html" class="nav-btn">🚪 入口</a>
         <span>🌱 練習區</span>
-        <button class="nav-btn" onclick="goHome()">🏠 選單</button>
+        <div class="header-right">
+            <button class="nav-btn" onclick="openHelp()">❓ 說明</button>
+            <button class="nav-btn" onclick="goHome()">🏠 選單</button>
+        </div>
     </header>
 
     <div id="homeScreen" class="screen active">
@@ -260,7 +268,7 @@
         <div id="quizFeedback" class="feedback-area"></div>
 
         <button class="btn-main" onclick="checkAnswer()" style="background:var(--action); box-shadow:0 5px 0 #d35400;">✨ 送出檢查</button>
-        <div style="text-align:center; color:#999; font-size:0.8rem; margin-top:10px;">(每題只有一次機會喔！)</div>
+        
     </div>
 
     <div id="finishScreen" class="screen">
@@ -280,7 +288,7 @@
 
 <div id="mistakeModal" class="modal">
     <div class="modal-content">
-        <span class="close-btn" onclick="closeMistakes()">&times;</span>
+        <span class="close-btn" onclick="closeModal('mistakeModal')">&times;</span>
         <h2 style="color:#e74c3c; text-align:center; margin-top:0;">📊 我的常錯字</h2>
         <div id="mistakeListContainer"></div>
         <div style="text-align:center; margin-top:20px;">
@@ -289,15 +297,34 @@
     </div>
 </div>
 
+<div id="helpModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('helpModal')">&times;</span>
+        <h2 style="color:var(--primary); text-align:center; margin-top:0;">📖 小朋友操作指南</h2>
+        
+        <h3 class="help-h3">📖 怎麼預習？</h3>
+        <p class="help-p">點擊格子看單字卡，聽聽看發音。看過的字，格子會變成綠色打勾勾喔 ✅！</p>
+
+        <h3 class="help-h3">✍️ 怎麼考試？</h3>
+        <p class="help-p">按下大喇叭 🔊，聽題目（字-句-字），然後把單字打出來。如果打開「自動倒數」，題目唸完就會開始讀秒喔！</p>
+
+        <h3 class="help-h3">📊 什麼是錯題本？</h3>
+        <p class="help-p">電腦會自動幫你記住你最常寫錯的字，點擊「錯題本」就可以複習了。</p>
+
+        <h3 class="help-h3">🔇 沒聲音怎麼辦？</h3>
+        <p class="help-p">請檢查手機左邊的開關，是不是開到「靜音模式」了？要關掉靜音才有聲音喔！</p>
+
+        <div style="text-align:center; margin-top:25px;">
+            <button class="btn-main" style="width:auto; padding:10px 40px;" onclick="closeModal('helpModal')">我知道了</button>
+        </div>
+    </div>
+</div>
+
 <script src="words.js"></script>
 <script>
     let db = [], currentList = [], currentIndex = 0;
     let viewedIndices = new Set(); 
-    
-    // 測驗記錄 (本次測驗)
     let quizResults = [];
-
-    // 計時器變數
     let timerValue = 8;
     let timerInterval = null;
     let isTimerRunning = false;
@@ -306,7 +333,7 @@
         if (typeof masterWordList !== 'undefined') {
             db = masterWordList;
             initSessions();
-            document.getElementById('loadStatus').innerText = "v2.6 Ready";
+            document.getElementById('loadStatus').innerText = "v2.8 Ready";
         } else {
             document.getElementById('loadStatus').innerHTML = "<span style='color:red'>⚠️ 找不到 words.js</span>";
         }
@@ -327,7 +354,6 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // 預習邏輯
     function prepareList(mode) {
         const session = parseInt(document.getElementById('sessionSelect').value);
         let list = db.filter(x => x.session === session);
@@ -339,6 +365,7 @@
         currentIndex = 0;
     }
 
+    // --- 預習 ---
     function startReviewGrid() {
         prepareList('review');
         if(currentList.length === 0) { alert("無單字"); return; }
@@ -362,7 +389,6 @@
         currentIndex = index;
         showScreen('flashcardScreen');
         updateReviewCard();
-        viewedIndices.add(currentList[currentIndex].word);
     }
 
     function backToGrid() { renderGrid(); showScreen('gridScreen'); }
@@ -371,6 +397,7 @@
         const item = currentList[currentIndex];
         document.getElementById('revWord').innerText = item.word;
         document.getElementById('revSentence').innerText = item.sentence;
+        if(item) viewedIndices.add(item.word);
     }
     
     function speakText(type) {
@@ -385,12 +412,11 @@
         else { if(confirm("回總表？")) backToGrid(); }
     }
 
-    // --- 測驗邏輯 ---
+    // --- 測驗 ---
     function startQuiz() {
         prepareList('quiz'); 
         if(currentList.length === 0) { alert("無單字"); return; }
-        
-        quizResults = []; // 重置成績單
+        quizResults = [];
         showScreen('quizScreen');
         loadQuizQuestion();
     }
@@ -400,15 +426,10 @@
         document.getElementById('quizIndex').innerText = currentIndex + 1;
         document.getElementById('quizTotal').innerText = currentList.length;
         document.getElementById('userSpelling').value = "";
-        document.getElementById('userSpelling').disabled = false; // 解鎖輸入
+        document.getElementById('userSpelling').disabled = false;
         document.getElementById('quizFeedback').innerText = "";
         document.getElementById('quizFeedback').className = "feedback-area";
-        
-        // 自動播放與計時
-        setTimeout(() => { 
-            document.getElementById('userSpelling').focus(); 
-            playQuestionSequence(); 
-        }, 500);
+        setTimeout(() => { document.getElementById('userSpelling').focus(); playQuestionSequence(); }, 500);
     }
 
     function playQuestionSequence() {
@@ -421,14 +442,10 @@
         const u3 = new SpeechSynthesisUtterance(item.word); u3.lang = 'en-US'; u3.rate = 0.8;
         
         u3.onend = function() {
-            if(document.getElementById('autoTimerSwitch').checked) {
-                startTimer();
-            }
+            if(document.getElementById('autoTimerSwitch').checked) startTimer();
         };
 
-        window.speechSynthesis.speak(u1);
-        window.speechSynthesis.speak(u2);
-        window.speechSynthesis.speak(u3);
+        window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3);
     }
 
     function checkAnswer() {
@@ -437,12 +454,10 @@
         const correctAns = item.word.trim().toLowerCase();
         const feedback = document.getElementById('quizFeedback');
         
-        // 鎖定輸入框，避免重複提交
         document.getElementById('userSpelling').disabled = true;
-        resetTimer(); // 停止計時
+        resetTimer();
 
         let isCorrect = false;
-
         if (userAns === correctAns) {
             feedback.innerHTML = "✅ 答對了！";
             feedback.className = "feedback-area correct";
@@ -451,144 +466,86 @@
         } else {
             feedback.innerHTML = `❌ 答案是：${item.word}`;
             feedback.className = "feedback-area wrong";
-            speak(item.word); // 唸正確答案
-            saveMyMistake(item.word); // 記錄錯題本
+            speak(item.word);
+            saveMyMistake(item.word);
             isCorrect = false;
         }
 
-        // 記錄本次測驗結果
-        quizResults.push({
-            word: item.word,
-            correct: isCorrect
-        });
-
-        // 1.5秒後自動跳轉
-        setTimeout(() => {
-            nextQuiz();
-        }, 1500);
+        quizResults.push({ word: item.word, correct: isCorrect });
+        setTimeout(() => { nextQuiz(); }, 1500);
     }
 
     function nextQuiz() {
         currentIndex++;
-        if (currentIndex < currentList.length) {
-            loadQuizQuestion();
-        } else {
-            renderSummary(); // 產生報表
-            showScreen('finishScreen');
-        }
+        if (currentIndex < currentList.length) loadQuizQuestion();
+        else { renderSummary(); showScreen('finishScreen'); }
     }
 
-    // --- 總結報表邏輯 ---
     function renderSummary() {
         const container = document.getElementById('summaryContainer');
         let html = "";
-        
         quizResults.forEach(r => {
             const statusIcon = r.correct ? "✅" : "❌";
             const color = r.correct ? "green" : "red";
-            
-            html += `<div class="summary-item">
-                <div style="display:flex; align-items:center;">
-                    <span class="s-status">${statusIcon}</span>
-                    <span class="s-word" style="color:${color}">${r.word}</span>
-                </div>
-                <button class="s-btn-audio" onclick="speak('${r.word}')">🔊</button>
-            </div>`;
+            html += `<div class="summary-item"><div style="display:flex; align-items:center;"><span class="s-status">${statusIcon}</span><span class="s-word" style="color:${color}">${r.word}</span></div><button class="s-btn-audio" onclick="speak('${r.word}')">🔊</button></div>`;
         });
-        
         container.innerHTML = html;
     }
 
     // 計時器
-    function manualStartTimer() {
-        if(isTimerRunning) resetTimer();
-        else startTimer();
-    }
-
+    function manualStartTimer() { if(isTimerRunning) resetTimer(); else startTimer(); }
     function startTimer() {
-        if(isTimerRunning) return;
-        isTimerRunning = true;
-        timerValue = 8;
+        if(isTimerRunning) return; isTimerRunning = true; timerValue = 8;
         updateTimerDisplay();
         const btn = document.getElementById('studentTimerBtn');
         btn.classList.add('active', 'ticking');
-
         timerInterval = setInterval(() => {
-            timerValue--;
-            updateTimerDisplay();
-            if(timerValue <= 0) {
-                clearInterval(timerInterval);
-                playDing();
-                isTimerRunning = false;
-                btn.classList.remove('ticking');
-            }
+            timerValue--; updateTimerDisplay();
+            if(timerValue <= 0) { clearInterval(timerInterval); playDing(); isTimerRunning = false; btn.classList.remove('ticking'); }
         }, 1000);
     }
+    function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; const btn = document.getElementById('studentTimerBtn'); btn.innerText = "8"; btn.classList.remove('active', 'ticking'); }
+    function updateTimerDisplay() { document.getElementById('studentTimerBtn').innerText = timerValue; }
 
-    function resetTimer() {
-        clearInterval(timerInterval);
-        isTimerRunning = false;
-        timerValue = 8;
-        const btn = document.getElementById('studentTimerBtn');
-        btn.innerText = "8";
-        btn.classList.remove('active', 'ticking');
-    }
-
-    function updateTimerDisplay() {
-        document.getElementById('studentTimerBtn').innerText = timerValue;
-    }
-
-    function speak(text) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.8;
-        window.speechSynthesis.speak(u);
-    }
-
+    function speak(text) { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.8; window.speechSynthesis.speak(u); }
     function playDing() {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const t = ctx.currentTime;
-        const osc1 = ctx.createOscillator();
-        const osc2 = ctx.createOscillator();
-        const gain = ctx.createGain();
+        const osc1 = ctx.createOscillator(); const osc2 = ctx.createOscillator(); const gain = ctx.createGain();
         osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
         osc1.type = "sine"; osc1.frequency.setValueAtTime(880, t);
         osc2.type = "sine"; osc2.frequency.setValueAtTime(1760, t);
-        gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(0.5, t + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
-        osc1.start(t); osc2.start(t);
-        osc1.stop(t + 1.5); osc2.stop(t + 1.5);
+        gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.5, t + 0.01); gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+        osc1.start(t); osc2.start(t); osc1.stop(t + 1.5); osc2.stop(t + 1.5);
     }
 
-    // 錯題本
+    // 錯題本 & 說明書
     function saveMyMistake(word) {
         let mistakes = JSON.parse(localStorage.getItem('myMistakes')) || {};
-        if (!mistakes[word]) mistakes[word] = 0;
-        mistakes[word]++;
+        if (!mistakes[word]) mistakes[word] = 0; mistakes[word]++;
         localStorage.setItem('myMistakes', JSON.stringify(mistakes));
     }
-
     function openMistakes() {
         document.getElementById('mistakeModal').style.display = 'block';
         const mistakes = JSON.parse(localStorage.getItem('myMistakes')) || {};
         const container = document.getElementById('mistakeListContainer');
-        
-        if (Object.keys(mistakes).length === 0) {
-            container.innerHTML = "<p style='text-align:center; padding:20px;'>好棒！目前沒有錯題紀錄！👏</p>";
-            return;
-        }
+        if (Object.keys(mistakes).length === 0) { container.innerHTML = "<p style='text-align:center; padding:20px;'>好棒！目前沒有錯題紀錄！👏</p>"; return; }
         let sorted = Object.keys(mistakes).map(key => { return { word: key, count: mistakes[key] }; }).sort((a,b) => b.count - a.count).slice(0, 5); 
         let html = "<ul class='mistake-list'>";
         sorted.forEach(item => { html += `<li class='mistake-item'><span>${item.word}</span><span class='mistake-count'>錯 ${item.count} 次</span></li>`; });
         html += "</ul>";
         container.innerHTML = html;
     }
-
-    function closeMistakes() { document.getElementById('mistakeModal').style.display = 'none'; }
-    function clearMyMistakes() {
-        if(confirm("確定清空？")) { localStorage.removeItem('myMistakes'); openMistakes(); }
+    
+    // 共用 Modal 開關
+    function openHelp() { document.getElementById('helpModal').style.display = 'block'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function clearMyMistakes() { if(confirm("確定清空？")) { localStorage.removeItem('myMistakes'); openMistakes(); } }
+    
+    // 點擊背景關閉任何 Modal
+    window.onclick = function(e) { 
+        if(e.target.classList.contains('modal')) e.target.style.display = 'none';
     }
-    window.onclick = function(e) { if(e.target == document.getElementById('mistakeModal')) closeMistakes(); }
 
 </script>
 </body>

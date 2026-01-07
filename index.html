@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v16.1 (擬真鈴聲版)</title>
+    <title>智慧單字小考官 v16.2</title>
     <style>
-        /* --- 🎨 1. 協調色彩系統 --- */
+        /* --- 🎨 色彩系統 --- */
         :root {
             --bg-color: #f4f6f8;
             --card-bg: #ffffff;
@@ -58,19 +58,16 @@
             border: 2px solid transparent; position: relative; overflow: hidden;
         }
 
-        /* 老師卡片 */
         .card-teacher:hover { transform: translateY(-8px); box-shadow: var(--shadow-float); border-color: var(--primary); }
         .card-teacher .icon { font-size: 4.5rem; margin-bottom: 15px; display: block; filter: drop-shadow(0 4px 6px rgba(52, 152, 219, 0.3)); }
         .card-teacher h2 { color: var(--text-main); margin: 0; font-size: 1.6rem; }
         .card-teacher p { color: var(--primary); font-weight: bold; margin-top: 5px; }
 
-        /* 學生卡片 */
         .card-student:hover { transform: translateY(-8px); box-shadow: var(--shadow-float); border-color: var(--student); }
         .card-student .icon { font-size: 4.5rem; margin-bottom: 15px; display: block; filter: drop-shadow(0 4px 6px rgba(46, 204, 113, 0.3)); }
         .card-student h2 { color: var(--text-main); margin: 0; font-size: 1.6rem; }
         .card-student p { color: var(--student); font-weight: bold; margin-top: 5px; }
 
-        /* 首頁說明按鈕 */
         .btn-landing-help {
             background: #fff; border: 2px solid #ddd; color: var(--text-sub);
             padding: 12px 30px; border-radius: 30px; font-weight: bold; cursor: pointer;
@@ -78,10 +75,8 @@
             box-shadow: 0 4px 0 #eee;
         }
         .btn-landing-help:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-landing-help:active { transform: translateY(2px); box-shadow: none; }
 
-
-        /* --- 👩‍🏫 老師版應用程式容器 --- */
+        /* --- 👩‍🏫 老師版容器 --- */
         #teacher-app {
             display: none; width: 100%; max-width: 900px;
             background: var(--card-bg); border-radius: var(--radius-card);
@@ -93,7 +88,6 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Header */
         header {
             background: white; border-bottom: 1px solid #eee; padding: 15px 25px;
             display: flex; justify-content: space-between; align-items: center;
@@ -102,25 +96,22 @@
         .header-brand { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: bold; color: var(--primary); }
         .nav-group { display: flex; gap: 8px; flex-wrap: wrap; }
         .nav-btn {
-            background: transparent; color: var(--text-sub);
-            padding: 8px 16px; border-radius: var(--radius-btn); cursor: pointer; border: none;
-            font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 6px;
-            transition: 0.2s;
+            background: transparent; color: var(--text-sub); padding: 8px 16px; border-radius: var(--radius-btn); 
+            cursor: pointer; border: none; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: 0.2s;
         }
         .nav-btn:hover { background: #f8f9fa; color: var(--primary); }
         .nav-btn.active-tab { background: var(--primary-light); color: var(--primary); }
         .btn-exit { color: var(--danger); border: 1px solid transparent; }
         .btn-exit:hover { border-color: #fadbd8; background: #fdfefe; color: var(--danger); }
 
-        /* --- 內容區塊 --- */
         .screen { padding: 30px; display: none; flex: 1; }
         .screen.active { display: block; animation: fadeIn 0.3s; }
 
+        /* 設定區 */
         .section-header { margin-bottom: 15px; display:flex; align-items:center; gap:10px; }
         .section-badge { background: var(--primary); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:0.9rem;}
         .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
 
-        /* 設定區 */
         .session-panel { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 25px; }
         .quick-select-bar { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .btn-pill { padding: 8px 16px; background: #fff; border: 1px solid #dcdcdc; border-radius: 20px; color: var(--text-sub); cursor: pointer; font-weight: 600; transition: 0.2s; flex-grow: 1; text-align: center; }
@@ -145,24 +136,19 @@
         .flash-card { flex-grow: 1; background: #fff; border: 2px solid #f0f0f0; border-radius: 16px; padding: 25px; text-align: center; position: relative; box-shadow: 0 4px 0 #f0f0f0; }
         .word-display { font-size: 4rem; font-weight: 800; color: var(--text-main); margin-bottom: 15px; line-height: 1.1; }
         .sentence-display { font-size: 1.4rem; color: #555; background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: left; border-left: 4px solid var(--primary); }
-        
-        /* 計時器 (按鈕微調) */
         .timer-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 90px; }
         .timer-btn { width: 80px; height: 80px; background: white; border: 5px solid var(--accent); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: 900; color: var(--accent); cursor: pointer; box-shadow: 0 4px 0 #d35400; transition: 0.1s; }
-        .timer-btn:active { transform: translateY(3px); box-shadow: none; }
         .timer-btn.ticking { color: var(--danger); border-color: var(--danger); box-shadow: 0 4px 0 #c0392b; animation: pulse 1s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         .mistake-label { color: var(--danger); font-weight: bold; margin-bottom: 10px; font-size: 1rem; }
         .student-grid { display: grid; gap: 12px; grid-template-columns: repeat(5, 1fr); margin-bottom: 25px; }
         .btn-student { background: white; border: 1px solid #ddd; border-radius: 12px; cursor: pointer; padding: 12px 0; display: flex; flex-direction: column; align-items: center; transition: 0.1s; box-shadow: 0 3px 0 #eee; }
-        .btn-student:active { transform: translateY(2px); box-shadow: none; }
         .btn-student.marked-wrong { background: var(--danger); border-color: #c0392b; color: white; box-shadow: 0 3px 0 #922b21; }
         .btn-student.marked-wrong .name { color: white; }
         .avatar { font-size: 2rem; margin-bottom: 5px; }
         .name { font-weight: 800; color: var(--text-sub); font-size: 1.1rem; }
         .btn-auto-speak { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; box-shadow: 0 3px 0 #d68910; }
-        .btn-auto-speak:active { transform: translateY(2px); box-shadow: none; }
         .btn-speak-small { background: #f0f2f5; border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; margin-left: 10px; transition: 0.2s; }
 
         /* 紀錄畫面 */
@@ -195,22 +181,24 @@
 
         /* --- 📖 萬用 Modal (說明書) --- */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background-color: #fff; margin: 5% auto; padding: 30px; width: 90%; max-width: 650px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; position: relative; }
-        .close-btn { position:absolute; right:20px; top:15px; font-size: 28px; cursor: pointer; color: #999; transition:0.2s; }
-        .close-btn:hover { color: #333; }
+        .modal-content { background-color: #fff; margin: 5% auto; padding: 0; width: 90%; max-width: 700px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* Modal Tabs */
+        .modal-tabs { display: flex; background: #f4f6f8; border-bottom: 1px solid #eee; padding: 0 20px; }
+        .tab-btn { padding: 15px 20px; cursor: pointer; border: none; background: transparent; font-weight: bold; color: var(--text-sub); border-bottom: 3px solid transparent; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        
+        .modal-body { padding: 30px; overflow-y: auto; flex: 1; }
+        .close-modal-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #999; z-index: 10; }
         
         /* 說明書內容樣式 */
-        .help-h2 { text-align:center; color: var(--text-main); border-bottom: 2px solid #eee; padding-bottom: 15px; margin-top:0; }
-        .help-block { margin-bottom: 25px; }
-        .help-h3 { color: var(--primary-dark); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-        .help-p { color: #555; line-height: 1.6; font-size: 0.95rem; margin: 5px 0; }
+        .help-h3 { color: var(--primary-dark); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; margin-top: 20px; }
+        .help-h3:first-child { margin-top: 0; }
         .help-list { padding-left: 20px; margin: 5px 0; }
         .help-list li { margin-bottom: 8px; color: #555; font-size: 0.95rem; }
         
-        /* 手機安裝指南卡片 */
         .install-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
         .install-card { background: #f8f9fa; padding: 15px; border-radius: 12px; border: 1px solid #eee; }
-        .install-icon { font-size: 1.5rem; margin-right: 5px; }
         .install-step { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.9rem; color: #444; }
         .install-step-icon { background: #fff; border: 1px solid #ddd; padding: 2px 6px; border-radius: 6px; font-size: 1.2rem; }
 
@@ -232,7 +220,6 @@
                 <h2>我是老師</h2>
                 <p>Teacher Mode</p>
             </div>
-
             <div class="landing-card card-student" onclick="enterStudentMode()">
                 <span class="icon">✏️</span>
                 <h2>我是學生</h2>
@@ -240,7 +227,7 @@
             </div>
         </div>
 
-        <button class="btn-landing-help" onclick="openHelp('landing')">
+        <button class="btn-landing-help" onclick="openHelp('general')">
             <span>📖</span> 使用教學 & 安裝指南
         </button>
     </div>
@@ -261,7 +248,7 @@
         <div id="setupScreen" class="screen active">
             <div id="loadError" style="display:none; background:#fee; color:#c0392b; padding:10px; border-radius:8px; text-align:center; margin-bottom:15px;">⚠️ 找不到 words.js</div>
             
-            <div class="section-header"><div class="section-badge">1</div><div class="section-title">選擇範圍</div></div>
+            <div class="section-header"><div class="section-badge">1</div><div class="section-title">選擇範圍 (智慧複選)</div></div>
             <div class="session-panel">
                 <div class="quick-select-bar">
                     <button class="btn-pill" onclick="selectRange(1,5)">U1-U5</button>
@@ -348,56 +335,61 @@
 
     <div id="helpModal" class="modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeHelp()">&times;</span>
+            <span class="close-modal-btn" onclick="closeHelp()">&times;</span>
             
-            <div id="help-content-landing" style="display:none;">
-                <h2 class="help-h2">📖 使用教學 & 安裝指南</h2>
-                
-                <div class="help-block">
-                    <h3 class="help-h3">🚀 如何安裝到手機/平板 (像 App 一樣)</h3>
+            <div class="modal-tabs">
+                <button class="tab-btn active" onclick="switchHelpTab('general')">一般/安裝</button>
+                <button class="tab-btn" onclick="switchHelpTab('teacher')">老師指南</button>
+                <button class="tab-btn" onclick="switchHelpTab('student')">學生指南</button>
+            </div>
+
+            <div class="modal-body">
+                <div id="tab-general" class="help-tab-content">
+                    <h3 class="help-h3">🚀 像 App 一樣安裝到手機</h3>
                     <div class="install-grid">
                         <div class="install-card">
                             <div style="font-weight:bold; margin-bottom:10px;">🍎 iOS (iPhone/iPad)</div>
-                            <div class="install-step"><span class="install-step-icon">1</span> 用 Safari 開啟本網頁</div>
-                            <div class="install-step"><span class="install-step-icon">2</span> 點擊下方 <span style="font-size:1.2rem;">📤</span> 分享按鈕</div>
-                            <div class="install-step"><span class="install-step-icon">3</span> 滑動選單，點選 <br><strong>「加入主畫面」</strong> (Add to Home Screen)</div>
+                            <div class="install-step"><span class="install-step-icon">1</span> 用 Safari 開啟網頁</div>
+                            <div class="install-step"><span class="install-step-icon">2</span> 點擊下方 <span style="font-size:1.2rem;">📤</span> 分享</div>
+                            <div class="install-step"><span class="install-step-icon">3</span> 點選 <strong>「加入主畫面」</strong></div>
                         </div>
                         <div class="install-card">
                             <div style="font-weight:bold; margin-bottom:10px;">🤖 Android (Chrome)</div>
-                            <div class="install-step"><span class="install-step-icon">1</span> 用 Chrome 開啟本網頁</div>
-                            <div class="install-step"><span class="install-step-icon">2</span> 點擊右上角 <span style="font-size:1.2rem;">⋮</span> 選單</div>
-                            <div class="install-step"><span class="install-step-icon">3</span> 點選 <strong>「安裝應用程式」</strong> 或 <br><strong>「加到主畫面」</strong></div>
+                            <div class="install-step"><span class="install-step-icon">1</span> 用 Chrome 開啟網頁</div>
+                            <div class="install-step"><span class="install-step-icon">2</span> 點擊右上角 <span style="font-size:1.2rem;">⋮</span></div>
+                            <div class="install-step"><span class="install-step-icon">3</span> 點選 <strong>「安裝應用程式」</strong></div>
                         </div>
                     </div>
-                </div>
-
-                <div class="help-block">
                     <h3 class="help-h3">💡 常見問題 (FAQ)</h3>
                     <ul class="help-list">
-                        <li><strong>Q: 為什麼沒聲音？</strong><br>A: 請檢查手機是否切換到「靜音模式」(側邊開關)，或調整媒體音量。iPhone 請務必關閉靜音。</li>
-                        <li><strong>Q: 換手機資料還在嗎？</strong><br>A: 不在喔！資料只存在當下的手機裡。若要轉移，請使用老師端的「備份/匯入」功能。</li>
+                        <li><strong>Q: 為什麼沒聲音？</strong><br>A: 請檢查手機是否為「靜音模式」(側邊開關)，iPhone 必須關閉靜音模式才能播放網頁音效。</li>
+                        <li><strong>Q: 換手機資料還在嗎？</strong><br>A: 不在喔！資料只存在當下的手機裡。若要轉移，請使用「備份/匯入」功能。</li>
                     </ul>
                 </div>
-            </div>
 
-            <div id="help-content-teacher" style="display:none;">
-                <h2 class="help-h2">👩‍🏫 教師操作指南</h2>
-                <div class="help-block">
-                    <h3 class="help-h3">🎯 測驗三步驟</h3>
+                <div id="tab-teacher" class="help-tab-content" style="display:none;">
+                    <h3 class="help-h3">🎯 測驗流程</h3>
                     <ul class="help-list">
-                        <li><strong>1. 選擇範圍</strong>：勾選要測驗的單元 (可複選)。</li>
-                        <li><strong>2. 播放題目</strong>：在測驗畫面，點擊黃色的「🔊 播放題目」，系統會自動唸「單字 ➜ 例句 ➜ 單字」。</li>
-                        <li><strong>3. 登記成績</strong>：若學生答錯，點擊該學生的動物頭像 (變紅色)。若全對直接按下一題。</li>
+                        <li><strong>1. 智慧選取</strong>：點擊 1-5 再點 6-10 可累加選取；全選狀態下點擊部分範圍可進行「反向取消」。</li>
+                        <li><strong>2. 自動朗讀</strong>：點擊黃色按鈕，系統依序唸出「單字 ➜ 例句 ➜ 單字」。</li>
+                        <li><strong>3. 記分</strong>：點擊學生頭像標記錯誤（變紅色）。</li>
+                    </ul>
+                    <h3 class="help-h3">💾 資料管理</h3>
+                    <ul class="help-list">
+                        <li><strong>備份</strong>：下載 JSON 檔保存。</li>
+                        <li><strong>匯入</strong>：在另一台電腦載入之前的備份檔。</li>
+                        <li><strong>匯出 Excel</strong>：將錯題紀錄轉為表格，方便列印或分析。</li>
                     </ul>
                 </div>
-                <div class="help-block">
-                    <h3 class="help-h3">💾 資料保存</h3>
-                    <p class="help-p">測驗紀錄儲存在這台電腦的瀏覽器中。若需更換電腦，請至「紀錄」頁面點擊「💾 備份」，將檔案傳到新電腦後再「📂 匯入」。</p>
-                </div>
-            </div>
 
-            <div style="text-align:center; margin-top:30px;">
-                <button class="btn-big" style="width:auto; padding:10px 40px; margin:0; font-size:1rem;" onclick="closeHelp()">我知道了</button>
+                <div id="tab-student" class="help-tab-content" style="display:none;">
+                    <h3 class="help-h3">🎒 自主練習模式</h3>
+                    <ul class="help-list">
+                        <li><strong>📖 單字預習</strong>：瀏覽單字卡，已看過的單字會在總表中打勾 ✅。</li>
+                        <li><strong>✍️ 聽寫挑戰</strong>：隨機抽取 5 題，聽音效輸入單字，系統會自動批改。</li>
+                        <li><strong>📊 錯題本</strong>：系統會自動記錄你常錯的單字，隨時可以複習。</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -441,20 +433,41 @@
     function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
     function setActiveTab(btn) { if(!btn) return; document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab')); btn.classList.add('active-tab'); }
 
-    // --- Modal 控制 ---
-    function openHelp(type) {
+    // --- Modal Tabs ---
+    function openHelp(defaultTab) {
         document.getElementById('helpModal').style.display = 'block';
-        document.getElementById('help-content-landing').style.display = 'none';
-        document.getElementById('help-content-teacher').style.display = 'none';
-        
-        if (type === 'landing') document.getElementById('help-content-landing').style.display = 'block';
-        else document.getElementById('help-content-teacher').style.display = 'block';
+        switchHelpTab(defaultTab || 'general');
     }
     function closeHelp() { document.getElementById('helpModal').style.display = 'none'; }
+    function switchHelpTab(tabName) {
+        // 隱藏所有內容
+        document.querySelectorAll('.help-tab-content').forEach(el => el.style.display = 'none');
+        // 顯示目標內容
+        document.getElementById('tab-' + tabName).style.display = 'block';
+        
+        // 更新按鈕狀態
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        // 簡單對應：第0個是general, 1是teacher, 2是student
+        if(tabName === 'general') document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        if(tabName === 'teacher') document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        if(tabName === 'student') document.querySelectorAll('.tab-btn')[2].classList.add('active');
+    }
     window.onclick = function(e) { if(e.target == document.getElementById('helpModal')) closeHelp(); }
 
-    // 選取邏輯
-    function selectRange(s, e) { document.querySelectorAll('.sess-cb').forEach(cb => { const v = parseInt(cb.value); if(!isNaN(v)) cb.checked = (v >= s && v <= e); }); }
+    // 智慧選取邏輯
+    function selectRange(s, e) {
+        const checkboxes = document.querySelectorAll('.sess-cb');
+        const targetCBs = [];
+        checkboxes.forEach(cb => {
+            const v = parseInt(cb.value);
+            if(v >= s && v <= e) targetCBs.push(cb);
+        });
+        
+        // 檢查是否全選
+        const allChecked = targetCBs.every(cb => cb.checked);
+        // 反轉狀態
+        targetCBs.forEach(cb => cb.checked = !allChecked);
+    }
     function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
 
     // 測驗邏輯
@@ -491,25 +504,16 @@
     }
     function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; document.getElementById('timerBtn').innerText = "8"; document.getElementById('timerBtn').classList.remove('ticking'); }
     
-    // 🔔 擬真鈴聲 (v16.1 版本)
+    // 擬真鈴聲
     function playDing() {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const t = ctx.currentTime;
-        const osc1 = ctx.createOscillator();
-        const osc2 = ctx.createOscillator();
-        const gain = ctx.createGain();
-
+        const osc1 = ctx.createOscillator(); const osc2 = ctx.createOscillator(); const gain = ctx.createGain();
         osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
-
         osc1.type = "sine"; osc1.frequency.setValueAtTime(880, t);
         osc2.type = "sine"; osc2.frequency.setValueAtTime(1760, t);
-
-        gain.gain.setValueAtTime(0, t);
-        gain.gain.linearRampToValueAtTime(0.5, t + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
-
-        osc1.start(t); osc2.start(t);
-        osc1.stop(t + 1.5); osc2.stop(t + 1.5);
+        gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.5, t + 0.01); gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+        osc1.start(t); osc2.start(t); osc1.stop(t + 1.5); osc2.stop(t + 1.5);
     }
 
     function toggleStudent(id) { document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong'); }
