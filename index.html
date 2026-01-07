@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v30.4</title>
+    <title>智慧單字小考官 v31.0</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -20,15 +20,10 @@
             --radius-card: 16px;
             --radius-btn: 8px;
             
-            /* 視覺化熱點 - 核心色 */
+            /* 視覺化熱點 */
             --heat-critical: #c0392b;
             --heat-high: #e67e22;
             --heat-med: #f1c40f;
-
-            /* 🛠️ [Fix] 補回缺失的背景色變數，讓圖示正確顯示 */
-            --heat-yellow-bg: #fef9e7; --heat-yellow-bd: #f1c40f;
-            --heat-orange-bg: #fdf2e9; --heat-orange-bd: #e67e22;
-            --heat-red-bg: #fadbd8; --heat-red-bd: #e74c3c;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -71,16 +66,16 @@
         /* --- 👩‍🏫 老師版容器 --- */
         #teacher-app {
             display: none; width: 100%; max-width: 1000px;
-            background: var(--bg-color); /* 讓 Header 懸浮時層次分明 */
+            background: var(--bg-color);
             min-height: 80vh; flex-direction: column;
             animation: slideUp 0.4s ease-out;
             padding-bottom: 20px;
-            overflow: visible; /* 允許下拉選單超出容器 */
+            overflow: visible;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ✨ 煥然一新的 Header */
+        /* Header */
         header {
             background: linear-gradient(to bottom, #ffffff, #f0f8ff); 
             border-top: 5px solid var(--primary);
@@ -95,7 +90,6 @@
         .header-brand { font-size: 1.3rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; letter-spacing: 1px; }
         .nav-group { display: flex; gap: 15px; align-items: center; }
 
-        /* 導航按鈕 */
         .nav-btn {
             background: white; color: var(--text-sub); padding: 8px 16px; border-radius: 20px; 
             cursor: pointer; border: 1px solid #e0e0e0; font-size: 0.95rem; font-weight: bold; 
@@ -105,28 +99,20 @@
         .nav-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
         .nav-btn.active-tab { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* 懸浮下拉選單 */
+        /* 懸浮選單 */
         .nav-dropdown-wrapper { position: relative; display: inline-block; padding-bottom: 10px; margin-bottom: -10px; }
-        
         .nav-dropdown-menu {
             display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
             background: white; min-width: 180px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             border-radius: 12px; padding: 8px 0; border: 1px solid #eee;
             z-index: 1001; margin-top: 5px; 
         }
-
-        /* 隱形橋 (防止游標斷開) */
-        .nav-dropdown-menu::after {
-            content: ""; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; background: transparent;
-        }
-        /* 小箭頭 */
+        .nav-dropdown-menu::after { content: ""; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; background: transparent; }
         .nav-dropdown-menu::before {
             content: ""; position: absolute; bottom: 100%; left: 50%; margin-left: -8px;
             border-width: 8px; border-style: solid; border-color: transparent transparent white transparent;
         }
-        
         .nav-dropdown-wrapper:hover .nav-dropdown-menu { display: block; animation: fadeIn 0.2s; }
-
         .nav-dropdown-item {
             padding: 10px 20px; color: var(--text-main); cursor: pointer; font-size: 0.9rem; font-weight: bold;
             transition: 0.1s; display: block; text-align: left;
@@ -134,14 +120,13 @@
         .nav-dropdown-item:hover { background: var(--primary-light); color: var(--primary); }
         .nav-dropdown-divider { height: 1px; background: #eee; margin: 5px 0; }
 
-
         .screen { 
             display: none; flex: 1; animation: fadeIn 0.3s; 
             background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .screen.active { display: block; }
 
-        /* 儀表板 & 安全離開 */
+        /* 儀表板 */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
         .dash-section-title { font-size: 1.1rem; color: var(--text-sub); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 30px; }
         .dash-section-title:first-child { margin-top: 0; }
@@ -198,12 +183,19 @@
         .custom-word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; }
         .custom-word-label { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--text-main); }
         .custom-word-label:has(input:checked) { border-color: #9b59b6; background: #fdfaff; color: #8e44ad; box-shadow: 0 2px 5px rgba(155, 89, 182, 0.2); }
-        .custom-word-label.tested-item { opacity: 0.5; background: #f4f6f8; border-color: #ddd; color: #95a5a6; }
         
-        .daily-picker-area { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; background: #f4f6f8; padding: 10px; border-radius: 8px; }
-        .daily-input { width: 60px; padding: 6px; border-radius: 6px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
-        .btn-daily-select { background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-daily-select:hover { background: #2980b9; }
+        /* 🆕 已考過的單字樣式 (v31.0 優化：灰底、深字、不透明) */
+        .custom-word-label.tested-item { 
+            background: #f1f3f5; border-color: #ced4da; color: #636e72; 
+        }
+        .custom-word-label.tested-item span::after { content: " (已考)"; font-size: 0.75rem; color: #adb5bd; margin-left: 4px; }
+        
+        /* 🆕 每日進度選取器 (v31.0 增強版) */
+        .daily-picker-area { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 15px; background: #f3e5f5; padding: 12px; border-radius: 12px; border: 1px solid #e1bee7; }
+        .daily-picker-group { display: flex; align-items: center; gap: 5px; }
+        .daily-input { width: 50px; padding: 6px; border-radius: 6px; border: 1px solid #9b59b6; text-align: center; font-weight: bold; color: #8e44ad; }
+        .btn-daily-start { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; border: none; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(142, 68, 173, 0.3); margin-left: auto; }
+        .btn-daily-start:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(142, 68, 173, 0.4); }
 
         /* 測驗畫面 */
         .progress-bar-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
@@ -296,12 +288,9 @@
         .full-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top:20px;}
         .word-item-card { background: white; border: 1px solid #eee; border-radius: 10px; padding: 15px; transition: 0.2s; position: relative; text-align: center; }
         .word-item-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; }
-        
-        /* 🛠️ [Fix] 補回缺失的熱點顏色定義 */
         .heatmap-yellow { background-color: var(--heat-yellow-bg); border-color: var(--heat-yellow-bd); }
         .heatmap-orange { background-color: var(--heat-orange-bg); border-color: var(--heat-orange-bd); }
         .heatmap-red { background-color: var(--heat-red-bg); border-color: var(--heat-red-bd); }
-        
         .wi-word { font-size: 1.3rem; font-weight: 800; color: var(--text-main); display: block; margin-bottom: 5px; }
         .wi-session { font-size: 0.8rem; color: #999; background: rgba(255,255,255,0.5); padding: 2px 6px; border-radius: 4px; display: inline-block; }
         .word-item-card[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: rgba(44, 62, 80, 0.9); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; white-space: pre-wrap; width: max-content; max-width: 200px; z-index: 100; pointer-events: none; margin-bottom: 8px; }
@@ -361,11 +350,11 @@
             <div class="nav-group">
                 <div class="nav-dropdown-wrapper">
                     <button class="nav-btn" id="nav-dash" onclick="showScreen('dashboardScreen'); setActiveTab(this);">
-                        🏠 首頁
+                        🏠 首頁 (選單)
                     </button>
                     <div class="nav-dropdown-menu">
-                        <span class="nav-dropdown-item" onclick="showScreen('setupScreen')">🤖 AI 隨機測驗</span>
                         <span class="nav-dropdown-item" onclick="showCustomQuizScreen()">🎯 指定單字測驗</span>
+                        <span class="nav-dropdown-item" onclick="showScreen('setupScreen')">🤖 AI 隨機測驗</span>
                         <div class="nav-dropdown-divider"></div>
                         <span class="nav-dropdown-item" onclick="showStudentStats()">🧑‍🎓 個別弱點總覽</span>
                         <span class="nav-dropdown-item" onclick="showClassStats()">🏫 全班弱點分析</span>
@@ -382,15 +371,15 @@
             
             <div class="dash-section-title">📝 測驗專區</div>
             <div class="dashboard-grid">
+                <div class="dash-card purple" onclick="showCustomQuizScreen()">
+                    <span class="dash-icon">🎯</span>
+                    <div class="dash-title">指定單字測驗</div>
+                    <div class="dash-desc">手動挑選、每日進度快選。</div>
+                </div>
                 <div class="dash-card primary" onclick="showScreen('setupScreen')">
                     <span class="dash-icon">🤖</span>
                     <div class="dash-title">AI 隨機測驗</div>
                     <div class="dash-desc">智慧權重選題，自動加強常錯字。</div>
-                </div>
-                <div class="dash-card purple" onclick="showCustomQuizScreen()">
-                    <span class="dash-icon">🎯</span>
-                    <div class="dash-title">指定單字測驗</div>
-                    <div class="dash-desc">手動挑選特定單字，針對性加強。</div>
                 </div>
             </div>
 
@@ -418,6 +407,46 @@
             </div>
         </div>
 
+        <div id="customQuizScreen" class="screen">
+            <div class="section-header">
+                <span class="section-title">🎯 指定單字測驗</span>
+                <button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 測驗常錯 Top 30</button>
+            </div>
+            <div class="session-panel">
+                <label style="font-weight:bold; display:block; margin-bottom:10px;">手動選擇單元</label>
+                <select id="customSessionSelect" onchange="renderCustomWordSelection()"></select>
+                
+                <div style="margin-top:20px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <label style="font-weight:bold;">勾選要考的單字</label>
+                        <button class="btn-tool" style="padding:4px 10px; font-size:0.8rem; margin-left:auto;" onclick="clearCustomSelection()">清除全選</button>
+                    </div>
+
+                    <div class="daily-picker-area">
+                        <div class="daily-picker-group">
+                            <span>選取接下來</span>
+                            <input type="number" id="dailyCount" value="3" class="daily-input" min="1" max="10">
+                            <span>個新字</span>
+                        </div>
+                        <div class="daily-picker-group">
+                            <span>，隨機考</span>
+                            <input type="number" id="dailyTestCount" value="3" class="daily-input" min="1" max="10">
+                            <span>題</span>
+                        </div>
+                        <button class="btn-daily-start" onclick="autoSelectAndStart()">▶ 開始</button>
+                    </div>
+
+                    <div style="font-size:0.9rem; color:var(--primary); font-weight:bold; margin-bottom:5px; text-align:right;">
+                        <span id="customSelectionCount">已選 0 題</span>
+                    </div>
+
+                    <div id="customWordGrid" class="custom-word-grid"></div>
+                </div>
+            </div>
+            <button class="btn-big" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" onclick="startCustomTest()">開始指定測驗 ▶</button>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁</button></div>
+        </div>
+
         <div id="setupScreen" class="screen">
             <div class="section-header"><span class="section-title">1. 選擇範圍 (智慧複選)</span></div>
             <div class="session-panel">
@@ -439,37 +468,6 @@
                 <strong>💡 AI 智慧選題：</strong> 系統會自動加重「全班常錯」與「個人常錯」單字的出現機率。
             </div>
             <button id="startBtn" class="btn-big" onclick="startRandomTest()" disabled>開始測驗 ▶</button>
-            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁</button></div>
-        </div>
-
-        <div id="customQuizScreen" class="screen">
-            <div class="section-header">
-                <span class="section-title">🎯 指定單字測驗</span>
-                <button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 測驗常錯 Top 30</button>
-            </div>
-            <div class="session-panel">
-                <label style="font-weight:bold; display:block; margin-bottom:10px;">手動選擇單元</label>
-                <select id="customSessionSelect" onchange="renderCustomWordSelection()"></select>
-                
-                <div style="margin-top:20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <label style="font-weight:bold;">勾選要考的單字</label>
-                        <div style="font-size:0.9rem; display:flex; align-items:center; gap:10px;">
-                            <div class="daily-picker-area">
-                                <span>選取接下來</span>
-                                <input type="number" id="dailyCount" value="3" class="daily-input" min="1" max="10">
-                                <span>個新字</span>
-                                <button class="btn-daily-select" onclick="autoSelectNextWords()">選取</button>
-                            </div>
-                            
-                            <span id="customSelectionCount" style="color:var(--primary); font-weight:bold; margin-left:10px;">已選 0 題</span>
-                            <button class="btn-tool" style="padding:4px 10px; font-size:0.8rem;" onclick="clearCustomSelection()">清除全選</button>
-                        </div>
-                    </div>
-                    <div id="customWordGrid" class="custom-word-grid"></div>
-                </div>
-            </div>
-            <button class="btn-big" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" onclick="startCustomTest()">開始指定測驗 ▶</button>
             <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁</button></div>
         </div>
 
@@ -584,13 +582,15 @@
         if (typeof masterWordList !== 'undefined') db = masterWordList; 
         setActiveTab(document.getElementById('nav-dash'));
         
-        // Load Daily Count Preference
-        const savedDaily = localStorage.getItem('dailyPickCount');
-        if(savedDaily) document.getElementById('dailyCount').value = savedDaily;
+        // Load Daily Preferences
+        const savedDailyPick = localStorage.getItem('dailyPickCount');
+        if(savedDailyPick) document.getElementById('dailyCount').value = savedDailyPick;
+        const savedDailyTest = localStorage.getItem('dailyTestCount');
+        if(savedDailyTest) document.getElementById('dailyTestCount').value = savedDailyTest;
         
-        document.getElementById('dailyCount').addEventListener('change', function() {
-            localStorage.setItem('dailyPickCount', this.value);
-        });
+        // Save listeners
+        document.getElementById('dailyCount').addEventListener('change', function() { localStorage.setItem('dailyPickCount', this.value); });
+        document.getElementById('dailyTestCount').addEventListener('change', function() { localStorage.setItem('dailyTestCount', this.value); });
     }
 
     function enterTeacherMode() {
@@ -627,14 +627,6 @@
     function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
     function setActiveTab(btn) { if(!btn) return; document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab')); btn.classList.add('active-tab'); }
     
-    function quickJump(target) {
-        if(target === "studentAnalysisScreen") { showStudentStats(); }
-        else if(target === "classAnalysisScreen") { showClassStats(); }
-        else if(target === "wordListScreen") { renderFullWordList(); showScreen(target); }
-        else if(target === "customQuizScreen") { showCustomQuizScreen(); }
-        else if(target !== "") { showScreen(target); }
-    }
-
     function showStudentStats() { showScreen('studentAnalysisScreen'); renderAllStudentOverview(); }
     function showClassStats() { showScreen('classAnalysisScreen'); renderGlobalStats(); renderSessionAnalysis(); }
     function showCustomQuizScreen() { showScreen('customQuizScreen'); }
@@ -696,19 +688,51 @@
         updateSelectionCounter();
     }
 
-    function autoSelectNextWords() {
-        const n = parseInt(document.getElementById('dailyCount').value) || 3;
+    // 🆕 每日速測邏輯 (Auto Select & Random Start)
+    function autoSelectAndStart() {
+        const pickCount = parseInt(document.getElementById('dailyCount').value) || 3;
+        const testCount = parseInt(document.getElementById('dailyTestCount').value) || 3;
         const checkboxes = Array.from(document.querySelectorAll('.custom-word-cb'));
+        
         if(checkboxes.length === 0) { alert("請先選擇單元！"); return; }
-        let count = 0;
+
+        // 1. 清除現有勾選
+        clearCustomSelection();
+
+        // 2. 勾選 N 個新字
+        let picked = 0;
         for (let cb of checkboxes) {
             const label = cb.closest('.custom-word-label');
-            if (!cb.checked && !label.classList.contains('tested-item')) {
-                cb.checked = true; count++;
-                if (count >= n) break;
+            if (!label.classList.contains('tested-item')) { // 只選沒考過的
+                cb.checked = true;
+                picked++;
+                if (picked >= pickCount) break;
             }
         }
         updateSelectionCounter();
+        
+        // 3. 檢查是否有選到字
+        const selectedWords = Array.from(document.querySelectorAll('.custom-word-cb:checked')).map(cb => cb.value);
+        
+        if(selectedWords.length === 0) { 
+            alert("本單元的新單字都考完了！請選擇其他單元。"); 
+            return; 
+        }
+
+        // 4. 從選中的字中，隨機抽 M 題
+        testList = db.filter(w => selectedWords.includes(w.word));
+        testList.sort(() => 0.5 - Math.random());
+        
+        // 如果選的字少於要考的題數，就全考
+        if (testList.length > testCount) {
+            testList = testList.slice(0, testCount);
+        }
+
+        // 5. 開始測驗
+        currentIndex = 0; 
+        showScreen('testScreen'); 
+        document.getElementById('totalNum').innerText = testList.length; 
+        loadCard();
     }
 
     function startCustomTest() {
