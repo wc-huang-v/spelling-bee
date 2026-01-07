@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v31.0</title>
+    <title>智慧單字小考官 v31.1 (Mobile UX Fixed)</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -24,6 +24,10 @@
             --heat-critical: #c0392b;
             --heat-high: #e67e22;
             --heat-med: #f1c40f;
+            /* 修正熱點顏色定義 */
+            --heat-yellow-bg: #fef9e7; --heat-yellow-bd: #f1c40f;
+            --heat-orange-bg: #fdf2e9; --heat-orange-bd: #e67e22;
+            --heat-red-bg: #fadbd8;    --heat-red-bd: #e74c3c;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -99,27 +103,42 @@
         .nav-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
         .nav-btn.active-tab { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* 懸浮選單 */
-        .nav-dropdown-wrapper { position: relative; display: inline-block; padding-bottom: 10px; margin-bottom: -10px; }
-        .nav-dropdown-menu {
-            display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-            background: white; min-width: 180px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            border-radius: 12px; padding: 8px 0; border: 1px solid #eee;
-            z-index: 1001; margin-top: 5px; 
+        /* 🛠️ 漢堡選單樣式修正 (Mobile Menu Fix) */
+        .nav-dropdown-wrapper { position: relative; display: inline-block; }
+        
+        .hamburger-btn {
+            font-size: 1.2rem; padding: 8px 14px;
+            background: var(--primary); color: white; border-color: var(--primary);
         }
-        .nav-dropdown-menu::after { content: ""; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; background: transparent; }
+        .hamburger-btn:active { transform: scale(0.95); }
+
+        .nav-dropdown-menu {
+            display: none; /* 預設隱藏，不使用 hover */
+            position: absolute; 
+            top: 100%; right: 0; /* 改為靠右對齊，避免跑版 */
+            transform: none; /* 移除原本的置中偏移 */
+            margin-top: 10px; 
+            background: white; min-width: 200px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border-radius: 12px; padding: 8px 0; border: 1px solid #eee;
+            z-index: 2000;
+        }
+        /* JS 控制的 class */
+        .nav-dropdown-menu.show { display: block; animation: fadeIn 0.2s; }
+
         .nav-dropdown-menu::before {
-            content: ""; position: absolute; bottom: 100%; left: 50%; margin-left: -8px;
+            content: ""; position: absolute; bottom: 100%; right: 15px; /* 箭頭也靠右 */
             border-width: 8px; border-style: solid; border-color: transparent transparent white transparent;
         }
-        .nav-dropdown-wrapper:hover .nav-dropdown-menu { display: block; animation: fadeIn 0.2s; }
+        
         .nav-dropdown-item {
-            padding: 10px 20px; color: var(--text-main); cursor: pointer; font-size: 0.9rem; font-weight: bold;
+            padding: 12px 20px; color: var(--text-main); cursor: pointer; font-size: 0.95rem; font-weight: bold;
             transition: 0.1s; display: block; text-align: left;
         }
         .nav-dropdown-item:hover { background: var(--primary-light); color: var(--primary); }
         .nav-dropdown-divider { height: 1px; background: #eee; margin: 5px 0; }
 
+        /* Screen Management */
         .screen { 
             display: none; flex: 1; animation: fadeIn 0.3s; 
             background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -184,13 +203,13 @@
         .custom-word-label { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--text-main); }
         .custom-word-label:has(input:checked) { border-color: #9b59b6; background: #fdfaff; color: #8e44ad; box-shadow: 0 2px 5px rgba(155, 89, 182, 0.2); }
         
-        /* 🆕 已考過的單字樣式 (v31.0 優化：灰底、深字、不透明) */
+        /* 🆕 已考過的單字樣式 */
         .custom-word-label.tested-item { 
             background: #f1f3f5; border-color: #ced4da; color: #636e72; 
         }
         .custom-word-label.tested-item span::after { content: " (已考)"; font-size: 0.75rem; color: #adb5bd; margin-left: 4px; }
         
-        /* 🆕 每日進度選取器 (v31.0 增強版) */
+        /* 🆕 每日進度選取器 */
         .daily-picker-area { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 15px; background: #f3e5f5; padding: 12px; border-radius: 12px; border: 1px solid #e1bee7; }
         .daily-picker-group { display: flex; align-items: center; gap: 5px; }
         .daily-input { width: 50px; padding: 6px; border-radius: 6px; border: 1px solid #9b59b6; text-align: center; font-weight: bold; color: #8e44ad; }
@@ -248,7 +267,7 @@
         /* 紀錄 & 總表 */
         .data-toolbar { background: white; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
         .btn-tool { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; color: white; font-size: 0.9rem; }
-        .btn-download { background: var(--success); }
+        .btn-download { background: var(--student); } /* Used student var for success green */
         .btn-backup { background: #8e44ad; }
         .btn-import { background: #34495e; }
         .btn-clear { background: transparent; color: var(--danger); border: 1px solid var(--danger); margin-left: auto; }
@@ -349,16 +368,18 @@
             <div class="header-brand">🎓 智能單字小考官</div>
             <div class="nav-group">
                 <div class="nav-dropdown-wrapper">
-                    <button class="nav-btn" id="nav-dash" onclick="showScreen('dashboardScreen'); setActiveTab(this);">
-                        🏠 首頁 (選單)
+                    <button class="nav-btn hamburger-btn" id="nav-dash" onclick="toggleMenu(event)">
+                        ☰
                     </button>
-                    <div class="nav-dropdown-menu">
-                        <span class="nav-dropdown-item" onclick="showCustomQuizScreen()">🎯 指定單字測驗</span>
-                        <span class="nav-dropdown-item" onclick="showScreen('setupScreen')">🤖 AI 隨機測驗</span>
+                    <div class="nav-dropdown-menu" id="mainMenu">
+                        <span class="nav-dropdown-item" onclick="navigate('dashboardScreen')">🏠 回首頁</span>
                         <div class="nav-dropdown-divider"></div>
-                        <span class="nav-dropdown-item" onclick="showStudentStats()">🧑‍🎓 個別弱點總覽</span>
-                        <span class="nav-dropdown-item" onclick="showClassStats()">🏫 全班弱點分析</span>
-                        <span class="nav-dropdown-item" onclick="renderFullWordList(); showScreen('wordListScreen')">📖 單字熱點總表</span>
+                        <span class="nav-dropdown-item" onclick="showCustomQuizScreen(); closeMenu()">🎯 指定單字測驗</span>
+                        <span class="nav-dropdown-item" onclick="navigate('setupScreen')">🤖 AI 隨機測驗</span>
+                        <div class="nav-dropdown-divider"></div>
+                        <span class="nav-dropdown-item" onclick="showStudentStats(); closeMenu()">🧑‍🎓 個別弱點總覽</span>
+                        <span class="nav-dropdown-item" onclick="showClassStats(); closeMenu()">🏫 全班弱點分析</span>
+                        <span class="nav-dropdown-item" onclick="renderFullWordList(); navigate('wordListScreen')">📖 單字熱點總表</span>
                     </div>
                 </div>
 
@@ -592,6 +613,32 @@
         document.getElementById('dailyCount').addEventListener('change', function() { localStorage.setItem('dailyPickCount', this.value); });
         document.getElementById('dailyTestCount').addEventListener('change', function() { localStorage.setItem('dailyTestCount', this.value); });
     }
+
+    // 🆕 選單控制邏輯 (Hamburger Menu Logic)
+    function toggleMenu(e) {
+        e.stopPropagation(); // 防止冒泡導致立刻被關閉
+        const menu = document.getElementById('mainMenu');
+        menu.classList.toggle('show');
+    }
+
+    function closeMenu() {
+        document.getElementById('mainMenu').classList.remove('show');
+    }
+
+    // 整合導航與關閉選單
+    function navigate(screenId) {
+        showScreen(screenId);
+        closeMenu();
+    }
+
+    // 點擊畫面空白處關閉選單
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('mainMenu');
+        const btn = document.querySelector('.hamburger-btn');
+        if (menu.classList.contains('show') && !menu.contains(e.target) && !btn.contains(e.target)) {
+            closeMenu();
+        }
+    });
 
     function enterTeacherMode() {
         document.getElementById('landing-page').style.display = 'none';
