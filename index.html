@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v23.0</title>
+    <title>智慧單字小考官 v24.0</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -20,10 +20,10 @@
             --radius-card: 16px;
             --radius-btn: 8px;
             
-            /* 熱點顏色 */
-            --heat-yellow-bg: #fef9e7; --heat-yellow-bd: #f1c40f;
-            --heat-orange-bg: #fdf2e9; --heat-orange-bd: #e67e22;
-            --heat-red-bg: #fadbd8; --heat-red-bd: #e74c3c;
+            /* 視覺化熱點 */
+            --heat-critical: #c0392b; /* 急救紅 */
+            --heat-high: #e67e22;     /* 警戒橘 */
+            --heat-med: #f1c40f;      /* 注意黃 */
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -44,7 +44,7 @@
         }
         .app-header-area { margin-bottom: 40px; text-align: center; }
         .app-title { font-size: 2.2rem; font-weight: 900; color: var(--text-main); margin-bottom: 5px; }
-        .app-subtitle { color: var(--text-sub); font-size: 1.1rem; margin-bottom: 40px; }
+        .app-subtitle { color: var(--text-sub); font-size: 1.1rem; }
         .role-container { display: flex; gap: 30px; width: 100%; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
         
         .landing-card {
@@ -55,17 +55,13 @@
         }
         .card-teacher:hover { transform: translateY(-8px); border-color: var(--primary); }
         .card-teacher .icon { font-size: 4.5rem; margin-bottom: 15px; display: block; }
-        .card-teacher h2 { color: var(--text-main); margin: 0; font-size: 1.6rem; }
         .card-student:hover { transform: translateY(-8px); border-color: var(--student); }
         .card-student .icon { font-size: 4.5rem; margin-bottom: 15px; display: block; }
-        .card-student h2 { color: var(--text-main); margin: 0; font-size: 1.6rem; }
-        
         .btn-landing-help {
             background: #fff; border: 2px solid #ddd; color: var(--text-sub);
             padding: 12px 30px; border-radius: 30px; font-weight: bold; cursor: pointer;
             font-size: 1rem; display: flex; align-items: center; gap: 8px; transition: 0.2s;
         }
-        .btn-landing-help:hover { border-color: var(--accent); color: var(--accent); }
 
         /* --- 👩‍🏫 老師版容器 --- */
         #teacher-app {
@@ -90,16 +86,14 @@
         }
         .nav-btn:hover { background: #f8f9fa; color: var(--primary); }
         .nav-btn.active-tab { background: var(--primary-light); color: var(--primary); }
-        .btn-exit { color: var(--danger); } .btn-exit:hover { background: #fdfefe; color: var(--danger); }
 
         .screen { padding: 30px; display: none; flex: 1; }
         .screen.active { display: block; animation: fadeIn 0.3s; }
 
-        /* 儀表板分區樣式 */
+        /* 儀表板 & 安全離開 */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
         .dash-section-title { font-size: 1.1rem; color: var(--text-sub); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 30px; }
         .dash-section-title:first-child { margin-top: 0; }
-        
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
         .dash-card {
             background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 25px;
             text-align: center; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
@@ -109,40 +103,43 @@
         .dash-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
         .dash-title { font-size: 1.2rem; font-weight: bold; color: var(--text-main); margin-bottom: 8px; }
         .dash-desc { font-size: 0.9rem; color: var(--text-sub); line-height: 1.5; }
-        
-        /* 卡片顏色線條 */
         .dash-card.primary { border-top: 5px solid var(--primary); }
+        .dash-card.purple { border-top: 5px solid #9b59b6; }
         .dash-card.accent { border-top: 5px solid var(--accent); }
-        .dash-card.success { border-top: 5px solid #2ecc71; }
         .dash-card.danger { border-top: 5px solid var(--danger); }
-        .dash-card.purple { border-top: 5px solid #9b59b6; } /* 指定測驗用 */
+        .dash-card.success { border-top: 5px solid #2ecc71; }
 
-        /* 設定區 & 通用 */
-        .section-header { margin-bottom: 15px; display:flex; align-items:center; gap:10px; justify-content: space-between; }
+        /* 底部安全離開 */
+        .safe-exit-area { margin-top: 50px; text-align: center; padding-top: 20px; border-top: 2px dashed #eee; }
+        .btn-safe-exit { background: transparent; border: 1px solid #ccc; color: #aaa; padding: 10px 20px; border-radius: 30px; cursor: pointer; transition: 0.2s; }
+        .btn-safe-exit:hover { background: #ffebeb; color: var(--danger); border-color: var(--danger); }
+
+        /* 通用元件 */
+        .section-header { margin-bottom: 15px; display:flex; align-items:center; justify-content: space-between; }
         .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
         .btn-tool { padding: 8px 16px; border-radius: 6px; border: 1px solid #ccc; font-weight: 600; cursor: pointer; font-size: 0.9rem; background:white; color:#555;}
-        
         .session-panel { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 25px; }
         .quick-select-bar { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .btn-pill { padding: 8px 16px; background: #fff; border: 1px solid #dcdcdc; border-radius: 20px; color: var(--text-sub); cursor: pointer; font-weight: 600; transition: 0.2s; flex-grow: 1; text-align: center; }
         .btn-pill:hover { border-color: var(--primary); color: var(--primary); }
         .btn-pill:active { background: var(--primary-light); }
-        
         .session-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; }
         .session-label { display: flex; align-items: center; padding: 10px; background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; cursor: pointer; font-size: 0.95rem; color: var(--text-main); transition: all 0.2s; }
-        .session-label:hover { border-color: var(--primary-dark); transform: translateY(-1px); }
         .session-label:has(.sess-cb:checked) { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); font-weight: bold; }
         .sess-cb { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--primary); cursor: pointer; }
-        
-        /* 指定測驗的單字選擇區 */
-        .custom-word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; }
-        .custom-word-label { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .custom-word-label:has(input:checked) { border-color: #9b59b6; background: #f5eef8; color: #8e44ad; }
-
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dcdcdc; font-size: 1rem; background: #fff; }
-        .btn-big { width: 100%; padding: 16px; margin-top: 30px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; font-size: 1.3rem; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4); transition: all 0.2s; }
+        .btn-big { width: 100%; padding: 16px; margin-top: 20px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; font-size: 1.3rem; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4); transition: all 0.2s; }
         .btn-big:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5); }
         .btn-big:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+        /* 指定測驗 UI */
+        .selection-bar { display: flex; justify-content: space-between; align-items: center; background: #f5eef8; padding: 10px 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #ebdef0; }
+        .selection-count { font-weight: bold; color: #8e44ad; }
+        .btn-clear-selection { background: #fff; border: 1px solid #8e44ad; color: #8e44ad; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
+        .btn-clear-selection:hover { background: #8e44ad; color: white; }
+        .custom-word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; }
+        .custom-word-label { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .custom-word-label:has(input:checked) { border-color: #9b59b6; background: #fdfaff; color: #8e44ad; box-shadow: 0 2px 5px rgba(155, 89, 182, 0.2); }
 
         /* 測驗畫面 */
         .progress-bar-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
@@ -172,34 +169,46 @@
         .btn-auto-speak { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; box-shadow: 0 3px 0 #d68910; }
         .btn-speak-small { background: #f0f2f5; border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; margin-left: 10px; transition: 0.2s; }
 
-        /* 紀錄 & 總表 & AI弱點區 */
-        .ai-weakness-box { 
-            background: #fff5f5; border: 2px dashed #e74c3c; border-radius: 12px; 
-            padding: 15px; margin-bottom: 20px; display: none; /* 預設隱藏 */
+        /* --- 🚨 急救單字卡 (Critical Cards) --- */
+        .critical-section { margin-bottom: 30px; animation: fadeIn 0.5s; }
+        .critical-header { color: var(--heat-critical); font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; }
+        .critical-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
+        .critical-card {
+            background: #fff; border: 2px solid var(--heat-critical); border-radius: 12px; padding: 15px;
+            text-align: center; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.1); position: relative; overflow: hidden;
         }
-        .ai-weakness-title { color: #c0392b; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
-        .ai-word-tag { display: inline-block; background: #e74c3c; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.9rem; margin-right: 5px; margin-bottom: 5px; font-weight: bold; }
+        .critical-card::before {
+            content: "SOS"; position: absolute; top: 0; right: 0; background: var(--heat-critical); color: white;
+            font-size: 0.7rem; padding: 2px 8px; border-bottom-left-radius: 8px; font-weight: bold;
+        }
+        .crit-word { display: block; font-size: 1.8rem; font-weight: 900; color: var(--text-main); margin-bottom: 5px; }
+        .crit-info { font-size: 0.9rem; color: var(--heat-critical); font-weight: bold; }
 
+        /* 紀錄 & 總表 */
         .data-toolbar { background: white; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
         .btn-tool { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; color: white; font-size: 0.9rem; }
         .btn-download { background: var(--success); }
         .btn-backup { background: #8e44ad; }
         .btn-import { background: #34495e; }
         .btn-clear { background: transparent; color: var(--danger); border: 1px solid var(--danger); margin-left: auto; }
-        .stat-card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 20px; flex: 1; margin-bottom: 20px; }
+        
         .table-container { max-height: 400px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
         th { text-align: left; padding: 12px; color: var(--text-sub); background: #f8f9fa; position: sticky; top: 0; }
         td { padding: 12px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); }
-        .badge { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; }
+        
+        /* 視覺化表格效果 */
+        .rank-high { font-weight: bold; color: var(--danger); }
+        .rank-bar-bg { width: 100px; height: 8px; background: #eee; border-radius: 4px; display: inline-block; margin-right: 8px; }
+        .rank-bar-fill { height: 100%; background: var(--danger); border-radius: 4px; }
 
         /* 熱點總表 & 排行 */
         .session-rank-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .rank-card { background: white; border: 2px solid; border-radius: 12px; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; }
         .rank-card:hover::after { content: attr(data-val); position: absolute; right: 10px; top: 5px; font-size: 0.8rem; font-weight: bold; background: rgba(0,0,0,0.7); color: white; padding: 2px 6px; border-radius: 4px; }
-        .rank-card.rank-1 { background: var(--heat-red-bg); border-color: var(--heat-red-bd); color: #c0392b; }
-        .rank-card.rank-2 { background: var(--heat-orange-bg); border-color: var(--heat-orange-bd); color: #d35400; }
-        .rank-card.rank-3 { background: var(--heat-yellow-bg); border-color: var(--heat-yellow-bd); color: #d4ac0d; }
+        .rank-card.rank-1 { background: #fadbd8; border-color: #e74c3c; color: #c0392b; }
+        .rank-card.rank-2 { background: #fdf2e9; border-color: #e67e22; color: #d35400; }
+        .rank-card.rank-3 { background: #fef9e7; border-color: #f1c40f; color: #d4ac0d; }
         .rank-icon { font-size: 2rem; font-weight: 900; opacity: 0.5; }
         .rank-info h4 { margin: 0; font-size: 1.2rem; font-weight: 900; }
         .rank-info p { margin: 2px 0 0; font-size: 0.9rem; opacity: 0.8; font-weight: bold; }
@@ -214,27 +223,15 @@
         .full-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top:20px;}
         .word-item-card { background: white; border: 1px solid #eee; border-radius: 10px; padding: 15px; transition: 0.2s; position: relative; text-align: center; }
         .word-item-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; }
-        .heatmap-yellow { background-color: var(--heat-yellow-bg); border-color: var(--heat-yellow-bd); }
-        .heatmap-orange { background-color: var(--heat-orange-bg); border-color: var(--heat-orange-bd); }
-        .heatmap-red { background-color: var(--heat-red-bg); border-color: var(--heat-red-bd); }
+        .heatmap-yellow { background-color: #fef9e7; border-color: #f1c40f; }
+        .heatmap-orange { background-color: #fdf2e9; border-color: #e67e22; }
+        .heatmap-red { background-color: #fadbd8; border-color: #e74c3c; }
         .wi-word { font-size: 1.3rem; font-weight: 800; color: var(--text-main); display: block; margin-bottom: 5px; }
         .wi-session { font-size: 0.8rem; color: #999; background: rgba(255,255,255,0.5); padding: 2px 6px; border-radius: 4px; display: inline-block; }
         .word-item-card[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: rgba(44, 62, 80, 0.9); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; white-space: pre-wrap; width: max-content; max-width: 200px; z-index: 100; pointer-events: none; margin-bottom: 8px; }
         .legend-bar { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-main); background: white; padding: 10px 15px; border-radius: 30px; border: 1px solid #eee; width: fit-content; }
         .legend-item { display: flex; align-items: center; gap: 5px; }
         .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #ccc; }
-
-        @media (max-width: 768px) {
-            .role-container { flex-direction: column; align-items: center; }
-            .landing-card { width: 100%; }
-            .card-container { flex-direction: column; }
-            .student-grid { grid-template-columns: repeat(3, 1fr); }
-            header { justify-content: center; padding: 10px; }
-            .nav-group { width: 100%; justify-content: space-between; order: 2; margin-top: 10px; }
-            .header-brand { width: 100%; justify-content: center; }
-            .data-toolbar { flex-direction: column; align-items: stretch; }
-            .btn-clear { margin-left: 0; }
-        }
 
         /* Modal */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
@@ -253,10 +250,8 @@
 
         /* Tag UI for AI Weight */
         .ai-tag {
-            position: absolute; top: 5px; right: 5px; 
-            font-size: 0.7rem; font-weight: bold; 
-            padding: 2px 6px; border-radius: 4px;
-            color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: absolute; top: 5px; right: 5px; font-size: 0.7rem; font-weight: bold; 
+            padding: 2px 6px; border-radius: 4px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -283,9 +278,10 @@
             <div class="header-brand"><span>🎓 測驗控制台</span></div>
             <div class="nav-group">
                 <button class="nav-btn" id="nav-dash" onclick="showScreen('dashboardScreen'); setActiveTab(this);">🏠 首頁</button>
+                <button class="nav-btn" id="nav-list" onclick="renderFullWordList(); showScreen('wordListScreen'); setActiveTab(this);">📖 總表</button>
+                <button class="nav-btn" id="nav-history" onclick="showHistory(); setActiveTab(this);">📊 紀錄</button>
                 <button class="nav-btn" onclick="openHelp('teacher')">❓ 說明</button>
-                <button class="nav-btn btn-exit" onclick="exitTeacherMode()">🚪 離開</button>
-            </div>
+                </div>
         </header>
 
         <div id="dashboardScreen" class="screen active">
@@ -310,7 +306,7 @@
                 <div class="dash-card accent" onclick="showStudentStats()">
                     <span class="dash-icon">🧑‍🎓</span>
                     <div class="dash-title">個別弱點</div>
-                    <div class="dash-desc">查看學生個人 AI 標記的常錯字。</div>
+                    <div class="dash-desc">查看學生 AI 標記的急救單字。</div>
                 </div>
                 <div class="dash-card danger" onclick="showClassStats()">
                     <span class="dash-icon">🏫</span>
@@ -322,6 +318,12 @@
                     <div class="dash-title">單字總表</div>
                     <div class="dash-desc">瀏覽單字庫與錯誤熱點。</div>
                 </div>
+            </div>
+
+            <div class="safe-exit-area">
+                <button class="btn-safe-exit" onclick="exitTeacherMode()">
+                    🚪 離開控制台 (回到總入口)
+                </button>
             </div>
         </div>
 
@@ -356,7 +358,13 @@
                 <select id="customSessionSelect" onchange="renderCustomWordSelection()"></select>
                 
                 <div style="margin-top:20px;">
-                    <label style="font-weight:bold; display:block; margin-bottom:10px;">步驟 2: 勾選要考的單字</label>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <label style="font-weight:bold;">步驟 2: 勾選要考的單字</label>
+                        <div style="font-size:0.9rem; display:flex; align-items:center; gap:10px;">
+                            <span id="customSelectionCount" style="color:var(--primary); font-weight:bold;">已選 0 題</span>
+                            <button class="btn-tool" style="padding:4px 10px; font-size:0.8rem;" onclick="clearCustomSelection()">清除全選</button>
+                        </div>
+                    </div>
                     <div id="customWordGrid" class="custom-word-grid"></div>
                 </div>
             </div>
@@ -395,9 +403,9 @@
                     <option value="1">🐃 1號同學</option><option value="2">🦫 2號同學</option><option value="3">🦥 3號同學</option><option value="4">🦛 4號同學</option><option value="5">🐨 5號同學</option>
                 </select>
                 
-                <div id="aiWeaknessBox" class="ai-weakness-box">
-                    <div class="ai-weakness-title">🔥 需加強單字 (AI 高權重)</div>
-                    <div id="aiWeaknessList"></div>
+                <div id="aiWeaknessBox" class="critical-section" style="display:none;">
+                    <div class="critical-header">🔥 急救單字卡 (高頻錯誤)</div>
+                    <div id="aiWeaknessList" class="critical-grid"></div>
                 </div>
 
                 <div id="studentStatsTable" class="table-container"></div>
@@ -460,7 +468,8 @@
                     <h3>測驗模式</h3>
                     <ul class="help-list">
                         <li><strong>AI 隨機測驗</strong>：自動加強常錯字。</li>
-                        <li><strong>指定單字測驗</strong>：老師手動勾選單字。測驗結果同樣會影響 AI 權重。</li>
+                        <li><strong>指定單字測驗</strong>：老師手動勾選單字，結果同樣影響 AI 權重。</li>
+                        <li><strong>數據分析</strong>：急救單字卡會顯示每位學生最需要加強的字。</li>
                     </ul>
                 </div>
                 <div id="tab-student" class="help-tab-content" style="display:none;">
@@ -507,7 +516,7 @@
         });
 
         // Custom Quiz Select
-        const customSel = document.getElementById('customSessionSelect'); customSel.innerHTML = '<option value="">-- 請選擇 --</option>';
+        const customSel = document.getElementById('customSessionSelect'); customSel.innerHTML = '<option value="">-- 請選擇單元 --</option>';
         sessions.forEach(s => {
             const opt = document.createElement('option'); opt.value = s; opt.innerText = `Unit ${s}`; customSel.appendChild(opt);
         });
@@ -544,58 +553,67 @@
     }
     function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
 
-    // --- Custom Quiz Logic (New) ---
+    // --- Custom Quiz Logic (Enhanced) ---
     function renderCustomWordSelection() {
         const sid = parseInt(document.getElementById('customSessionSelect').value);
         const container = document.getElementById('customWordGrid');
+        const countSpan = document.getElementById('customSelectionCount');
+        
         container.innerHTML = "";
+        countSpan.innerText = "已選 0 題";
+        
         if(isNaN(sid)) return;
 
         const words = db.filter(x => x.session === sid);
         words.forEach(w => {
             const label = document.createElement('label');
             label.className = 'custom-word-label';
-            label.innerHTML = `<span>${w.word}</span> <input type="checkbox" value="${w.word}" class="custom-word-cb">`;
+            // Add onchange to update counter
+            label.innerHTML = `<span>${w.word}</span> <input type="checkbox" value="${w.word}" class="custom-word-cb" onchange="updateSelectionCounter()">`;
             container.appendChild(label);
         });
+    }
+
+    function updateSelectionCounter() {
+        const count = document.querySelectorAll('.custom-word-cb:checked').length;
+        document.getElementById('customSelectionCount').innerText = `已選 ${count} 題`;
+    }
+
+    function clearCustomSelection() {
+        document.querySelectorAll('.custom-word-cb').forEach(cb => cb.checked = false);
+        updateSelectionCounter();
     }
 
     function startCustomTest() {
         const selectedWords = Array.from(document.querySelectorAll('.custom-word-cb:checked')).map(cb => cb.value);
         if(selectedWords.length === 0) { alert("請至少選擇一個單字"); return; }
         
-        // Find objects
         testList = db.filter(w => selectedWords.includes(w.word));
-        // Shuffle
         testList.sort(() => 0.5 - Math.random());
         
         currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
     }
 
-    // --- 🧠 AI Weight Algorithm (v22.0) ---
+    // --- 🧠 AI Weight Logic ---
     function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
     function getTestLogs() { return JSON.parse(localStorage.getItem('spellingTestLogs')) || []; } 
 
-    // Helper to check individual weight
     function getIndividualWeight(word, studentId) {
         const history = getHistory();
         const logs = getTestLogs();
         
-        // Count errors for this student
         const errorCount = history.filter(h => h.word === word && h.student === studentId).length;
-        if (errorCount <= 3) return 1; // Threshold > 3
+        if (errorCount <= 3) return 1; 
 
-        // Check recovery
         const wordLogs = logs.filter(l => l.word === word).sort((a,b) => b.timestamp - a.timestamp);
         if (wordLogs.length >= 2) {
             const recent2 = wordLogs.slice(0, 2);
             const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
-            if (avgAcc === 1) return 1; // Recovered
+            if (avgAcc === 1) return 1; 
         }
-        return 5; // Default high weight
+        return 5; 
     }
 
-    // Main Weight Logic
     function getSmartWordList(pool, count) {
         const history = getHistory();
         const logs = getTestLogs();
@@ -610,9 +628,7 @@
 
         let weightedPool = [];
         pool.forEach(item => {
-            let weight = 1; 
-            let reason = "";
-
+            let weight = 1; let reason = "";
             const classErrors = errorMap[item.word] || 0;
             const isClassWeak = classErrors > 5;
             let isIndivWeak = false;
@@ -627,9 +643,7 @@
                     if (avgAcc >= 0.8) { weight = 1; } 
                     else if (avgAcc > 0.4) { weight += 10; reason = "⚠️ 全班常錯"; }
                     else { weight += 30; reason = "🔥 全班重災區"; }
-                } else {
-                    weight += 10; reason = "⚠️ 全班常錯";
-                }
+                } else { weight += 10; reason = "⚠️ 全班常錯"; }
             } else if (isIndivWeak) {
                 if (wordLogs.length >= 2) {
                     const recent2 = wordLogs.slice(0, 2);
@@ -638,11 +652,8 @@
                     else if (avgAcc >= 0.8) { weight += 2; reason = "👀 個別需留意"; }
                     else if (avgAcc > 0.4) { weight += 5; reason = "❗ 個人常錯"; }
                     else { weight += 15; reason = "⚡ 個人嚴重"; }
-                } else {
-                    weight += 5; reason = "❗ 個人常錯";
-                }
+                } else { weight += 5; reason = "❗ 個人常錯"; }
             }
-
             for(let k=0; k<weight; k++) { weightedPool.push({ ...item, tag: (k===0 ? reason : "") }); }
         });
 
@@ -750,12 +761,11 @@
     }
     function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
 
-    // Analysis
+    // Analysis (Visual Updates)
     function renderStudentHistory() {
         const sid = parseInt(document.getElementById('historyStudentSelect').value);
         const h = getHistory().filter(x => x.student === sid);
         
-        // 1. Render Table
         const c = document.getElementById('studentStatsTable');
         if(h.length===0){c.innerHTML="<p style='text-align:center;color:#999'>無紀錄</p>";}
         else {
@@ -766,7 +776,7 @@
             c.innerHTML = html+"</table>";
         }
 
-        // 2. Render AI Weakness Box (New)
+        // Render AI Weakness Box (Critical Cards)
         const weakBox = document.getElementById('aiWeaknessBox');
         const weakList = document.getElementById('aiWeaknessList');
         const uniqueWords = [...new Set(db.map(x => x.word))];
@@ -777,7 +787,13 @@
             const weight = getIndividualWeight(word, sid);
             if (weight > 1) {
                 hasWeakness = true;
-                weakHtml += `<span class="ai-word-tag">${word}</span>`;
+                // 用卡片樣式呈現
+                weakHtml += `
+                    <div class="critical-card">
+                        <span class="crit-word">${word}</span>
+                        <span class="crit-info">AI 權重: ${weight}x</span>
+                    </div>
+                `;
             }
         });
 
@@ -794,10 +810,25 @@
         if(h.length===0){c.innerHTML="<p style='text-align:center;color:#999'>無紀錄</p>";return;}
         let counts={}; h.forEach(x=>{if(!counts[x.word])counts[x.word]=0;counts[x.word]++;});
         let s = Object.keys(counts).map(k=>({w:k,c:counts[k]})).sort((a,b)=>b.c-a.c).slice(0,50);
-        let html="<table><tr><th>錯</th><th>字</th></tr>";
-        s.forEach(i=>{html+=`<tr><td><span class="badge" style="background:var(--primary)">${i.c}</span></td><td>${i.w}</td></tr>`});
+        let maxCount = s[0]?.c || 1; // For bar chart relative width
+
+        let html="<table><tr><th width='60%'>常錯單字 (Top 50)</th><th>錯誤次數</th></tr>";
+        s.forEach(i=>{
+            const widthPct = (i.c / maxCount) * 100;
+            // Add visual bar
+            html+=`<tr>
+                <td style="font-weight:bold; font-size:1.1rem; color:#2c3e50;">${i.w}</td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <span class="rank-bar-bg"><span class="rank-bar-fill" style="width:${widthPct}%"></span></span>
+                        <span class="rank-high">${i.c}</span>
+                    </div>
+                </td>
+            </tr>`
+        });
         c.innerHTML = html+"</table>";
     }
+
     function renderSessionAnalysis() {
         const h = getHistory(); const sessions = {};
         h.forEach(rec => {
@@ -827,6 +858,7 @@
         });
         breakdownContainer.innerHTML = breakdownHtml;
     }
+    
     function renderFullWordList() {
         const history = getHistory(); const errorMap = {}; const animalMap = {1:"🐃", 2:"🦫", 3:"🦥", 4:"🦛", 5:"🐨"};
         history.forEach(h => { if(!errorMap[h.word]) errorMap[h.word] = { total: 0, students: new Set() }; errorMap[h.word].total++; errorMap[h.word].students.add(h.student); });
