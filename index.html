@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v30.1</title>
+    <title>智慧單字小考官 v30.2</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -66,47 +66,75 @@
         /* --- 👩‍🏫 老師版容器 --- */
         #teacher-app {
             display: none; width: 100%; max-width: 1000px;
-            background: var(--bg-color); /* 讓 Header 懸浮時下方內容透出背景色 */
-            overflow: visible; /* 允許 Header sticky */
+            background: var(--bg-color); /* 讓 Header 懸浮時層次分明 */
             min-height: 80vh; flex-direction: column;
             animation: slideUp 0.4s ease-out;
             padding-bottom: 20px;
+            overflow: visible; /* 重要：允許下拉選單超出容器 */
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ✨ 煥然一新的 Header (v30.1) */
+        /* ✨ 煥然一新的 Header (v30.2) */
         header {
-            background: rgba(255, 255, 255, 0.95); /* 白底半透明 */
-            backdrop-filter: blur(10px); /* 毛玻璃特效 */
-            padding: 12px 20px;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06); /* 輕柔陰影 */
-            border-radius: 16px; /* 圓角 */
-            position: sticky; top: 10px; z-index: 100; /* 懸浮置頂 */
+            /* 顏色調整：不再是純白，帶一點點藍灰，且有頂部邊框 */
+            background: linear-gradient(to bottom, #ffffff, #f0f8ff); 
+            border-top: 5px solid var(--primary); /* 明顯的頂部識別色 */
+            border-bottom: 1px solid #dbeafa;
+            border-radius: 0 0 16px 16px; /* 下方圓角 */
+            
+            padding: 12px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15); /* 帶有顏色的陰影 */
+            position: sticky; top: 0; z-index: 1000;
             margin-bottom: 20px;
         }
-        .header-brand { font-size: 1.3rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-        .nav-group { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .header-brand { font-size: 1.3rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; letter-spacing: 1px; }
         
-        .nav-select {
-            padding: 8px 15px; border-radius: 20px; border: 1px solid #e0e0e0;
-            font-size: 0.9rem; color: var(--text-main); cursor: pointer; outline: none;
-            background-color: #f8f9fa; font-weight: bold; transition: 0.2s;
-        }
-        .nav-select:hover { border-color: var(--primary); background: #fff; }
+        .nav-group { display: flex; gap: 15px; align-items: center; }
 
+        /* 導航按鈕 */
         .nav-btn {
-            background: transparent; color: var(--text-sub); padding: 8px 12px; border-radius: 8px; 
-            cursor: pointer; border: none; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: 0.2s;
+            background: white; color: var(--text-sub); padding: 8px 16px; border-radius: 20px; 
+            cursor: pointer; border: 1px solid #e0e0e0; font-size: 0.95rem; font-weight: bold; 
+            display: flex; align-items: center; gap: 6px; transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .nav-btn:hover { background: #f0f2f5; color: var(--primary); }
-        .nav-btn.active-tab { background: var(--primary-light); color: var(--primary); }
+        .nav-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+        .nav-btn.active-tab { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* 🆕 懸浮下拉選單 (Hover Dropdown) */
+        .nav-dropdown-wrapper { position: relative; display: inline-block; }
+        
+        /* 隱藏的選單 */
+        .nav-dropdown-menu {
+            display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            background: white; min-width: 180px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-radius: 12px; padding: 8px 0; margin-top: 10px; border: 1px solid #eee;
+            z-index: 1001;
+        }
+        /* 小箭頭 */
+        .nav-dropdown-menu::before {
+            content: ""; position: absolute; bottom: 100%; left: 50%; margin-left: -8px;
+            border-width: 8px; border-style: solid; border-color: transparent transparent white transparent;
+        }
+        
+        /* 滑鼠移過 Wrapper 時顯示選單 */
+        .nav-dropdown-wrapper:hover .nav-dropdown-menu { display: block; animation: fadeIn 0.2s; }
+
+        /* 選單項目 */
+        .nav-dropdown-item {
+            padding: 10px 20px; color: var(--text-main); cursor: pointer; font-size: 0.9rem; font-weight: bold;
+            transition: 0.1s; display: block; text-align: left;
+        }
+        .nav-dropdown-item:hover { background: var(--primary-light); color: var(--primary); }
+        .nav-dropdown-divider { height: 1px; background: #eee; margin: 5px 0; }
+
 
         .screen { 
-            padding: 0 10px; display: none; flex: 1; animation: fadeIn 0.3s; 
-            /* 內容區背景獨立 */
-            background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            /* 內容區樣式 */
+            display: none; flex: 1; animation: fadeIn 0.3s; 
+            background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .screen.active { display: block; }
 
@@ -204,7 +232,7 @@
 
         /* 個別弱點分析全覽 */
         .student-analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .student-card-view { background: white; border: 1px solid #ddd; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; height: 100%; box-shadow: 0 3px 0 #eee; }
+        .student-card-view { background: white; border: 1px solid #ddd; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; height: auto; box-shadow: 0 3px 0 #eee; }
         .student-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 2px solid #f4f6f8; padding-bottom: 8px; }
         .student-card-body { flex: 1; }
         .weak-word-tag { display: inline-block; background: #fadbd8; color: #c0392b; padding: 4px 8px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; margin: 3px 0; width: 100%; }
@@ -276,7 +304,7 @@
         .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #ccc; }
 
         /* Modal */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
         .modal-content { background-color: #fff; margin: 5% auto; padding: 0; width: 90%; max-width: 700px; border-radius: 20px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
         .modal-tabs { display: flex; background: #f4f6f8; border-bottom: 1px solid #eee; padding: 0 20px; }
         .tab-btn { padding: 15px 20px; cursor: pointer; border: none; background: transparent; font-weight: bold; color: var(--text-sub); border-bottom: 3px solid transparent; }
@@ -321,18 +349,24 @@
     </div>
 
     <div id="teacher-app">
+        
         <header>
-            <div class="header-brand"><span>🎓 測驗控制台</span></div>
+            <div class="header-brand">🎓 智能單字小考官</div>
             <div class="nav-group">
-                <button class="nav-btn" id="nav-dash" onclick="showScreen('dashboardScreen'); setActiveTab(this);">🏠 首頁</button>
-                <select class="nav-select" onchange="quickJump(this.value); this.value='';">
-                    <option value="">🚀 快速前往...</option>
-                    <option value="setupScreen">🤖 AI 隨機測驗</option>
-                    <option value="customQuizScreen">🎯 指定單字測驗</option>
-                    <option value="studentAnalysisScreen">🧑‍🎓 個別弱點總覽</option>
-                    <option value="classAnalysisScreen">🏫 全班弱點分析</option>
-                    <option value="wordListScreen">📖 單字熱點總表</option>
-                </select>
+                <div class="nav-dropdown-wrapper">
+                    <button class="nav-btn" id="nav-dash" onclick="showScreen('dashboardScreen'); setActiveTab(this);">
+                        🏠 首頁 (選單)
+                    </button>
+                    <div class="nav-dropdown-menu">
+                        <span class="nav-dropdown-item" onclick="showScreen('setupScreen')">🤖 AI 隨機測驗</span>
+                        <span class="nav-dropdown-item" onclick="showCustomQuizScreen()">🎯 指定單字測驗</span>
+                        <div class="nav-dropdown-divider"></div>
+                        <span class="nav-dropdown-item" onclick="showStudentStats()">🧑‍🎓 個別弱點總覽</span>
+                        <span class="nav-dropdown-item" onclick="showClassStats()">🏫 全班弱點分析</span>
+                        <span class="nav-dropdown-item" onclick="renderFullWordList(); showScreen('wordListScreen')">📖 單字熱點總表</span>
+                    </div>
+                </div>
+
                 <button class="nav-btn" onclick="openHelp('teacher')">❓ 說明</button>
             </div>
         </header>
@@ -399,7 +433,7 @@
                 <strong>💡 AI 智慧選題：</strong> 系統會自動加重「全班常錯」與「個人常錯」單字的出現機率。
             </div>
             <button id="startBtn" class="btn-big" onclick="startRandomTest()" disabled>開始測驗 ▶</button>
-            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁</button></div>
         </div>
 
         <div id="customQuizScreen" class="screen">
@@ -430,7 +464,7 @@
                 </div>
             </div>
             <button class="btn-big" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" onclick="startCustomTest()">開始指定測驗 ▶</button>
-            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁</button></div>
         </div>
 
         <div id="testScreen" class="screen">
@@ -466,7 +500,7 @@
                 <button class="btn-tool btn-import" onclick="document.getElementById('fileInput').click()">📂 匯入</button>
                 <input type="file" id="fileInput" style="display:none" onchange="restoreData(this)">
             </div>
-            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁</button></div>
         </div>
 
         <div id="classAnalysisScreen" class="screen">
@@ -492,7 +526,7 @@
             <div style="text-align:right; margin-top:20px;">
                 <button class="btn-tool btn-clear" onclick="clearHistory()">🗑️ 清空所有紀錄</button>
             </div>
-            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁</button></div>
         </div>
 
         <div id="wordListScreen" class="screen">
@@ -507,7 +541,7 @@
                 <span class="legend-item"><span class="legend-dot" style="background:var(--heat-red-bg); border-color:var(--heat-red-bd);"></span> Top 30</span>
             </div>
             <div id="fullWordListContainer" class="full-list-grid"></div>
-            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁</button></div>
         </div>
 
     </div>
@@ -837,12 +871,10 @@
         const animalMap = {1:"🐃", 2:"🦫", 3:"🦥", 4:"🦛", 5:"🐨"};
         const uniqueWords = [...new Set(db.map(x => x.word))];
         
-        // Data for details
         const history = getHistory();
         const logs = getTestLogs(); 
 
         for (let i = 1; i <= 5; i++) {
-            // 1. Critical Words
             let criticalWords = [];
             uniqueWords.forEach(word => {
                 const weight = getIndividualWeight(word, i);
@@ -850,7 +882,6 @@
             });
             criticalWords.sort((a,b) => b.weight - a.weight);
 
-            // 2. All Historical Errors
             let allMistakes = [];
             const studentErrors = history.filter(h => h.student === i);
             const wordErrorMap = {};
@@ -865,7 +896,6 @@
             allMistakes.sort((a,b) => b.errors - a.errors);
             if(allMistakes.length > 100) allMistakes = allMistakes.slice(0, 100);
 
-            // 3. Render
             const card = document.createElement('div'); card.className = 'student-card-view';
             let listHtml = "";
             if (criticalWords.length === 0) listHtml = `<div class="no-weakness">🎉 表現優異！</div>`;
