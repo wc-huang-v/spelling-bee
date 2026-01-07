@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v25.0</title>
+    <title>智慧單字小考官 v27.0</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -70,6 +70,7 @@
             box-shadow: var(--shadow-card); overflow: hidden;
             min-height: 80vh; flex-direction: column;
             animation: slideUp 0.4s ease-out;
+            padding-bottom: 20px;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
@@ -79,18 +80,25 @@
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
         }
         .header-brand { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
-        .nav-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .nav-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        
+        .nav-select {
+            padding: 8px 12px; border-radius: 20px; border: 1px solid #ddd;
+            font-size: 0.9rem; color: var(--text-main); cursor: pointer; outline: none;
+            background-color: #f8f9fa; font-weight: bold;
+        }
+        .nav-select:hover { border-color: var(--primary); }
+
         .nav-btn {
             background: transparent; color: var(--text-sub); padding: 8px 16px; border-radius: var(--radius-btn); 
             cursor: pointer; border: none; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: 0.2s;
         }
         .nav-btn:hover { background: #f8f9fa; color: var(--primary); }
-        .nav-btn.active-tab { background: var(--primary-light); color: var(--primary); }
 
         .screen { padding: 30px; display: none; flex: 1; }
         .screen.active { display: block; animation: fadeIn 0.3s; }
 
-        /* 儀表板 */
+        /* 儀表板 & 安全離開 */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
         .dash-section-title { font-size: 1.1rem; color: var(--text-sub); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 30px; }
         .dash-section-title:first-child { margin-top: 0; }
@@ -115,7 +123,7 @@
         .btn-safe-exit:hover { background: #ffebeb; color: var(--danger); border-color: var(--danger); }
 
         /* 通用元件 */
-        .section-header { margin-bottom: 15px; display:flex; align-items:center; justify-content: space-between; }
+        .section-header { margin-bottom: 15px; display:flex; align-items:center; justify-content: space-between; flex-wrap: wrap; gap:10px; }
         .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
         .btn-tool { padding: 8px 16px; border-radius: 6px; border: 1px solid #ccc; font-weight: 600; cursor: pointer; font-size: 0.9rem; background:white; color:#555;}
         
@@ -126,24 +134,22 @@
         .btn-pill:active { background: var(--primary-light); }
         .session-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; }
         .session-label { display: flex; align-items: center; padding: 10px; background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; cursor: pointer; font-size: 0.95rem; color: var(--text-main); transition: all 0.2s; }
+        .session-label:hover { border-color: var(--primary-dark); transform: translateY(-1px); }
         .session-label:has(.sess-cb:checked) { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); font-weight: bold; }
         .sess-cb { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--primary); cursor: pointer; }
-        
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dcdcdc; font-size: 1rem; background: #fff; }
         .btn-big { width: 100%; padding: 16px; margin-top: 20px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; font-size: 1.3rem; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4); transition: all 0.2s; }
         .btn-big:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5); }
         .btn-big:disabled { background: #bdc3c7; cursor: not-allowed; }
 
-        /* 🔥 急救按鈕 (Hotspot Button) */
-        .btn-quick-fix {
-            background: linear-gradient(135deg, #e67e22, #d35400); color: white; border: none;
-            padding: 12px; border-radius: 12px; cursor: pointer; width: 100%;
-            font-size: 1.1rem; font-weight: bold; margin-bottom: 20px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: 0 4px 8px rgba(230, 126, 34, 0.3); transition: 0.2s;
+        /* 🔥 小巧的急救按鈕 (Compact Top 30) */
+        .btn-compact-action { 
+            background: white; border: 1px solid var(--accent); color: var(--accent);
+            padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+            transition: 0.2s;
         }
-        .btn-quick-fix:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(230, 126, 34, 0.4); }
-        .btn-quick-fix:active { transform: translateY(1px); box-shadow: none; }
+        .btn-compact-action:hover { background: var(--accent); color: white; }
 
         /* 指定測驗 UI */
         .custom-word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; }
@@ -178,14 +184,13 @@
         .btn-auto-speak { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; box-shadow: 0 3px 0 #d68910; }
         .btn-speak-small { background: #f0f2f5; border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; margin-left: 10px; transition: 0.2s; }
 
-        /* 🚨 急救單字卡 */
-        .critical-section { margin-bottom: 30px; animation: fadeIn 0.5s; }
-        .critical-header { color: var(--heat-critical); font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; }
-        .critical-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
-        .critical-card { background: #fff; border: 2px solid var(--heat-critical); border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.1); position: relative; overflow: hidden; }
-        .critical-card::before { content: "SOS"; position: absolute; top: 0; right: 0; background: var(--heat-critical); color: white; font-size: 0.7rem; padding: 2px 8px; border-bottom-left-radius: 8px; font-weight: bold; }
-        .crit-word { display: block; font-size: 1.8rem; font-weight: 900; color: var(--text-main); margin-bottom: 5px; }
-        .crit-info { font-size: 0.9rem; color: var(--heat-critical); font-weight: bold; }
+        /* 個別弱點分析全覽 */
+        .student-analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .student-card-view { background: white; border: 1px solid #ddd; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; height: 100%; box-shadow: 0 3px 0 #eee; }
+        .student-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 2px solid #f4f6f8; padding-bottom: 8px; }
+        .student-card-body { flex: 1; }
+        .weak-word-tag { display: inline-block; background: #fadbd8; color: #c0392b; padding: 4px 8px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; margin: 3px 0; width: 100%; }
+        .no-weakness { color: #2ecc71; font-size: 0.85rem; font-weight: bold; padding: 10px; text-align: center; background: #eafaf1; border-radius: 8px; }
 
         /* 紀錄 & 總表 */
         .data-toolbar { background: white; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -221,6 +226,12 @@
         .word-list-mini li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #eee; font-size: 0.9rem; color: #555; }
         .err-count { background: #fadbd8; color: #c0392b; padding: 2px 6px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; }
 
+        /* 🆕 分頁籤與單字表 */
+        .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 5px 2px; margin-bottom: 15px; scrollbar-width: none; }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+        .filter-tab { flex: 0 0 auto; padding: 6px 14px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; color: #7f8c8d; transition: 0.2s; }
+        .filter-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
         .full-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top:20px;}
         .word-item-card { background: white; border: 1px solid #eee; border-radius: 10px; padding: 15px; transition: 0.2s; position: relative; text-align: center; }
         .word-item-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; }
@@ -251,6 +262,14 @@
 
         /* Tag UI for AI Weight */
         .ai-tag { position: absolute; top: 5px; right: 5px; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
+        /* 頁面底部安全離開按鈕 */
+        .page-bottom-actions { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #ddd; text-align: center; }
+        .btn-bottom-home { background: #f4f6f8; border: 1px solid #ccc; color: #555; padding: 12px 30px; border-radius: 30px; cursor: pointer; font-weight: bold; transition: 0.2s; width: 80%; max-width: 300px; }
+        .btn-bottom-home:hover { background: #e9ecef; border-color: #bbb; }
+        .btn-safe-exit { background: transparent; border: 1px solid transparent; color: #999; padding: 8px 15px; cursor: pointer; font-size: 0.85rem; margin-top: 10px; text-decoration: underline; }
+        .btn-safe-exit:hover { color: var(--danger); }
+
     </style>
 </head>
 <body>
@@ -276,8 +295,14 @@
             <div class="header-brand"><span>🎓 測驗控制台</span></div>
             <div class="nav-group">
                 <button class="nav-btn" id="nav-dash" onclick="showScreen('dashboardScreen'); setActiveTab(this);">🏠 首頁</button>
-                <button class="nav-btn" id="nav-list" onclick="renderFullWordList(); showScreen('wordListScreen'); setActiveTab(this);">📖 總表</button>
-                <button class="nav-btn" id="nav-history" onclick="showHistory(); setActiveTab(this);">📊 紀錄</button>
+                <select class="nav-select" onchange="quickJump(this.value); this.value='';">
+                    <option value="">🚀 快速前往...</option>
+                    <option value="setupScreen">🤖 AI 隨機測驗</option>
+                    <option value="customQuizScreen">🎯 指定單字測驗</option>
+                    <option value="studentAnalysisScreen">🧑‍🎓 個別弱點總覽</option>
+                    <option value="classAnalysisScreen">🏫 全班弱點分析</option>
+                    <option value="wordListScreen">📖 單字熱點總表</option>
+                </select>
                 <button class="nav-btn" onclick="openHelp('teacher')">❓ 說明</button>
             </div>
         </header>
@@ -303,12 +328,12 @@
             <div class="dashboard-grid">
                 <div class="dash-card accent" onclick="showStudentStats()">
                     <span class="dash-icon">🧑‍🎓</span>
-                    <div class="dash-title">個別弱點</div>
-                    <div class="dash-desc">查看學生 AI 標記的急救單字。</div>
+                    <div class="dash-title">個別弱點總覽</div>
+                    <div class="dash-desc">全班 5 位學生弱點一次看完。</div>
                 </div>
                 <div class="dash-card danger" onclick="showClassStats()">
                     <span class="dash-icon">🏫</span>
-                    <div class="dash-title">全班弱點</div>
+                    <div class="dash-title">全班弱點分析</div>
                     <div class="dash-desc">Top 50 排行與單元分析。</div>
                 </div>
                 <div class="dash-card success" onclick="renderFullWordList(); showScreen('wordListScreen')">
@@ -318,15 +343,13 @@
                 </div>
             </div>
 
-            <div class="safe-exit-area">
-                <button class="btn-safe-exit" onclick="exitTeacherMode()">
-                    🚪 離開控制台 (回到總入口)
-                </button>
+            <div class="page-bottom-actions">
+                <button class="btn-safe-exit" onclick="exitTeacherMode()">🚪 離開控制台 (回到總入口)</button>
             </div>
         </div>
 
         <div id="setupScreen" class="screen">
-            <div class="section-header"><span class="section-title">1. 選擇範圍 (智慧複選)</span><button class="btn-tool" onclick="showScreen('dashboardScreen')">⬅ 回選單</button></div>
+            <div class="section-header"><span class="section-title">1. 選擇範圍 (智慧複選)</span></div>
             <div class="session-panel">
                 <div class="quick-select-bar">
                     <button class="btn-pill" onclick="selectRange(1,5)">U1-U5</button>
@@ -346,22 +369,21 @@
                 <strong>💡 AI 智慧選題：</strong> 系統會自動加重「全班常錯」與「個人常錯」單字的出現機率。
             </div>
             <button id="startBtn" class="btn-big" onclick="startRandomTest()" disabled>開始測驗 ▶</button>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
         </div>
 
         <div id="customQuizScreen" class="screen">
-            <div class="section-header"><span class="section-title">🎯 指定單字測驗</span><button class="btn-tool" onclick="showScreen('dashboardScreen')">⬅ 回選單</button></div>
-            
+            <div class="section-header">
+                <span class="section-title">🎯 指定單字測驗</span>
+            </div>
             <div class="session-panel">
-                <label style="font-weight:bold; display:block; margin-bottom:10px;">✨ 快速功能</label>
-                <button class="btn-quick-fix" onclick="startTopErrorTest()">
-                    <span>⚡ 一鍵測驗全班常錯字 (AI Top 30)</span>
-                </button>
-
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <label style="font-weight:bold;">✨ 快速功能</label>
+                    <button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 測驗常錯 Top 30</button>
+                </div>
                 <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
-
                 <label style="font-weight:bold; display:block; margin-bottom:10px;">手動選擇單元</label>
                 <select id="customSessionSelect" onchange="renderCustomWordSelection()"></select>
-                
                 <div style="margin-top:20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                         <label style="font-weight:bold;">勾選要考的單字</label>
@@ -373,8 +395,8 @@
                     <div id="customWordGrid" class="custom-word-grid"></div>
                 </div>
             </div>
-            
             <button class="btn-big" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);" onclick="startCustomTest()">開始指定測驗 ▶</button>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
         </div>
 
         <div id="testScreen" class="screen">
@@ -402,34 +424,25 @@
         </div>
 
         <div id="studentAnalysisScreen" class="screen">
-            <div class="section-header"><span class="section-title">🧑‍🎓 個別學生弱點分析</span><button class="btn-tool" onclick="showScreen('dashboardScreen')">⬅ 回選單</button></div>
-            <div class="stat-card">
-                <select id="historyStudentSelect" onchange="renderStudentHistory()" style="width:100%; padding:12px; border:2px solid var(--primary); border-radius:8px; font-weight:bold; margin-bottom:20px;">
-                    <option value="1">🐃 1號同學</option><option value="2">🦫 2號同學</option><option value="3">🦥 3號同學</option><option value="4">🦛 4號同學</option><option value="5">🐨 5號同學</option>
-                </select>
-                
-                <div id="aiWeaknessBox" class="critical-section" style="display:none;">
-                    <div class="critical-header">🔥 急救單字卡 (高頻錯誤)</div>
-                    <div id="aiWeaknessList" class="critical-grid"></div>
-                </div>
-
-                <div id="studentStatsTable" class="table-container"></div>
-            </div>
+            <div class="section-header"><span class="section-title">🧑‍🎓 個別弱點總覽</span></div>
+            <div id="studentAnalysisGrid" class="student-analysis-grid"></div>
             <div class="data-toolbar" style="margin-top:20px;">
                 <button class="btn-tool btn-download" onclick="exportToCSV()">📥 匯出 Excel</button>
                 <button class="btn-tool btn-backup" onclick="backupData()">💾 備份</button>
                 <button class="btn-tool btn-import" onclick="document.getElementById('fileInput').click()">📂 匯入</button>
                 <input type="file" id="fileInput" style="display:none" onchange="restoreData(this)">
             </div>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
         </div>
 
         <div id="classAnalysisScreen" class="screen">
-            <div class="section-header"><span class="section-title">🏫 全班弱點分析</span><button class="btn-tool" onclick="showScreen('dashboardScreen')">⬅ 回選單</button></div>
+            <div class="section-header">
+                <span class="section-title">🏫 全班弱點分析</span>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 測驗常錯Top30</button>
+                </div>
+            </div>
             
-            <button class="btn-quick-fix" style="margin-bottom:30px;" onclick="startTopErrorTest()">
-                <span>⚡ 一鍵測驗 Top 30 常錯字</span>
-            </button>
-
             <div class="analysis-container">
                 <div>
                     <h4 style="margin:0 0 10px 0; color:#555;">⚠️ 錯誤熱點排行 (答錯次數最多單元)</h4>
@@ -447,10 +460,14 @@
             <div style="text-align:right; margin-top:20px;">
                 <button class="btn-tool btn-clear" onclick="clearHistory()">🗑️ 清空所有紀錄</button>
             </div>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
         </div>
 
         <div id="wordListScreen" class="screen">
-            <div class="section-header"><span class="section-title">📖 單字總表 (錯題熱點)</span><button class="btn-tool" onclick="showScreen('dashboardScreen')">⬅ 回選單</button></div>
+            <div class="section-header"><span class="section-title">📖 單字總表 (錯題熱點)</span></div>
+            
+            <div id="wordListTabs" class="filter-tabs"></div>
+
             <div class="legend-bar">
                 <span class="legend-item"><span class="legend-dot" style="background:#fff;"></span> 無錯誤</span>
                 <span class="legend-item"><span class="legend-dot" style="background:var(--heat-yellow-bg); border-color:var(--heat-yellow-bd);"></span> 1~4次</span>
@@ -458,6 +475,7 @@
                 <span class="legend-item"><span class="legend-dot" style="background:var(--heat-red-bg); border-color:var(--heat-red-bd);"></span> Top 30</span>
             </div>
             <div id="fullWordListContainer" class="full-list-grid"></div>
+            <div class="page-bottom-actions"><button class="btn-bottom-home" onclick="showScreen('dashboardScreen')">🏠 回首頁儀表板</button></div>
         </div>
 
     </div>
@@ -475,15 +493,10 @@
                     <h3>🚀 安裝到手機</h3><p>iOS: 用 Safari 開啟 -> 分享 -> 加入主畫面<br>Android: 用 Chrome 開啟 -> 選單 -> 安裝應用程式</p>
                 </div>
                 <div id="tab-teacher" class="help-tab-content" style="display:none;">
-                    <h3>測驗模式</h3>
-                    <ul class="help-list">
-                        <li><strong>AI 隨機測驗</strong>：自動加強常錯字。</li>
-                        <li><strong>指定單字測驗</strong>：老師手動勾選單字，結果同樣影響 AI 權重。</li>
-                        <li><strong>一鍵快篩</strong>：直接抓出全班常錯 Top 30 進行隨機 5 題測驗。</li>
-                    </ul>
+                    <h3>測驗模式</h3><p>AI 隨機測驗、指定單字測驗、一鍵常錯快篩。</p>
                 </div>
                 <div id="tab-student" class="help-tab-content" style="display:none;">
-                    <h3>練習模式</h3><p>預習單字卡或進行隨機聽寫挑戰。</p>
+                    <h3>練習模式</h3><p>預習單字卡、隨機聽寫挑戰。</p>
                 </div>
             </div>
         </div>
@@ -493,6 +506,7 @@
 <script>
     let db = [], testList = [], currentIndex = 0;
     let timerValue = 8, timerInterval = null, isTimerRunning = false;
+    let currentListFilter = 'all'; // 🆕 Track filter
 
     window.onload = function() { 
         if (typeof masterWordList !== 'undefined') db = masterWordList; 
@@ -518,14 +532,12 @@
         document.getElementById('startBtn').disabled = false;
         const sessions = [...new Set(db.map(x => x.session))].sort((a,b)=>a-b);
         
-        // Random Quiz Selection
         const grid = document.getElementById('sessionGrid'); grid.innerHTML = '';
         sessions.forEach(s => { 
             const label = document.createElement('label'); label.className = 'session-label';
             label.innerHTML = `<input type="checkbox" value="${s}" class="sess-cb"> U${s}`; grid.appendChild(label);
         });
 
-        // Custom Quiz Select
         const customSel = document.getElementById('customSessionSelect'); customSel.innerHTML = '<option value="">-- 請選擇單元 --</option>';
         sessions.forEach(s => {
             const opt = document.createElement('option'); opt.value = s; opt.innerText = `Unit ${s}`; customSel.appendChild(opt);
@@ -534,9 +546,16 @@
 
     function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
     function setActiveTab(btn) { if(!btn) return; document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab')); btn.classList.add('active-tab'); }
+    
+    function quickJump(target) {
+        if(target === "studentAnalysisScreen") { showStudentStats(); }
+        else if(target === "classAnalysisScreen") { showClassStats(); }
+        else if(target === "wordListScreen") { renderFullWordList(); showScreen(target); }
+        else if(target === "customQuizScreen") { showCustomQuizScreen(); }
+        else if(target !== "") { showScreen(target); }
+    }
 
-    // Navigation
-    function showStudentStats() { showScreen('studentAnalysisScreen'); renderStudentHistory(); }
+    function showStudentStats() { showScreen('studentAnalysisScreen'); renderAllStudentOverview(); }
     function showClassStats() { showScreen('classAnalysisScreen'); renderGlobalStats(); renderSessionAnalysis(); }
     function showCustomQuizScreen() { showScreen('customQuizScreen'); }
 
@@ -553,7 +572,6 @@
     }
     window.onclick = function(e) { if(e.target==document.getElementById('helpModal')) closeHelp(); }
 
-    // Range Logic
     function selectRange(s, e) {
         const cbs = document.querySelectorAll('.sess-cb');
         const target = [];
@@ -563,189 +581,123 @@
     }
     function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
 
-    // --- Custom Quiz Logic ---
+    // Custom Quiz
     function renderCustomWordSelection() {
         const sid = parseInt(document.getElementById('customSessionSelect').value);
         const container = document.getElementById('customWordGrid');
         const countSpan = document.getElementById('customSelectionCount');
-        
-        container.innerHTML = "";
-        countSpan.innerText = "已選 0 題";
-        
+        container.innerHTML = ""; countSpan.innerText = "已選 0 題";
         if(isNaN(sid)) return;
-
         const words = db.filter(x => x.session === sid);
         words.forEach(w => {
-            const label = document.createElement('label');
-            label.className = 'custom-word-label';
+            const label = document.createElement('label'); label.className = 'custom-word-label';
             label.innerHTML = `<span>${w.word}</span> <input type="checkbox" value="${w.word}" class="custom-word-cb" onchange="updateSelectionCounter()">`;
             container.appendChild(label);
         });
     }
-
     function updateSelectionCounter() {
         const count = document.querySelectorAll('.custom-word-cb:checked').length;
         document.getElementById('customSelectionCount').innerText = `已選 ${count} 題`;
     }
-
-    function clearCustomSelection() {
-        document.querySelectorAll('.custom-word-cb').forEach(cb => cb.checked = false);
-        updateSelectionCounter();
-    }
-
+    function clearCustomSelection() { document.querySelectorAll('.custom-word-cb').forEach(cb => cb.checked = false); updateSelectionCounter(); }
     function startCustomTest() {
         const selectedWords = Array.from(document.querySelectorAll('.custom-word-cb:checked')).map(cb => cb.value);
         if(selectedWords.length === 0) { alert("請至少選擇一個單字"); return; }
-        testList = db.filter(w => selectedWords.includes(w.word));
-        testList.sort(() => 0.5 - Math.random());
+        testList = db.filter(w => selectedWords.includes(w.word)); testList.sort(() => 0.5 - Math.random());
         currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
     }
 
-    // --- ⚡ TOP ERROR TEST (New) ---
+    // Top Error Test
     function startTopErrorTest() {
-        // 1. Calculate weights for ALL words
         const weightedDB = [];
-        const history = getHistory();
-        const logs = getTestLogs();
-        const errorMap = {};
-        const individualErrorMap = {};
-
-        // Pre-calc errors
+        const history = getHistory(); const logs = getTestLogs();
+        const errorMap = {}; const individualErrorMap = {};
         history.forEach(h => {
             if(!errorMap[h.word]) errorMap[h.word] = 0; errorMap[h.word]++;
             const key = h.word + "_" + h.student;
             if(!individualErrorMap[key]) individualErrorMap[key] = 0; individualErrorMap[key]++;
         });
-
-        // Loop all db
         db.forEach(item => {
             let weight = 1; 
-            const classErrors = errorMap[item.word] || 0;
-            const isClassWeak = classErrors > 5;
-            let isIndivWeak = false;
-            for(let i=1; i<=5; i++) { if((individualErrorMap[item.word + "_" + i] || 0) > 3) isIndivWeak = true; }
-
+            const classErrors = errorMap[item.word] || 0; const isClassWeak = classErrors > 5;
+            let isIndivWeak = false; for(let i=1; i<=5; i++) { if((individualErrorMap[item.word + "_" + i] || 0) > 3) isIndivWeak = true; }
             const wordLogs = logs.filter(l => l.word === item.word).sort((a,b) => b.timestamp - a.timestamp);
-
-            // Same weight logic as random test
             if (isClassWeak) {
                 if (wordLogs.length >= 3) {
-                    const recent3 = wordLogs.slice(0, 3);
-                    const avgAcc = recent3.reduce((sum, l) => sum + l.accuracy, 0) / 3;
+                    const recent3 = wordLogs.slice(0, 3); const avgAcc = recent3.reduce((sum, l) => sum + l.accuracy, 0) / 3;
                     if (avgAcc >= 0.8) weight = 1; else if (avgAcc > 0.4) weight += 10; else weight += 30;
                 } else { weight += 10; }
             } else if (isIndivWeak) {
                 if (wordLogs.length >= 2) {
-                    const recent2 = wordLogs.slice(0, 2);
-                    const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
+                    const recent2 = wordLogs.slice(0, 2); const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
                     if (avgAcc === 1) weight = 1; else if (avgAcc >= 0.8) weight += 2; else if (avgAcc > 0.4) weight += 5; else weight += 15;
                 } else { weight += 5; }
             }
-            weightedPoolItem = { ...item, currentWeight: weight };
-            weightedDB.push(weightedPoolItem);
+            weightedDB.push({ ...item, currentWeight: weight });
         });
-
-        // 2. Sort by weight DESC
         weightedDB.sort((a, b) => b.currentWeight - a.currentWeight);
-
-        // 3. Take Top 30
         const top30 = weightedDB.slice(0, 30);
-        
-        if (top30.length === 0 || top30[0].currentWeight <= 1) {
-            // Optional: check if there are any high weight words
-            // alert("目前沒有高頻錯字！隨機出題...");
-        }
-
-        // 4. Randomly pick 5 from these 30
-        top30.sort(() => 0.5 - Math.random());
-        testList = top30.slice(0, 5);
-
-        // Start
-        currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
+        if(top30.length > 0) {
+            top30.sort(() => 0.5 - Math.random()); testList = top30.slice(0, 5);
+            currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
+        } else { alert("目前沒有足夠的錯誤數據！"); }
     }
 
-    // --- 🧠 AI Weight Logic ---
+    // AI Weight
     function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
     function getTestLogs() { return JSON.parse(localStorage.getItem('spellingTestLogs')) || []; } 
-
     function getIndividualWeight(word, studentId) {
-        const history = getHistory();
-        const logs = getTestLogs();
+        const history = getHistory(); const logs = getTestLogs();
         const errorCount = history.filter(h => h.word === word && h.student === studentId).length;
         if (errorCount <= 3) return 1; 
         const wordLogs = logs.filter(l => l.word === word).sort((a,b) => b.timestamp - a.timestamp);
         if (wordLogs.length >= 2) {
-            const recent2 = wordLogs.slice(0, 2);
-            const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
+            const recent2 = wordLogs.slice(0, 2); const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
             if (avgAcc === 1) return 1; 
         }
         return 5; 
     }
-
     function getSmartWordList(pool, count) {
-        const history = getHistory();
-        const logs = getTestLogs();
-        const errorMap = {};
-        const individualErrorMap = {};
-
+        const history = getHistory(); const logs = getTestLogs();
+        const errorMap = {}; const individualErrorMap = {};
         history.forEach(h => {
             if(!errorMap[h.word]) errorMap[h.word] = 0; errorMap[h.word]++;
             const key = h.word + "_" + h.student;
             if(!individualErrorMap[key]) individualErrorMap[key] = 0; individualErrorMap[key]++;
         });
-
         let weightedPool = [];
         pool.forEach(item => {
             let weight = 1; let reason = "";
-            const classErrors = errorMap[item.word] || 0;
-            const isClassWeak = classErrors > 5;
-            let isIndivWeak = false;
-            for(let i=1; i<=5; i++) { if((individualErrorMap[item.word + "_" + i] || 0) > 3) isIndivWeak = true; }
-
+            const classErrors = errorMap[item.word] || 0; const isClassWeak = classErrors > 5;
+            let isIndivWeak = false; for(let i=1; i<=5; i++) { if((individualErrorMap[item.word + "_" + i] || 0) > 3) isIndivWeak = true; }
             const wordLogs = logs.filter(l => l.word === item.word).sort((a,b) => b.timestamp - a.timestamp);
-
             if (isClassWeak) {
                 if (wordLogs.length >= 3) {
-                    const recent3 = wordLogs.slice(0, 3);
-                    const avgAcc = recent3.reduce((sum, l) => sum + l.accuracy, 0) / 3;
-                    if (avgAcc >= 0.8) { weight = 1; } 
-                    else if (avgAcc > 0.4) { weight += 10; reason = "⚠️ 全班常錯"; }
-                    else { weight += 30; reason = "🔥 全班重災區"; }
+                    const recent3 = wordLogs.slice(0, 3); const avgAcc = recent3.reduce((sum, l) => sum + l.accuracy, 0) / 3;
+                    if (avgAcc >= 0.8) { weight = 1; } else if (avgAcc > 0.4) { weight += 10; reason = "⚠️ 全班常錯"; } else { weight += 30; reason = "🔥 全班重災區"; }
                 } else { weight += 10; reason = "⚠️ 全班常錯"; }
             } else if (isIndivWeak) {
                 if (wordLogs.length >= 2) {
-                    const recent2 = wordLogs.slice(0, 2);
-                    const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
-                    if (avgAcc === 1) { weight = 1; }
-                    else if (avgAcc >= 0.8) { weight += 2; reason = "👀 個別需留意"; }
-                    else if (avgAcc > 0.4) { weight += 5; reason = "❗ 個人常錯"; }
-                    else { weight += 15; reason = "⚡ 個人嚴重"; }
+                    const recent2 = wordLogs.slice(0, 2); const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
+                    if (avgAcc === 1) { weight = 1; } else if (avgAcc >= 0.8) { weight += 2; reason = "👀 個別需留意"; } else if (avgAcc > 0.4) { weight += 5; reason = "❗ 個人常錯"; } else { weight += 15; reason = "⚡ 個人嚴重"; }
                 } else { weight += 5; reason = "❗ 個人常錯"; }
             }
             for(let k=0; k<weight; k++) { weightedPool.push({ ...item, tag: (k===0 ? reason : "") }); }
         });
-
         weightedPool.sort(() => 0.5 - Math.random());
-        const uniqueList = [];
-        const seen = new Set();
-        for(let w of weightedPool) {
-            if(!seen.has(w.word)) { uniqueList.push(w); seen.add(w.word); }
-            if(uniqueList.length >= count) break;
-        }
+        const uniqueList = []; const seen = new Set();
+        for(let w of weightedPool) { if(!seen.has(w.word)) { uniqueList.push(w); seen.add(w.word); } if(uniqueList.length >= count) break; }
         return uniqueList;
     }
 
-    // Random Quiz Start
     function startRandomTest() {
         const cbs = document.querySelectorAll('.sess-cb:checked');
         const sids = Array.from(cbs).map(cb => parseInt(cb.value));
         if(sids.length === 0) { alert("請勾選單元"); return; }
         const pool = db.filter(i => sids.includes(i.session));
         if(pool.length === 0) { alert("無單字"); return; }
-        
         const count = parseInt(document.getElementById('wordCount').value);
         testList = getSmartWordList(pool, count);
-        
         currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
     }
 
@@ -755,9 +707,7 @@
         document.getElementById('displayWord').innerText = item.word;
         document.getElementById('displaySentence').innerText = item.sentence;
         for(let i=1; i<=5; i++) document.getElementById(`btn-s${i}`).classList.remove('marked-wrong');
-        
-        const oldTag = document.querySelector('.ai-tag');
-        if(oldTag) oldTag.remove();
+        const oldTag = document.querySelector('.ai-tag'); if(oldTag) oldTag.remove();
         if(item.tag) {
             const tag = document.createElement('span'); tag.className = 'ai-tag'; tag.innerText = item.tag;
             tag.style.backgroundColor = item.tag.includes('全班') ? '#e74c3c' : '#f39c12';
@@ -777,7 +727,6 @@
     }
     function speak(text) { const u = new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=0.8; window.speechSynthesis.speak(u); }
 
-    // Timer
     function manualStartTimer() { if(isTimerRunning) resetTimer(); else startTimer(); }
     function startTimer() {
         if(isTimerRunning) return; isTimerRunning = true; timerValue = 8;
@@ -799,76 +748,40 @@
         osc1.start(t); osc2.start(t); osc1.stop(t+1.5); osc2.stop(t+1.5);
     }
 
-    // Save Logic
     function toggleStudent(id) { document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong'); }
     function nextWord() {
-        const item = testList[currentIndex]; 
-        const date = new Date().toLocaleDateString('zh-TW');
-        let errorCount = 0;
-        for(let i=1; i<=5; i++) { 
-            if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) {
-                saveMistake(i, item, date);
-                errorCount++;
-            }
-        }
+        const item = testList[currentIndex]; const date = new Date().toLocaleDateString('zh-TW'); let errorCount = 0;
+        for(let i=1; i<=5; i++) { if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) { saveMistake(i, item, date); errorCount++; } }
         saveTestLog(item.word, errorCount, 5); 
-        currentIndex++; 
-        if(currentIndex < testList.length) loadCard(); 
-        else { alert("測驗結束"); showClassStats(); }
+        currentIndex++; if(currentIndex < testList.length) loadCard(); else { alert("測驗結束"); showClassStats(); }
     }
+    function saveMistake(sid, w, d) { let h = JSON.parse(localStorage.getItem('spellingHistory')) || []; h.push({ student: sid, word: w.word, session: w.session, sentence: w.sentence, date: d }); localStorage.setItem('spellingHistory', JSON.stringify(h)); }
+    function saveTestLog(word, errCount, totalStudents) { let logs = JSON.parse(localStorage.getItem('spellingTestLogs')) || []; logs.push({ word: word, timestamp: Date.now(), accuracy: (totalStudents - errCount) / totalStudents }); localStorage.setItem('spellingTestLogs', JSON.stringify(logs)); }
 
-    function saveMistake(sid, w, d) {
-        let h = JSON.parse(localStorage.getItem('spellingHistory')) || [];
-        h.push({ student: sid, word: w.word, session: w.session, sentence: w.sentence, date: d });
-        localStorage.setItem('spellingHistory', JSON.stringify(h));
-    }
-    function saveTestLog(word, errCount, totalStudents) {
-        let logs = JSON.parse(localStorage.getItem('spellingTestLogs')) || [];
-        logs.push({ word: word, timestamp: Date.now(), accuracy: (totalStudents - errCount) / totalStudents });
-        localStorage.setItem('spellingTestLogs', JSON.stringify(logs));
-    }
-    function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
-
-    // Analysis (Visual Updates)
-    function renderStudentHistory() {
-        const sid = parseInt(document.getElementById('historyStudentSelect').value);
-        const h = getHistory().filter(x => x.student === sid);
-        
-        const c = document.getElementById('studentStatsTable');
-        if(h.length===0){c.innerHTML="<p style='text-align:center;color:#999'>無紀錄</p>";}
-        else {
-            let counts={}; h.forEach(x=>{if(!counts[x.word])counts[x.word]={c:0,s:x.session};counts[x.word].c++;});
-            let s = Object.keys(counts).map(k=>({w:k,...counts[k]})).sort((a,b)=>b.c-a.c);
-            let html="<table><tr><th>次</th><th>字</th><th>U</th></tr>";
-            s.forEach(i=>{html+=`<tr><td><span class="badge">${i.c}</span></td><td>${i.w}</td><td>${i.s}</td></tr>`});
-            c.innerHTML = html+"</table>";
-        }
-
-        // Render AI Weakness Box (Critical Cards)
-        const weakBox = document.getElementById('aiWeaknessBox');
-        const weakList = document.getElementById('aiWeaknessList');
+    function renderAllStudentOverview() {
+        const container = document.getElementById('studentAnalysisGrid');
+        container.innerHTML = "";
+        const animalMap = {1:"🐃", 2:"🦫", 3:"🦥", 4:"🦛", 5:"🐨"};
         const uniqueWords = [...new Set(db.map(x => x.word))];
-        let weakHtml = "";
-        let hasWeakness = false;
 
-        uniqueWords.forEach(word => {
-            const weight = getIndividualWeight(word, sid);
-            if (weight > 1) {
-                hasWeakness = true;
-                weakHtml += `
-                    <div class="critical-card">
-                        <span class="crit-word">${word}</span>
-                        <span class="crit-info">AI 權重: ${weight}x</span>
-                    </div>
-                `;
+        for (let i = 1; i <= 5; i++) {
+            let criticalWords = [];
+            uniqueWords.forEach(word => {
+                const weight = getIndividualWeight(word, i);
+                if (weight > 1) criticalWords.push({ w: word, weight: weight });
+            });
+            criticalWords.sort((a,b) => b.weight - a.weight);
+
+            const card = document.createElement('div'); card.className = 'student-card-view';
+            let listHtml = "";
+            if (criticalWords.length === 0) {
+                listHtml = `<div class="no-weakness">🎉 表現優異！</div>`;
+            } else {
+                criticalWords.slice(0, 5).forEach(item => { listHtml += `<span class="weak-word-tag">${item.w} (x${item.weight})</span>`; });
+                if(criticalWords.length > 5) listHtml += `<span style="font-size:0.8rem; color:#999;">...還有 ${criticalWords.length-5} 個</span>`;
             }
-        });
-
-        if (hasWeakness) {
-            weakList.innerHTML = weakHtml;
-            weakBox.style.display = 'block';
-        } else {
-            weakBox.style.display = 'none';
+            card.innerHTML = `<div class="student-card-header"><span style="font-size:1.5rem;">${animalMap[i]}</span><span style="font-weight:bold; color:var(--text-main);">${i}號同學</span></div><div class="student-card-body">${listHtml}</div>`;
+            container.appendChild(card);
         }
     }
 
@@ -878,19 +791,10 @@
         let counts={}; h.forEach(x=>{if(!counts[x.word])counts[x.word]=0;counts[x.word]++;});
         let s = Object.keys(counts).map(k=>({w:k,c:counts[k]})).sort((a,b)=>b.c-a.c).slice(0,50);
         let maxCount = s[0]?.c || 1; 
-
         let html="<table><tr><th width='60%'>常錯單字 (Top 50)</th><th>錯誤次數</th></tr>";
         s.forEach(i=>{
             const widthPct = (i.c / maxCount) * 100;
-            html+=`<tr>
-                <td style="font-weight:bold; font-size:1.1rem; color:#2c3e50;">${i.w}</td>
-                <td>
-                    <div style="display:flex; align-items:center;">
-                        <span class="rank-bar-bg"><span class="rank-bar-fill" style="width:${widthPct}%"></span></span>
-                        <span class="rank-high">${i.c}</span>
-                    </div>
-                </td>
-            </tr>`
+            html+=`<tr><td style="font-weight:bold; font-size:1.1rem; color:#2c3e50;">${i.w}</td><td><div style="display:flex; align-items:center;"><span class="rank-bar-bg"><span class="rank-bar-fill" style="width:${widthPct}%"></span></span><span class="rank-high">${i.c}</span></div></td></tr>`
         });
         c.innerHTML = html+"</table>";
     }
@@ -925,12 +829,41 @@
         breakdownContainer.innerHTML = breakdownHtml;
     }
     
+    // 🆕 渲染分頁籤
+    function renderWordListTabs() {
+        const sessions = [...new Set(db.map(x => x.session))].sort((a,b)=>a-b);
+        const tabsContainer = document.getElementById('wordListTabs');
+        tabsContainer.innerHTML = "";
+        
+        // "All" Tab
+        const allTab = document.createElement('div');
+        allTab.className = `filter-tab ${currentListFilter === 'all' ? 'active' : ''}`;
+        allTab.innerText = "全部";
+        allTab.onclick = () => { currentListFilter = 'all'; renderFullWordList(); renderWordListTabs(); };
+        tabsContainer.appendChild(allTab);
+
+        // Session Tabs
+        sessions.forEach(s => {
+            const tab = document.createElement('div');
+            tab.className = `filter-tab ${currentListFilter === s ? 'active' : ''}`;
+            tab.innerText = `U${s}`;
+            tab.onclick = () => { currentListFilter = s; renderFullWordList(); renderWordListTabs(); };
+            tabsContainer.appendChild(tab);
+        });
+    }
+
     function renderFullWordList() {
+        renderWordListTabs(); // Ensure tabs are rendered
         const history = getHistory(); const errorMap = {}; const animalMap = {1:"🐃", 2:"🦫", 3:"🦥", 4:"🦛", 5:"🐨"};
         history.forEach(h => { if(!errorMap[h.word]) errorMap[h.word] = { total: 0, students: new Set() }; errorMap[h.word].total++; errorMap[h.word].students.add(h.student); });
         const top30 = Object.keys(errorMap).sort((a,b)=>errorMap[b].total - errorMap[a].total).slice(0, 30); const top30Set = new Set(top30);
+        
         const container = document.getElementById('fullWordListContainer'); container.innerHTML = "";
-        db.forEach(item => {
+        
+        // 🆕 Filter DB based on current tab
+        const filteredDB = (currentListFilter === 'all') ? db : db.filter(w => w.session === currentListFilter);
+
+        filteredDB.forEach(item => {
             const errData = errorMap[item.word] || { total: 0, students: new Set() };
             const div = document.createElement('div'); div.className = 'word-item-card';
             if (top30Set.has(item.word) && errData.total > 0) div.classList.add('heatmap-red');
