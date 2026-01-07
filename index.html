@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v21.0 (AI權重版)</title>
+    <title>智慧單字小考官 v22.0 (精細化AI版)</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -142,6 +142,7 @@
         
         .timer-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 100px; gap: 8px; }
         .timer-btn { width: 80px; height: 80px; background: white; border: 5px solid #dcdcdc; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: 900; color: #95a5a6; cursor: pointer; box-shadow: 0 4px 0 #bdc3c7; transition: 0.1s; }
+        .timer-btn:active { transform: translateY(3px); box-shadow: none; }
         .timer-btn.active { border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 0 #d35400; }
         .timer-btn.ticking { color: var(--danger); border-color: var(--danger); box-shadow: 0 4px 0 #c0392b; animation: pulse 1s infinite; }
         .switch-wrapper { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-sub); }
@@ -162,6 +163,7 @@
         .name { font-weight: 800; color: var(--text-sub); font-size: 1.1rem; }
         .btn-student.marked-wrong .name { color: white; }
         .btn-auto-speak { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; box-shadow: 0 3px 0 #d68910; }
+        .btn-auto-speak:active { transform: translateY(2px); box-shadow: none; }
         .btn-speak-small { background: #f0f2f5; border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; margin-left: 10px; transition: 0.2s; }
 
         /* 紀錄 & 總表 */
@@ -478,9 +480,9 @@
     }
     function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
 
-    // --- 🧠 AI Weight Algorithm (v21.0) ---
+    // --- 🧠 AI Weight Algorithm (v22.0) ---
     function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
-    function getTestLogs() { return JSON.parse(localStorage.getItem('spellingTestLogs')) || []; } // New: 測驗日誌
+    function getTestLogs() { return JSON.parse(localStorage.getItem('spellingTestLogs')) || []; } 
 
     function getSmartWordList(pool, count) {
         const history = getHistory();
@@ -490,89 +492,58 @@
 
         // 1. 統計錯誤
         history.forEach(h => {
-            // Class Level
-            if(!errorMap[h.word]) errorMap[h.word] = 0;
-            errorMap[h.word]++;
-            
-            // Individual Level
+            if(!errorMap[h.word]) errorMap[h.word] = 0; errorMap[h.word]++;
             const key = h.word + "_" + h.student;
-            if(!individualErrorMap[key]) individualErrorMap[key] = 0;
-            individualErrorMap[key]++;
+            if(!individualErrorMap[key]) individualErrorMap[key] = 0; individualErrorMap[key]++;
         });
 
         // 2. 建立加權池
         let weightedPool = [];
-        
         pool.forEach(item => {
-            let weight = 1; // 基礎權重
+            let weight = 1; 
             let reason = "";
 
-            // Check Class Weakness (Total Errors > 5)
             const classErrors = errorMap[item.word] || 0;
             const isClassWeak = classErrors > 5;
-
-            // Check Individual Weakness (Any student > 3)
             let isIndivWeak = false;
-            for(let i=1; i<=5; i++) {
-                if((individualErrorMap[item.word + "_" + i] || 0) > 3) isIndivWeak = true;
-            }
+            for(let i=1; i<=5; i++) { if((individualErrorMap[item.word + "_" + i] || 0) > 3) isIndivWeak = true; }
 
-            // --- 復活機制 ---
-            // 找出此單字的測驗紀錄 (由新到舊)
+            // 復活機制 - 抓取單字測驗紀錄
             const wordLogs = logs.filter(l => l.word === item.word).sort((a,b) => b.timestamp - a.timestamp);
 
             if (isClassWeak) {
-                // Class Rule: Last 3 times, avg acc >= 80%
                 if (wordLogs.length >= 3) {
                     const recent3 = wordLogs.slice(0, 3);
                     const avgAcc = recent3.reduce((sum, l) => sum + l.accuracy, 0) / 3;
-                    if (avgAcc >= 0.8) {
-                        weight = 1; // 復活成功
-                    } else {
-                        weight += 50; // 復活失敗，強力加權
-                        reason = "🔥 全班重災區";
-                    }
+                    if (avgAcc >= 0.8) { weight = 1; } 
+                    else if (avgAcc > 0.4) { weight += 10; reason = "⚠️ 全班常錯"; }
+                    else { weight += 30; reason = "🔥 全班重災區"; }
                 } else {
-                    weight += 10; // 尚未測滿3次，維持高權重
-                    reason = "⚠️ 全班常錯";
+                    weight += 10; reason = "⚠️ 全班常錯";
                 }
             } else if (isIndivWeak) {
-                // Individual Rule: Last 2 times, acc == 100%
                 if (wordLogs.length >= 2) {
                     const recent2 = wordLogs.slice(0, 2);
-                    const allPerfect = recent2.every(l => l.accuracy === 1);
-                    if (allPerfect) {
-                        weight = 1; // 復活成功
-                    } else {
-                        weight += 30; // 復活失敗
-                        reason = "⚡ 個人常錯";
-                    }
+                    const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
+                    if (avgAcc === 1) { weight = 1; }
+                    else if (avgAcc >= 0.8) { weight += 2; reason = "👀 個別需留意"; }
+                    else if (avgAcc > 0.4) { weight += 5; reason = "❗ 個人常錯"; }
+                    else { weight += 15; reason = "⚡ 個人嚴重"; }
                 } else {
-                    weight += 5;
-                    reason = "❗ 個人常錯";
+                    weight += 5; reason = "❗ 個人常錯";
                 }
             }
 
-            // 加入池中 (根據權重重複添加)
-            for(let k=0; k<weight; k++) {
-                weightedPool.push({ ...item, tag: (k===0 ? reason : "") }); 
-            }
+            for(let k=0; k<weight; k++) { weightedPool.push({ ...item, tag: (k===0 ? reason : "") }); }
         });
 
-        // 3. 隨機抽取
         weightedPool.sort(() => 0.5 - Math.random());
-        
-        // 去除重複 (確保同個單字只出現一次，但高權重者更有機會被選到前面)
         const uniqueList = [];
         const seen = new Set();
         for(let w of weightedPool) {
-            if(!seen.has(w.word)) {
-                uniqueList.push(w);
-                seen.add(w.word);
-            }
+            if(!seen.has(w.word)) { uniqueList.push(w); seen.add(w.word); }
             if(uniqueList.length >= count) break;
         }
-        
         return uniqueList;
     }
 
@@ -585,8 +556,6 @@
         if(pool.length === 0) { alert("無單字"); return; }
         
         const count = parseInt(document.getElementById('wordCount').value);
-        
-        // 使用 AI 選題
         testList = getSmartWordList(pool, count);
         
         currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
@@ -599,14 +568,10 @@
         document.getElementById('displaySentence').innerText = item.sentence;
         for(let i=1; i<=5; i++) document.getElementById(`btn-s${i}`).classList.remove('marked-wrong');
         
-        // Show AI Tag if exists
         const oldTag = document.querySelector('.ai-tag');
         if(oldTag) oldTag.remove();
-        
         if(item.tag) {
-            const tag = document.createElement('span');
-            tag.className = 'ai-tag';
-            tag.innerText = item.tag;
+            const tag = document.createElement('span'); tag.className = 'ai-tag'; tag.innerText = item.tag;
             tag.style.backgroundColor = item.tag.includes('全班') ? '#e74c3c' : '#f39c12';
             document.getElementById('quizCard').appendChild(tag);
         }
@@ -654,16 +619,13 @@
         const date = new Date().toLocaleDateString('zh-TW');
         let errorCount = 0;
 
-        // Save Errors
         for(let i=1; i<=5; i++) { 
             if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) {
                 saveMistake(i, item, date);
                 errorCount++;
             }
         }
-
-        // 🧠 Save Test Log (For AI Recovery)
-        saveTestLog(item.word, errorCount, 5); // Assuming 5 students
+        saveTestLog(item.word, errorCount, 5); 
 
         currentIndex++; 
         if(currentIndex < testList.length) loadCard(); 
