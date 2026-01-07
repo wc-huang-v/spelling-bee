@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v30.3</title>
+    <title>智慧單字小考官 v30.4</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -20,10 +20,15 @@
             --radius-card: 16px;
             --radius-btn: 8px;
             
-            /* 視覺化熱點 */
+            /* 視覺化熱點 - 核心色 */
             --heat-critical: #c0392b;
             --heat-high: #e67e22;
             --heat-med: #f1c40f;
+
+            /* 🛠️ [Fix] 補回缺失的背景色變數，讓圖示正確顯示 */
+            --heat-yellow-bg: #fef9e7; --heat-yellow-bd: #f1c40f;
+            --heat-orange-bg: #fdf2e9; --heat-orange-bd: #e67e22;
+            --heat-red-bg: #fadbd8; --heat-red-bd: #e74c3c;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -70,7 +75,7 @@
             min-height: 80vh; flex-direction: column;
             animation: slideUp 0.4s ease-out;
             padding-bottom: 20px;
-            overflow: visible; /* 重要：允許下拉選單超出容器 */
+            overflow: visible; /* 允許下拉選單超出容器 */
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
@@ -100,30 +105,21 @@
         .nav-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
         .nav-btn.active-tab { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* 🆕 懸浮下拉選單 (Hover Dropdown) - 修正版 */
-        .nav-dropdown-wrapper { position: relative; display: inline-block; padding-bottom: 10px; margin-bottom: -10px; /* 增加下方感應區 */ }
+        /* 懸浮下拉選單 */
+        .nav-dropdown-wrapper { position: relative; display: inline-block; padding-bottom: 10px; margin-bottom: -10px; }
         
         .nav-dropdown-menu {
             display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
             background: white; min-width: 180px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             border-radius: 12px; padding: 8px 0; border: 1px solid #eee;
-            z-index: 1001;
-            /* 修正：把 margin-top 拿掉，改用 invisible bridge */
-            margin-top: 5px; 
+            z-index: 1001; margin-top: 5px; 
         }
 
-        /* 🌉 隱形橋：填補按鈕與選單的空隙，防止游標迷路 */
+        /* 隱形橋 (防止游標斷開) */
         .nav-dropdown-menu::after {
-            content: "";
-            position: absolute;
-            top: -20px; /* 往上延伸覆蓋空隙 */
-            left: 0;
-            width: 100%;
-            height: 20px;
-            background: transparent;
+            content: ""; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; background: transparent;
         }
-
-        /* 小箭頭 (維持原樣，用 before) */
+        /* 小箭頭 */
         .nav-dropdown-menu::before {
             content: ""; position: absolute; bottom: 100%; left: 50%; margin-left: -8px;
             border-width: 8px; border-style: solid; border-color: transparent transparent white transparent;
@@ -300,9 +296,12 @@
         .full-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top:20px;}
         .word-item-card { background: white; border: 1px solid #eee; border-radius: 10px; padding: 15px; transition: 0.2s; position: relative; text-align: center; }
         .word-item-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; }
-        .heatmap-yellow { background-color: #fef9e7; border-color: #f1c40f; }
-        .heatmap-orange { background-color: #fdf2e9; border-color: #e67e22; }
-        .heatmap-red { background-color: #fadbd8; border-color: #e74c3c; }
+        
+        /* 🛠️ [Fix] 補回缺失的熱點顏色定義 */
+        .heatmap-yellow { background-color: var(--heat-yellow-bg); border-color: var(--heat-yellow-bd); }
+        .heatmap-orange { background-color: var(--heat-orange-bg); border-color: var(--heat-orange-bd); }
+        .heatmap-red { background-color: var(--heat-red-bg); border-color: var(--heat-red-bd); }
+        
         .wi-word { font-size: 1.3rem; font-weight: 800; color: var(--text-main); display: block; margin-bottom: 5px; }
         .wi-session { font-size: 0.8rem; color: #999; background: rgba(255,255,255,0.5); padding: 2px 6px; border-radius: 4px; display: inline-block; }
         .word-item-card[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: rgba(44, 62, 80, 0.9); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; white-space: pre-wrap; width: max-content; max-width: 200px; z-index: 100; pointer-events: none; margin-bottom: 8px; }
