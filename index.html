@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v18.0 (智慧熱點版)</title>
+    <title>智慧單字小考官 v19.0 (儀表板版)</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -20,15 +20,11 @@
             --radius-card: 16px;
             --radius-btn: 8px;
             --shadow-card: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-float: 0 8px 24px rgba(0,0,0,0.12);
             
-            /* 熱點顏色定義 */
-            --heat-yellow-bg: #fef9e7;
-            --heat-yellow-bd: #f1c40f;
-            --heat-orange-bg: #fdf2e9;
-            --heat-orange-bd: #e67e22;
-            --heat-red-bg: #fadbd8;
-            --heat-red-bd: #e74c3c;
+            /* 熱點顏色 */
+            --heat-yellow-bg: #fef9e7; --heat-yellow-bd: #f1c40f;
+            --heat-orange-bg: #fdf2e9; --heat-orange-bd: #e67e22;
+            --heat-red-bg: #fadbd8; --heat-red-bd: #e74c3c;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -86,7 +82,7 @@
             background: white; border-bottom: 1px solid #eee; padding: 15px 25px;
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
         }
-        .header-brand { font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+        .header-brand { font-size: 1.2rem; font-weight: bold; color: var(--primary); display:flex; align-items:center; gap:8px;}
         .nav-group { display: flex; gap: 8px; flex-wrap: wrap; }
         .nav-btn {
             background: transparent; color: var(--text-sub); padding: 8px 16px; border-radius: var(--radius-btn); 
@@ -99,7 +95,25 @@
         .screen { padding: 30px; display: none; flex: 1; }
         .screen.active { display: block; animation: fadeIn 0.3s; }
 
-        /* 設定區 */
+        /* --- 🎛️ 老師儀表板 (Dashboard) --- */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .dash-card {
+            background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 25px;
+            text-align: center; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+            box-shadow: 0 4px 0 #eee;
+        }
+        .dash-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 8px 15px rgba(52, 152, 219, 0.15); }
+        .dash-card:active { transform: translateY(2px); box-shadow: none; }
+        
+        .dash-icon { font-size: 3rem; margin-bottom: 15px; display: block; }
+        .dash-title { font-size: 1.3rem; font-weight: bold; color: var(--text-main); margin-bottom: 8px; }
+        .dash-desc { font-size: 0.9rem; color: var(--text-sub); line-height: 1.5; }
+        .dash-card.primary { border-top: 5px solid var(--primary); }
+        .dash-card.accent { border-top: 5px solid var(--accent); }
+        .dash-card.success { border-top: 5px solid var(--success); }
+        .dash-card.danger { border-top: 5px solid var(--danger); }
+
+        /* 設定區 & 通用 */
         .section-header { margin-bottom: 15px; display:flex; align-items:center; gap:10px; }
         .section-badge { background: var(--primary); color:white; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:0.9rem;}
         .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
@@ -110,13 +124,12 @@
         .btn-pill:active { background: var(--primary-light); }
         .session-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; }
         .session-label { display: flex; align-items: center; padding: 10px; background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; cursor: pointer; font-size: 0.95rem; color: var(--text-main); transition: all 0.2s; }
-        .session-label:hover { border-color: var(--primary-dark); transform: translateY(-1px); }
         .session-label:has(.sess-cb:checked) { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); font-weight: bold; }
         .sess-cb { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--primary); cursor: pointer; }
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dcdcdc; font-size: 1rem; background: #fff; }
         .btn-big { width: 100%; padding: 16px; margin-top: 30px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; font-size: 1.3rem; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4); transition: all 0.2s; }
         .btn-big:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5); }
-        .btn-big:disabled { background: #bdc3c7; cursor: not-allowed; box-shadow: none; transform: none;}
+        .btn-big:disabled { background: #bdc3c7; cursor: not-allowed; }
 
         /* 測驗畫面 */
         .progress-bar-container { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
@@ -128,7 +141,6 @@
         
         .timer-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 100px; gap: 8px; }
         .timer-btn { width: 80px; height: 80px; background: white; border: 5px solid #dcdcdc; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; font-weight: 900; color: #95a5a6; cursor: pointer; box-shadow: 0 4px 0 #bdc3c7; transition: 0.1s; }
-        .timer-btn:active { transform: translateY(3px); box-shadow: none; }
         .timer-btn.active { border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 0 #d35400; }
         .timer-btn.ticking { color: var(--danger); border-color: var(--danger); box-shadow: 0 4px 0 #c0392b; animation: pulse 1s infinite; }
         .switch-wrapper { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-sub); }
@@ -140,17 +152,14 @@
         input:checked + .slider:before { transform: translateX(16px); }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        .mistake-label { color: var(--danger); font-weight: bold; margin-bottom: 10px; font-size: 1rem; }
         .student-grid { display: grid; gap: 12px; grid-template-columns: repeat(5, 1fr); margin-bottom: 25px; }
         .btn-student { background: white; border: 1px solid #ddd; border-radius: 12px; cursor: pointer; padding: 12px 0; display: flex; flex-direction: column; align-items: center; transition: 0.1s; box-shadow: 0 3px 0 #eee; }
-        .btn-student:active { transform: translateY(2px); box-shadow: none; }
         .btn-student.marked-wrong { background: var(--danger); border-color: #c0392b; color: white; box-shadow: 0 3px 0 #922b21; }
         .avatar { font-size: 2rem; margin-bottom: 5px; }
         .name { font-weight: 800; color: var(--text-sub); font-size: 1.1rem; }
         .btn-student.marked-wrong .name { color: white; }
-        .btn-auto-speak { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; box-shadow: 0 3px 0 #d68910; }
-        .btn-auto-speak:active { transform: translateY(2px); box-shadow: none; }
-        .btn-speak-small { background: #f0f2f5; border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; margin-left: 10px; transition: 0.2s; }
+        .btn-auto-speak { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-speak-small { background: #f0f2f5; border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; margin-left: 10px; }
 
         /* 紀錄 & 總表 */
         .data-toolbar { background: white; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -159,46 +168,25 @@
         .btn-backup { background: #8e44ad; }
         .btn-import { background: #34495e; }
         .btn-clear { background: transparent; color: var(--danger); border: 1px solid var(--danger); margin-left: auto; }
-        .stat-card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 20px; flex: 1; }
-        .stat-header { font-size: 1rem; font-weight: bold; color: var(--text-main); margin-bottom: 15px; border-bottom: 2px solid #f4f6f8; padding-bottom: 10px; }
-        .table-container { max-height: 350px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { text-align: left; padding: 10px; color: var(--text-sub); background: #f8f9fa; position: sticky; top: 0; font-size: 0.85rem; }
-        td { padding: 10px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); }
+        
+        .stat-card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 20px; flex: 1; margin-bottom: 20px; }
+        .stat-header { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 15px; border-bottom: 2px solid #f4f6f8; padding-bottom: 10px; }
+        .table-container { max-height: 400px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { text-align: left; padding: 12px; color: var(--text-sub); background: #f8f9fa; position: sticky; top: 0; }
+        td { padding: 12px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); }
         .badge { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: bold; }
 
-        /* --- 🆕 熱點總表樣式 (Heatmap) --- */
+        /* 熱點總表 */
         .full-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-        .word-item-card { 
-            background: white; border: 1px solid #eee; border-radius: 10px; padding: 15px; 
-            transition: 0.2s; position: relative; text-align: center;
-        }
+        .word-item-card { background: white; border: 1px solid #eee; border-radius: 10px; padding: 15px; transition: 0.2s; position: relative; text-align: center; }
         .word-item-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10; }
-        
-        /* 熱點分級顏色 */
         .heatmap-yellow { background-color: var(--heat-yellow-bg); border-color: var(--heat-yellow-bd); }
         .heatmap-orange { background-color: var(--heat-orange-bg); border-color: var(--heat-orange-bd); }
         .heatmap-red { background-color: var(--heat-red-bg); border-color: var(--heat-red-bd); }
-        
         .wi-word { font-size: 1.3rem; font-weight: 800; color: var(--text-main); display: block; margin-bottom: 5px; }
         .wi-session { font-size: 0.8rem; color: #999; background: rgba(255,255,255,0.5); padding: 2px 6px; border-radius: 4px; display: inline-block; }
-        
-        /* Tooltip */
-        .word-item-card[data-tooltip]:hover::after {
-            content: attr(data-tooltip);
-            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-            background: rgba(44, 62, 80, 0.9); color: white; padding: 8px 12px; border-radius: 6px;
-            font-size: 0.85rem; white-space: pre-wrap; width: max-content; max-width: 200px;
-            z-index: 100; pointer-events: none; margin-bottom: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        /* Tooltip 三角形 */
-        .word-item-card[data-tooltip]:hover::before {
-            content: ""; position: absolute; bottom: 100%; left: 50%; margin-left: -5px;
-            border-width: 5px; border-style: solid; border-color: rgba(44, 62, 80, 0.9) transparent transparent transparent;
-            z-index: 100; margin-bottom: -2px;
-        }
-
-        /* 顏色標示條 */
+        .word-item-card[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: rgba(44, 62, 80, 0.9); color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; white-space: pre-wrap; width: max-content; max-width: 200px; z-index: 100; pointer-events: none; margin-bottom: 8px; }
         .legend-bar { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; font-size: 0.9rem; color: var(--text-main); background: white; padding: 10px 15px; border-radius: 30px; border: 1px solid #eee; width: fit-content; }
         .legend-item { display: flex; align-items: center; gap: 5px; }
         .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #ccc; }
@@ -254,17 +242,39 @@
         <header>
             <div class="header-brand"><span>🎓 測驗控制台</span></div>
             <div class="nav-group">
-                <button class="nav-btn" id="nav-setup" onclick="showScreen('setupScreen'); setActiveTab(this);">🏠 首頁</button>
-                <button class="nav-btn" id="nav-list" onclick="renderFullWordList(); showScreen('wordListScreen'); setActiveTab(this);">📖 總表</button>
-                <button class="nav-btn" id="nav-history" onclick="showHistory(); setActiveTab(this);">📊 紀錄</button>
+                <button class="nav-btn" id="nav-dash" onclick="showScreen('dashboardScreen'); setActiveTab(this);">🏠 首頁</button>
                 <button class="nav-btn" onclick="openHelp('teacher')">❓ 說明</button>
                 <button class="nav-btn btn-exit" onclick="exitTeacherMode()">🚪 離開</button>
             </div>
         </header>
 
-        <div id="setupScreen" class="screen active">
-            <div id="loadError" style="display:none; background:#fee; color:#c0392b; padding:10px; border-radius:8px; text-align:center; margin-bottom:15px;">⚠️ 找不到 words.js</div>
-            
+        <div id="dashboardScreen" class="screen active">
+            <h2 style="color:var(--text-main); margin-bottom:20px;">👋 歡迎回來，今天要做什麼？</h2>
+            <div class="dashboard-grid">
+                <div class="dash-card primary" onclick="showScreen('setupScreen')">
+                    <span class="dash-icon">🚀</span>
+                    <div class="dash-title">開始測驗</div>
+                    <div class="dash-desc">設定範圍、題數，進行課堂聽寫測驗。</div>
+                </div>
+                <div class="dash-card accent" onclick="showStudentStats()">
+                    <span class="dash-icon">🧑‍🎓</span>
+                    <div class="dash-title">個別學生弱點</div>
+                    <div class="dash-desc">查看特定學生的常錯單字與測驗紀錄。</div>
+                </div>
+                <div class="dash-card danger" onclick="showClassStats()">
+                    <span class="dash-icon">🏫</span>
+                    <div class="dash-title">全班弱點分析</div>
+                    <div class="dash-desc">查看全班 Top 50 常錯單字排行榜。</div>
+                </div>
+                <div class="dash-card success" onclick="renderFullWordList(); showScreen('wordListScreen')">
+                    <span class="dash-icon">📖</span>
+                    <div class="dash-title">單字總表</div>
+                    <div class="dash-desc">瀏覽所有單字，並以顏色標示錯誤熱點。</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="setupScreen" class="screen">
             <div class="section-header"><div class="section-badge">1</div><div class="section-title">選擇範圍 (智慧複選)</div></div>
             <div class="session-panel">
                 <div class="quick-select-bar">
@@ -276,7 +286,6 @@
                 </div>
                 <div id="sessionGrid" class="session-grid"></div>
             </div>
-
             <div class="section-header"><div class="section-badge">2</div><div class="section-title">題數</div></div>
             <select id="wordCount">
                 <option value="5">5 題 (暖身)</option>
@@ -285,8 +294,8 @@
                 <option value="30">30 題 (高手)</option>
                 <option value="50">50 題 (總複習)</option>
             </select>
-
             <button id="startBtn" class="btn-big" onclick="startTest()" disabled>開始測驗 ▶</button>
+            <button class="btn-tool" style="width:100%; margin-top:10px; background:transparent; color:#999; border:1px solid #ccc;" onclick="showScreen('dashboardScreen')">⬅ 回儀表板</button>
         </div>
 
         <div id="testScreen" class="screen">
@@ -294,7 +303,6 @@
                 <div class="progress-info">Q <span id="currentNum">1</span></div>
                 <div class="progress-total">/ <span id="totalNum">10</span></div>
             </div>
-            
             <div class="card-container">
                 <div class="flash-card">
                     <button class="btn-auto-speak" onclick="playQuestionSequence()">🔊 播放 (字-句-字)</button>
@@ -315,7 +323,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="mistake-label">👇 答錯請點擊 (變紅色)：</div>
             <div class="student-grid">
                 <div class="btn-student" id="btn-s1" onclick="toggleStudent(1)"><span class="avatar">🐃</span><span class="name">1</span></div>
@@ -324,46 +331,56 @@
                 <div class="btn-student" id="btn-s4" onclick="toggleStudent(4)"><span class="avatar">🦛</span><span class="name">4</span></div>
                 <div class="btn-student" id="btn-s5" onclick="toggleStudent(5)"><span class="avatar">🐨</span><span class="name">5</span></div>
             </div>
-
             <button class="btn-big btn-next" onclick="nextWord()">下一題 ➡</button>
         </div>
 
-        <div id="historyScreen" class="screen">
+        <div id="studentAnalysisScreen" class="screen">
+            <div class="section-header" style="justify-content:space-between;">
+                <div class="section-title">🧑‍🎓 個別學生弱點分析</div>
+                <button class="btn-tool" style="background:#fff; color:#555; border:1px solid #ccc;" onclick="showScreen('dashboardScreen')">⬅ 回儀表板</button>
+            </div>
+            <div class="stat-card">
+                <select id="historyStudentSelect" onchange="renderStudentHistory()" style="width:100%; padding:12px; border:2px solid var(--primary); border-radius:8px; font-weight:bold; margin-bottom:20px;">
+                    <option value="1">🐃 1號同學</option>
+                    <option value="2">🦫 2號同學</option>
+                    <option value="3">🦥 3號同學</option>
+                    <option value="4">🦛 4號同學</option>
+                    <option value="5">🐨 5號同學</option>
+                </select>
+                <div id="studentStatsTable" class="table-container"></div>
+            </div>
             <div class="data-toolbar">
                 <button class="btn-tool btn-download" onclick="exportToCSV()">📥 匯出 Excel</button>
-                <button class="btn-tool btn-backup" onclick="backupData()">💾 備份</button>
-                <button class="btn-tool btn-import" onclick="document.getElementById('fileInput').click()">📂 匯入</button>
+                <button class="btn-tool btn-backup" onclick="backupData()">💾 備份資料</button>
+                <button class="btn-tool btn-import" onclick="document.getElementById('fileInput').click()">📂 匯入資料</button>
                 <input type="file" id="fileInput" style="display:none" onchange="restoreData(this)">
-                <button class="btn-tool btn-clear" onclick="clearHistory()">🗑️ 清空</button>
             </div>
-            <div style="display:flex; gap:20px; flex-wrap:wrap;">
-                <div class="stat-card">
-                    <div class="stat-header">🧑‍🎓 學生錯題榜</div>
-                    <select id="historyStudentSelect" onchange="renderStudentHistory()" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px;">
-                        <option value="1">🐃 1號</option><option value="2">🦫 2號</option><option value="3">🦥 3號</option><option value="4">🦛 4號</option><option value="5">🐨 5號</option>
-                    </select>
-                    <div id="studentStatsTable" class="table-container"></div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-header">🚨 全班常錯單字 (Top 50)</div>
-                    <div id="globalStatsTable" class="table-container"></div>
-                </div>
+        </div>
+
+        <div id="classAnalysisScreen" class="screen">
+            <div class="section-header" style="justify-content:space-between;">
+                <div class="section-title">🏫 全班弱點分析 (Top 50)</div>
+                <button class="btn-tool" style="background:#fff; color:#555; border:1px solid #ccc;" onclick="showScreen('dashboardScreen')">⬅ 回儀表板</button>
+            </div>
+            <div class="stat-card">
+                <div id="globalStatsTable" class="table-container"></div>
+            </div>
+            <div style="text-align:right;">
+                <button class="btn-tool btn-clear" onclick="clearHistory()">🗑️ 清空所有紀錄</button>
             </div>
         </div>
 
         <div id="wordListScreen" class="screen">
             <div class="section-header" style="justify-content:space-between;">
                 <div class="section-title">📖 單字總表 (錯題熱點)</div>
-                <button class="btn-tool" style="background:#fff; color:#555; border:1px solid #ccc;" onclick="renderFullWordList()">🔄 刷新</button>
+                <button class="btn-tool" style="background:#fff; color:#555; border:1px solid #ccc;" onclick="showScreen('dashboardScreen')">⬅ 回儀表板</button>
             </div>
-            
             <div class="legend-bar">
                 <span class="legend-item"><span class="legend-dot" style="background:#fff;"></span> 無錯誤</span>
                 <span class="legend-item"><span class="legend-dot" style="background:var(--heat-yellow-bg); border-color:var(--heat-yellow-bd);"></span> 1~4次</span>
                 <span class="legend-item"><span class="legend-dot" style="background:var(--heat-orange-bg); border-color:var(--heat-orange-bd);"></span> 5次+</span>
                 <span class="legend-item"><span class="legend-dot" style="background:var(--heat-red-bg); border-color:var(--heat-red-bd);"></span> Top 30</span>
             </div>
-
             <div id="fullWordListContainer" class="full-list-grid"></div>
         </div>
 
@@ -406,7 +423,7 @@
 
     window.onload = function() { 
         if (typeof masterWordList !== 'undefined') db = masterWordList; 
-        setActiveTab(document.getElementById('nav-setup'));
+        setActiveTab(document.getElementById('nav-dash'));
     }
 
     function enterTeacherMode() {
@@ -415,13 +432,14 @@
         if(db.length > 0) initApp();
         else if(typeof masterWordList !== 'undefined') { db = masterWordList; initApp(); }
         else document.getElementById('loadError').style.display='block';
+        showScreen('dashboardScreen');
     }
     
     function enterStudentMode() { window.location.href = "student.html"; }
     function exitTeacherMode() {
         document.getElementById('teacher-app').style.display = 'none';
         document.getElementById('landing-page').style.display = 'flex';
-        showScreen('setupScreen'); setActiveTab(document.getElementById('nav-setup'));
+        showScreen('dashboardScreen'); setActiveTab(document.getElementById('nav-dash'));
     }
 
     function initApp() {
@@ -436,6 +454,10 @@
 
     function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
     function setActiveTab(btn) { if(!btn) return; document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active-tab')); btn.classList.add('active-tab'); }
+
+    // Navigation functions for new Dashboard
+    function showStudentStats() { showScreen('studentAnalysisScreen'); renderStudentHistory(); }
+    function showClassStats() { showScreen('classAnalysisScreen'); renderGlobalStats(); }
 
     // Modal
     function openHelp(tab) { document.getElementById('helpModal').style.display = 'block'; switchHelpTab(tab || 'general'); }
@@ -452,19 +474,19 @@
 
     // Range Logic
     function selectRange(s, e) {
-        const checkboxes = document.querySelectorAll('.sess-cb');
-        const targetCBs = [];
-        checkboxes.forEach(cb => { const v = parseInt(cb.value); if(v >= s && v <= e) targetCBs.push(cb); });
-        const allChecked = targetCBs.every(cb => cb.checked);
-        targetCBs.forEach(cb => cb.checked = !allChecked);
+        const cbs = document.querySelectorAll('.sess-cb');
+        const target = [];
+        cbs.forEach(cb => { const v = parseInt(cb.value); if(v >= s && v <= e) target.push(cb); });
+        const allChecked = target.every(cb => cb.checked);
+        target.forEach(cb => cb.checked = !allChecked);
     }
     function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
 
     // Quiz
     function startTest() {
         const cbs = document.querySelectorAll('.sess-cb:checked');
-        const sids = Array.from(cbs).map(cb => isNaN(parseInt(cb.value)) ? cb.value : parseInt(cb.value));
-        if(sids.length === 0) { alert("請至少勾選一個單元！"); return; }
+        const sids = Array.from(cbs).map(cb => parseInt(cb.value));
+        if(sids.length === 0) { alert("請勾選單元"); return; }
         const pool = db.filter(i => sids.includes(i.session));
         if(pool.length === 0) { alert("無單字"); return; }
         testList = [...pool].sort(() => 0.5 - Math.random()).slice(0, parseInt(document.getElementById('wordCount').value));
@@ -480,7 +502,6 @@
     }
 
     function speakText(type) { const item = testList[currentIndex]; speak(type === 'word' ? item.word : item.sentence); }
-    
     function playQuestionSequence() {
         resetTimer();
         const item = testList[currentIndex]; window.speechSynthesis.cancel();
@@ -512,16 +533,15 @@
         osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
         osc1.type = "sine"; osc1.frequency.setValueAtTime(880, t);
         osc2.type = "sine"; osc2.frequency.setValueAtTime(1760, t);
-        gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.5, t + 0.01); gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
-        osc1.start(t); osc2.start(t); osc1.stop(t + 1.5); osc2.stop(t + 1.5);
+        gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.5, t+0.01); gain.gain.exponentialRampToValueAtTime(0.001, t+1.5);
+        osc1.start(t); osc2.start(t); osc1.stop(t+1.5); osc2.stop(t+1.5);
     }
 
-    // Stats
     function toggleStudent(id) { document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong'); }
     function nextWord() {
         const item = testList[currentIndex]; const date = new Date().toLocaleDateString('zh-TW');
         for(let i=1; i<=5; i++) { if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) saveMistake(i, item, date); }
-        currentIndex++; if(currentIndex < testList.length) loadCard(); else { alert("測驗結束"); showHistory(); }
+        currentIndex++; if(currentIndex < testList.length) loadCard(); else { alert("測驗結束"); showClassStats(); }
     }
 
     function saveMistake(sid, w, d) {
@@ -530,7 +550,6 @@
         localStorage.setItem('spellingHistory', JSON.stringify(h));
     }
     function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
-    function showHistory() { showScreen('historyScreen'); renderStudentHistory(); renderGlobalStats(); }
     
     function renderStudentHistory() {
         const sid = parseInt(document.getElementById('historyStudentSelect').value);
@@ -559,14 +578,13 @@
         const errorMap = {};
         const animalMap = {1:"🐃", 2:"🦫", 3:"🦥", 4:"🦛", 5:"🐨"};
 
-        // 1. 統計錯誤
         history.forEach(h => {
             if(!errorMap[h.word]) errorMap[h.word] = { total: 0, students: new Set() };
             errorMap[h.word].total++;
             errorMap[h.word].students.add(h.student);
         });
 
-        // 2. 找出 Top 30
+        // 找出 Top 30
         const sortedErrorWords = Object.keys(errorMap).sort((a, b) => errorMap[b].total - errorMap[a].total).slice(0, 30);
         const top30Set = new Set(sortedErrorWords);
 
@@ -578,25 +596,17 @@
             const div = document.createElement('div');
             div.className = 'word-item-card';
             
-            // 3. 判斷顏色 (優先級: Top30 > 5+ > 1-4)
-            if (top30Set.has(item.word) && errData.total > 0) {
-                div.classList.add('heatmap-red'); // Top 30 (紅色)
-            } else if (errData.total >= 5) {
-                div.classList.add('heatmap-orange'); // 5次以上 (橘色)
-            } else if (errData.total > 0) {
-                div.classList.add('heatmap-yellow'); // 1-4次 (黃色)
-            }
+            // 判斷顏色 (Top30 > 5+ > 1-4)
+            if (top30Set.has(item.word) && errData.total > 0) div.classList.add('heatmap-red');
+            else if (errData.total >= 5) div.classList.add('heatmap-orange');
+            else if (errData.total > 0) div.classList.add('heatmap-yellow');
 
-            // 4. Tooltip
             if(errData.total > 0) {
                 const names = Array.from(errData.students).map(sid => `${sid}號${animalMap[sid]}`).join(", ");
                 div.setAttribute('data-tooltip', `錯誤數:${errData.total}\n常錯:${names}`);
             }
 
-            div.innerHTML = `
-                <span class="wi-word">${item.word}</span>
-                <span class="wi-session">U${item.session}</span>
-            `;
+            div.innerHTML = `<span class="wi-word">${item.word}</span><span class="wi-session">U${item.session}</span>`;
             container.appendChild(div);
         });
     }

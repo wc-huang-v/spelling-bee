@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生練習區 v2.8</title>
+    <title>學生練習區 v2.9</title>
     <style>
         /* --- 🎨 學生版配色 --- */
         :root {
@@ -35,10 +35,10 @@
             border: 4px solid #fff; min-height: 85vh; position: relative;
         }
 
-        /* Header 調整：容納更多按鈕 */
+        /* Header: 移除離開按鈕，只保留功能鍵 */
         header {
-            background: var(--primary); color: white; padding: 12px 10px;
-            font-size: 1.1rem; font-weight: 900;
+            background: var(--primary); color: white; padding: 12px 15px;
+            font-size: 1.2rem; font-weight: 900;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 4px solid var(--primary-dark);
         }
@@ -47,8 +47,8 @@
 
         .nav-btn {
             background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); 
-            color: white; padding: 6px 10px; border-radius: 20px; cursor: pointer; 
-            font-size: 0.85rem; font-weight:bold; transition: 0.2s;
+            color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; 
+            font-size: 0.9rem; font-weight:bold; transition: 0.2s;
             text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
             min-width: 60px;
         }
@@ -95,6 +95,15 @@
             font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #fadbd8;
         }
 
+        /* 🚪 底部安全離開按鈕 */
+        .safe-exit-area { margin-top: 40px; text-align: center; border-top: 2px dashed #eee; padding-top: 20px; }
+        .btn-safe-exit {
+            background: transparent; border: 1px solid #ccc; color: #999;
+            padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;
+        }
+        .btn-safe-exit:hover { border-color: var(--wrong); color: var(--wrong); background: #fff5f5; }
+
         /* 卡片區 */
         .word-card {
             background: #fff; border: 3px solid var(--primary); border-radius: 25px;
@@ -115,8 +124,6 @@
         .btn-main { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 50px; font-size: 1.2rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 var(--primary-dark); transition: 0.1s; margin-bottom: 10px; }
         .btn-main:active { transform: translateY(4px); box-shadow: none; }
         
-        .btn-link { display: block; width: 100%; text-align: center; padding: 12px; color: #7f8c8d; text-decoration: none; font-weight: bold; border: 2px solid #eee; border-radius: 30px; margin-top: 10px; }
-        .btn-link:active { background: #eee; }
         .btn-small { padding: 12px 25px; background: #fff; border: 2px solid #eee; border-radius: 30px; color: var(--text-light); cursor: pointer; font-weight: bold; font-size: 1rem; box-shadow: 0 4px 0 #eee; flex: 1; }
 
         /* 測驗區 */
@@ -165,15 +172,11 @@
         /* Modal (共用樣式) */
         .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
         .modal-content { background-color: #fff; margin: 15% auto; padding: 25px; width: 90%; max-width: 500px; border-radius: 20px; max-height: 70vh; overflow-y: auto; position: relative; border: 4px solid var(--primary); }
-        /* 錯題本用紅色框 */
         #mistakeModal .modal-content { border-color: #e74c3c; } 
-        
         .close-btn { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
         .mistake-list { list-style: none; padding: 0; }
         .mistake-item { border-bottom: 1px dashed #eee; padding: 10px 0; display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; color: #555; }
         .mistake-count { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.9rem; }
-
-        /* 說明書內容 */
         .help-h3 { color: var(--primary-dark); font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; margin-top: 15px; }
         .help-p { color: #555; line-height: 1.6; font-size: 0.95rem; margin: 0; }
 
@@ -183,7 +186,6 @@
 
 <div class="app-container">
     <header>
-        <a href="index.html" class="nav-btn">🚪 入口</a>
         <span>🌱 練習區</span>
         <div class="header-right">
             <button class="nav-btn" onclick="openHelp()">❓ 說明</button>
@@ -215,6 +217,13 @@
         </div>
 
         <button class="btn-mistake" onclick="openMistakes()">📊 我的錯題本 (Top 5)</button>
+        
+        <div class="safe-exit-area">
+            <button class="btn-safe-exit" onclick="confirmExit()">
+                🚪 結束練習 (回到總入口)
+            </button>
+        </div>
+
         <div id="loadStatus" style="text-align:center; margin-top:20px; color:#ccc; font-size:0.8rem;"></div>
     </div>
 
@@ -281,7 +290,6 @@
         <div id="summaryContainer" class="summary-container"></div>
 
         <button class="btn-main" onclick="goHome()" style="margin-top:20px;">🏠 回選單</button>
-        <a href="index.html" class="btn-link">🚪 離開練習區</a>
     </div>
 
 </div>
@@ -311,8 +319,8 @@
         <h3 class="help-h3">📊 什麼是錯題本？</h3>
         <p class="help-p">電腦會自動幫你記住你最常寫錯的字，點擊「錯題本」就可以複習了。</p>
 
-        <h3 class="help-h3">🔇 沒聲音怎麼辦？</h3>
-        <p class="help-p">請檢查手機左邊的開關，是不是開到「靜音模式」了？要關掉靜音才有聲音喔！</p>
+        <h3 class="help-h3">🚪 怎麼離開？</h3>
+        <p class="help-p">要先回到「選單」首頁，滑到最下面就會看到「🚪 結束練習」的按鈕囉！</p>
 
         <div style="text-align:center; margin-top:25px;">
             <button class="btn-main" style="width:auto; padding:10px 40px;" onclick="closeModal('helpModal')">我知道了</button>
@@ -333,7 +341,7 @@
         if (typeof masterWordList !== 'undefined') {
             db = masterWordList;
             initSessions();
-            document.getElementById('loadStatus').innerText = "v2.8 Ready";
+            document.getElementById('loadStatus').innerText = "v2.9 Ready";
         } else {
             document.getElementById('loadStatus').innerHTML = "<span style='color:red'>⚠️ 找不到 words.js</span>";
         }
@@ -352,6 +360,13 @@
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
+    }
+
+    // 安全離開確認
+    function confirmExit() {
+        if(confirm("確定要離開練習區回到入口嗎？\n\n注意：你的「單字預習勾勾」會被重置，但「錯題本」紀錄會保留。")) {
+            window.location.href = "index.html";
+        }
     }
 
     function prepareList(mode) {
@@ -519,7 +534,7 @@
         osc1.start(t); osc2.start(t); osc1.stop(t + 1.5); osc2.stop(t + 1.5);
     }
 
-    // 錯題本 & 說明書
+    // 錯題本 & Modal
     function saveMyMistake(word) {
         let mistakes = JSON.parse(localStorage.getItem('myMistakes')) || {};
         if (!mistakes[word]) mistakes[word] = 0; mistakes[word]++;
@@ -537,15 +552,11 @@
         container.innerHTML = html;
     }
     
-    // 共用 Modal 開關
     function openHelp() { document.getElementById('helpModal').style.display = 'block'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     function clearMyMistakes() { if(confirm("確定清空？")) { localStorage.removeItem('myMistakes'); openMistakes(); } }
     
-    // 點擊背景關閉任何 Modal
-    window.onclick = function(e) { 
-        if(e.target.classList.contains('modal')) e.target.style.display = 'none';
-    }
+    window.onclick = function(e) { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; }
 
 </script>
 </body>
