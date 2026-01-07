@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主練習區</title>
+    <title>學生自主練習 v2.0</title>
     <style>
-        /* --- 共用可愛風格 --- */
+        /* --- 🎨 1. 學生版專屬配色 (魔法紫風格) --- */
         :root {
-            --bg-color: #e8f8f5; /* 學生版用清新的薄荷綠背景 */
+            --bg-color: #f4ecf7; /* 淺紫色背景 */
             --card-bg: #ffffff;
-            --primary: #48c9b0;  /* 薄荷綠主色 */
-            --primary-dark: #16a085;
-            --accent: #f4d03f;   /* 黃色 */
+            --primary: #af7ac5;  /* 柔和紫主色 */
+            --primary-dark: #884ea0;
+            --accent: #f1c40f;   /* 黃色點綴 */
+            --success: #58d68d;  /* 薄荷綠 (完成色) */
+            --success-bg: #e9f7ef;
             --danger: #ec7063;
-            --text-main: #2c3e50;
+            --text-main: #4a235a; /* 深紫色文字 */
             --radius-box: 20px;
             --radius-btn: 50px;
             --shadow: 0 8px 20px rgba(0,0,0,0.08);
@@ -23,69 +25,107 @@
             font-family: 'Microsoft JhengHei', 'Varela Round', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0; padding: 20px;
+            margin: 0; padding: 15px;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
         }
 
         .app-container {
-            width: 100%; max-width: 600px; /* 學生版窄一點，像手機 App */
+            width: 100%; max-width: 600px;
             background: var(--card-bg); border-radius: var(--radius-box);
             box-shadow: var(--shadow); overflow: hidden;
-            border: 4px solid #fff; min-height: 80vh; position: relative;
+            border: 4px solid #fff; min-height: 85vh; position: relative;
         }
 
         header {
             background: var(--primary); color: white; padding: 15px;
             text-align: center; font-size: 1.2rem; font-weight: bold;
             display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .home-btn {
             background: rgba(255,255,255,0.3); border: none; color: white;
-            padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;
+            padding: 5px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight:bold;
         }
 
         .screen { padding: 25px; display: none; animation: fadeIn 0.3s; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 選單按鈕 */
-        .menu-grid { display: grid; gap: 15px; margin-top: 20px; }
+        /* 首頁選單 */
+        .menu-grid { display: grid; gap: 15px; margin-top: 30px; }
         .mode-card {
             background: white; border: 2px solid #e8e8e8; border-radius: 15px;
-            padding: 20px; text-align: center; cursor: pointer; transition: 0.2s;
+            padding: 25px; text-align: center; cursor: pointer; transition: 0.2s;
             box-shadow: 0 4px 0 #e8e8e8;
         }
         .mode-card:hover { transform: translateY(-3px); border-color: var(--primary); }
         .mode-card:active { transform: translateY(2px); box-shadow: none; }
-        .mode-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
-        .mode-title { font-weight: bold; font-size: 1.2rem; color: var(--text-main); }
-        .mode-desc { font-size: 0.9rem; color: #7f8c8d; margin-top: 5px; }
+        .mode-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
+        .mode-title { font-weight: 900; font-size: 1.4rem; color: var(--text-main); }
+        .mode-desc { font-size: 1rem; color: #888; margin-top: 5px; }
 
         /* 單元選擇 */
-        .session-select-area { margin-top: 20px; }
+        .session-select-area { margin-top: 20px; background: #fff; padding:15px; border-radius:15px; border:1px solid #eee; }
         select {
             width: 100%; padding: 12px; border-radius: 12px;
-            border: 2px solid #bdc3c7; font-size: 1rem; background: white;
+            border: 2px solid #d2b4de; font-size: 1.1rem; background: white; color: var(--text-main);
+            outline: none;
+        }
+
+        /* --- 🆕 單字總表 (Grid) --- */
+        .word-grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 兩欄 */
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .grid-item {
+            background: #fff;
+            border: 2px solid #eee;
+            border-radius: 15px;
+            padding: 20px 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            box-shadow: 0 4px 0 #eee;
+        }
+        .grid-item:active { transform: translateY(3px); box-shadow: none; }
+
+        /* 已讀過的單字樣式 */
+        .grid-item.viewed {
+            background-color: var(--success-bg);
+            border-color: var(--success);
+            color: #1d8348;
+            box-shadow: 0 4px 0 #abebc6;
+        }
+        .grid-item.viewed::after {
+            content: "✅";
+            position: absolute; top: 5px; right: 5px; font-size: 0.8rem;
         }
 
         /* 預習卡片 */
         .word-card {
             background: #fff; border: 3px dashed var(--primary); border-radius: 20px;
-            padding: 30px 20px; text-align: center; margin-bottom: 20px; position: relative;
+            padding: 40px 20px; text-align: center; margin-bottom: 20px; position: relative;
         }
-        .wc-word { font-size: 3.5rem; font-weight: 900; color: var(--primary-dark); margin-bottom: 10px; }
-        .wc-sentence { font-size: 1.2rem; color: #555; background: #f4f6f7; padding: 15px; border-radius: 10px; }
+        .wc-word { font-size: 3.5rem; font-weight: 900; color: var(--primary-dark); margin-bottom: 10px; word-break: break-word;}
+        .wc-sentence { font-size: 1.2rem; color: #555; background: #fbfcfc; padding: 15px; border-radius: 10px; text-align: left; }
         
         /* 測驗區 */
         .quiz-status { text-align: right; color: #999; margin-bottom: 10px; }
         .quiz-input {
             width: 100%; padding: 15px; font-size: 1.5rem; text-align: center;
-            border: 2px solid #bdc3c7; border-radius: 12px; outline: none;
-            margin-bottom: 15px; letter-spacing: 1px;
+            border: 2px solid #d2b4de; border-radius: 12px; outline: none;
+            margin-bottom: 15px; letter-spacing: 1px; color: var(--text-main);
         }
-        .quiz-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(72, 201, 176, 0.2); }
+        .quiz-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(175, 122, 197, 0.2); }
         
         .feedback-area {
             min-height: 40px; text-align: center; font-weight: bold; margin-bottom: 15px; font-size: 1.2rem;
@@ -112,7 +152,7 @@
         .btn-nav-group { display: flex; gap: 10px; justify-content: center; }
         .btn-small {
             padding: 10px 20px; background: #ecf0f1; border: none; border-radius: 30px;
-            color: #7f8c8d; cursor: pointer; font-weight: bold;
+            color: #7f8c8d; cursor: pointer; font-weight: bold; font-size: 1rem;
         }
 
     </style>
@@ -121,46 +161,56 @@
 
 <div class="app-container">
     <header>
-        <span>🎓 學生自主練習</span>
-        <button class="home-btn" onclick="goHome()">回首頁</button>
+        <span>🔮 學生練習區</span>
+        <button class="home-btn" onclick="goHome()">🏠 回首頁</button>
     </header>
 
     <div id="homeScreen" class="screen active">
-        <div style="text-align:center; margin-bottom:20px;">
-            <div style="font-size:3rem;">🦁</div>
-            <h2>你好！今天想練什麼？</h2>
+        <div style="text-align:center; margin-bottom:10px; margin-top:20px;">
+            <h2 style="color:var(--primary-dark);">Ready to learn?</h2>
+            <p style="color:#888;">選擇單元，開始你的魔法練習吧！</p>
         </div>
 
         <div class="session-select-area">
-            <label><strong>1. 先選擇單元：</strong></label>
+            <label style="display:block; margin-bottom:8px; color:var(--text-main); font-weight:bold;">📍 請選擇單元：</label>
             <select id="sessionSelect"></select>
         </div>
 
         <div class="menu-grid">
-            <div class="mode-card" onclick="startReview()">
+            <div class="mode-card" onclick="startReviewGrid()">
                 <span class="mode-icon">📖</span>
-                <div class="mode-title">單字預習卡</div>
-                <div class="mode-desc">看單字、聽發音、讀例句</div>
+                <div class="mode-title">單字預習</div>
+                <div class="mode-desc">瀏覽單字卡，累積經驗值</div>
             </div>
             <div class="mode-card" onclick="startQuiz()">
                 <span class="mode-icon">✍️</span>
-                <div class="mode-title">聽寫大挑戰</div>
-                <div class="mode-desc">聽題目 (字-句-字) 並拼寫</div>
+                <div class="mode-title">聽寫挑戰</div>
+                <div class="mode-desc">聽題目拼單字</div>
             </div>
         </div>
-        <div id="loadStatus" style="text-align:center; margin-top:20px; color:#999; font-size:0.9rem;"></div>
+        <div id="loadStatus" style="text-align:center; margin-top:20px; color:#aaa; font-size:0.8rem;"></div>
     </div>
 
-    <div id="reviewScreen" class="screen">
-        <div class="quiz-status">單字 <span id="revIndex">1</span> / <span id="revTotal">10</span></div>
+    <div id="gridScreen" class="screen">
+        <h3 style="text-align:center; color:var(--primary-dark); margin-bottom:15px;">這個單元有這些字...</h3>
+        <p style="text-align:center; color:#888; font-size:0.9rem;">點擊單字進入卡片，看過的會變綠色喔！</p>
         
+        <div id="wordGrid" class="word-grid-container">
+            </div>
+
+        <button class="btn-main" onclick="goHome()" style="margin-top:30px; background:#bdc3c7; box-shadow:0 5px 0 #95a5a6;">回上一頁</button>
+    </div>
+
+    <div id="flashcardScreen" class="screen">
         <div class="word-card">
-            <div class="wc-word" id="revWord">Apple</div>
+            <div class="wc-word" id="revWord">...</div>
             <button class="btn-audio" onclick="playWord()">🔊</button>
-            <div class="wc-sentence" id="revSentence">I eat an apple.</div>
+            <div class="wc-sentence" id="revSentence">...</div>
         </div>
 
-        <div class="btn-nav-group">
+        <button class="btn-main" onclick="backToGrid()">🆗 看完了，回總表</button>
+        
+        <div style="display:flex; justify-content:space-between; margin-top:15px;">
             <button class="btn-small" onclick="prevReview()">⬅ 上一個</button>
             <button class="btn-small" onclick="nextReview()">下一個 ➡</button>
         </div>
@@ -170,24 +220,24 @@
         <div class="quiz-status">進度 <span id="quizIndex">1</span> / <span id="quizTotal">10</span></div>
         
         <div style="text-align:center; margin-bottom:20px;">
-            <div style="font-size:1rem; color:#7f8c8d; margin-bottom:10px;">點擊喇叭聽題目</div>
+            <div style="font-size:1rem; color:#888; margin-bottom:10px;">點擊聽題目</div>
             <button class="btn-audio" onclick="playQuestionSequence()" style="width:80px; height:80px; font-size:2rem;">🔊</button>
-            <div style="font-size:0.8rem; color:#95a5a6;">(播放順序：單字 ➡ 例句 ➡ 單字)</div>
+            <div style="font-size:0.8rem; color:#aaa;">(順序：字 ➡ 句 ➡ 字)</div>
         </div>
 
-        <input type="text" id="userSpelling" class="quiz-input" placeholder="在此輸入單字..." autocomplete="off" autocapitalize="off">
+        <input type="text" id="userSpelling" class="quiz-input" placeholder="輸入單字..." autocomplete="off" autocapitalize="off">
         
         <div id="quizFeedback" class="feedback-area"></div>
 
         <button class="btn-main" onclick="checkAnswer()">送出檢查</button>
-        <button class="btn-small" onclick="showAnswer()" style="width:100%; margin-top:10px; background:transparent; border:1px solid #ccc;">🙈 我不會，看答案</button>
+        <button class="btn-small" onclick="showAnswer()" style="width:100%; margin-top:10px; background:transparent; border:1px solid #ccc;">🙈 我不會，偷看答案</button>
         <button class="btn-small" id="nextQuizBtn" onclick="nextQuiz()" style="width:100%; margin-top:10px; display:none; background:var(--primary); color:white;">下一題 ➡</button>
     </div>
 
     <div id="finishScreen" class="screen" style="text-align:center;">
-        <div style="font-size:4rem; margin-top:30px;">🎉</div>
-        <h2>練習完成！</h2>
-        <p>你真的很棒喔！要再練一次嗎？</p>
+        <div style="font-size:5rem; margin-top:30px;">🏆</div>
+        <h2 style="color:var(--text-main);">挑戰成功！</h2>
+        <p style="color:#555;">你完成練習了，真厲害！</p>
         <button class="btn-main" onclick="goHome()">回首頁選單</button>
     </div>
 
@@ -200,14 +250,17 @@
     let currentList = [];
     let currentIndex = 0;
     
+    // 用來記錄哪些單字已經看過了 (存 index)
+    let viewedIndices = new Set();
+
     // 初始化
     window.onload = function() {
         if (typeof masterWordList !== 'undefined') {
             db = masterWordList;
             initSessions();
-            document.getElementById('loadStatus').innerText = "✅ 題庫載入成功";
+            document.getElementById('loadStatus').innerText = "✅ 魔法書載入完畢";
         } else {
-            document.getElementById('loadStatus').innerHTML = "<span style='color:red'>⚠️ 錯誤：找不到 words.js</span>";
+            document.getElementById('loadStatus').innerHTML = "<span style='color:red'>⚠️ 找不到 words.js 檔案</span>";
         }
     };
 
@@ -222,9 +275,7 @@
         });
     }
 
-    function goHome() {
-        showScreen('homeScreen');
-    }
+    function goHome() { showScreen('homeScreen'); }
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -237,20 +288,70 @@
         currentIndex = 0;
     }
 
-    // --- 預習模式邏輯 ---
-    function startReview() {
+    // --- 🆕 總表模式邏輯 (Grid Mode) ---
+    function startReviewGrid() {
         prepareList();
-        if(currentList.length === 0) { alert("此單元無單字"); return; }
-        showScreen('reviewScreen');
-        updateReviewCard();
+        if(currentList.length === 0) { alert("此單元沒有單字喔！"); return; }
+        
+        // 如果換了單元，重置閱讀紀錄 (簡單起見，每次回首頁重置，或保留皆可。這裡做「當次練習保留」)
+        // 若希望切換單元清空紀錄： viewedIndices.clear(); 
+        // 這裡我們只在第一次進入該session時清空，或是簡單點，每次按預習都重置？
+        // 為了讓學生有成就感，我們這裡不強制清空，除非重新整理網頁。
+
+        renderGrid();
+        showScreen('gridScreen');
     }
 
+    function renderGrid() {
+        const container = document.getElementById('wordGrid');
+        container.innerHTML = ""; // 清空
+
+        currentList.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'grid-item';
+            div.innerText = item.word;
+            
+            // 檢查是否看過
+            if (viewedIndices.has(item.word)) { // 用單字當 key 比較保險，跨單元不會錯亂
+                div.classList.add('viewed');
+            }
+
+            div.onclick = () => {
+                jumpToCard(index);
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function jumpToCard(index) {
+        currentIndex = index;
+        showScreen('flashcardScreen');
+        updateReviewCard();
+        
+        // 標記為已讀
+        markAsViewed();
+    }
+
+    function backToGrid() {
+        renderGrid(); // 重新渲染以更新顏色
+        showScreen('gridScreen');
+    }
+
+    function markAsViewed() {
+        const item = currentList[currentIndex];
+        viewedIndices.add(item.word);
+    }
+
+    // --- 單字卡邏輯 ---
     function updateReviewCard() {
         const item = currentList[currentIndex];
-        document.getElementById('revIndex').innerText = currentIndex + 1;
-        document.getElementById('revTotal').innerText = currentList.length;
         document.getElementById('revWord').innerText = item.word;
         document.getElementById('revSentence').innerText = item.sentence;
+        
+        // 自動發音 (選擇性，怕學生覺得吵可以拿掉)
+        // playWord(); 
+
+        markAsViewed(); // 只要翻到這張卡，就標記
     }
 
     function playWord() {
@@ -263,16 +364,16 @@
     }
     function nextReview() {
         if(currentIndex < currentList.length - 1) { currentIndex++; updateReviewCard(); }
-        else { alert("這是最後一個字囉！"); }
+        else { 
+            if(confirm("這是最後一個字了，要回總表嗎？")) backToGrid();
+        }
     }
 
     // --- 測驗模式邏輯 ---
     function startQuiz() {
         prepareList();
-        // 隨機打亂順序
-        currentList.sort(() => Math.random() - 0.5);
-        if(currentList.length === 0) { alert("此單元無單字"); return; }
-        
+        currentList.sort(() => Math.random() - 0.5); // 隨機
+        if(currentList.length === 0) { alert("無單字"); return; }
         showScreen('quizScreen');
         loadQuizQuestion();
     }
@@ -284,27 +385,18 @@
         document.getElementById('quizFeedback').innerText = "";
         document.getElementById('nextQuizBtn').style.display = 'none';
         
-        // 自動播放題目
         setTimeout(playQuestionSequence, 500);
     }
 
-    // 核心功能：播放 "單字 -> 例句 -> 單字"
     function playQuestionSequence() {
         const item = currentList[currentIndex];
+        window.speechSynthesis.cancel();
         
-        // 使用 SpeechSynthesis 的隊列功能
-        const u1 = new SpeechSynthesisUtterance(item.word);
-        u1.lang = 'en-US'; u1.rate = 0.8;
-        
-        const u2 = new SpeechSynthesisUtterance(item.sentence);
-        u2.lang = 'en-US'; u2.rate = 0.8;
-        
-        const u3 = new SpeechSynthesisUtterance(item.word);
-        u3.lang = 'en-US'; u3.rate = 0.8;
+        const u1 = new SpeechSynthesisUtterance(item.word); u1.lang = 'en-US'; u1.rate = 0.8;
+        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.lang = 'en-US'; u2.rate = 0.8;
+        const u3 = new SpeechSynthesisUtterance(item.word); u3.lang = 'en-US'; u3.rate = 0.8;
 
-        window.speechSynthesis.cancel(); // 先停止之前的
         window.speechSynthesis.speak(u1);
-        // 為了讓聲音不要連太快，可以在中間插入一個極短的停頓 (雖然 speak queue 會自動排隊)
         window.speechSynthesis.speak(u2);
         window.speechSynthesis.speak(u3);
     }
@@ -320,9 +412,8 @@
             playDing();
             document.getElementById('nextQuizBtn').style.display = 'block';
         } else {
-            feedback.innerHTML = "❌ 再試一次喔！加油！";
+            feedback.innerHTML = "❌ 再試一次喔！";
             feedback.className = "feedback-area wrong";
-            // 答錯可以重新播放單字提示
             speak(currentList[currentIndex].word);
         }
     }
@@ -336,23 +427,17 @@
 
     function nextQuiz() {
         currentIndex++;
-        if (currentIndex < currentList.length) {
-            loadQuizQuestion();
-        } else {
-            showScreen('finishScreen');
-        }
+        if (currentIndex < currentList.length) { loadQuizQuestion(); } 
+        else { showScreen('finishScreen'); }
     }
 
-    // 工具函式
     function speak(text) {
         window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-US'; u.rate = 0.8;
+        const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.8;
         window.speechSynthesis.speak(u);
     }
 
     function playDing() {
-        // 簡單的答對音效
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -363,7 +448,6 @@
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
         osc.start(); osc.stop(ctx.currentTime + 0.3);
     }
-
 </script>
 </body>
 </html>
