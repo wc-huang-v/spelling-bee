@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v30.2</title>
+    <title>智慧單字小考官 v30.3</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -75,22 +75,19 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ✨ 煥然一新的 Header (v30.2) */
+        /* ✨ 煥然一新的 Header */
         header {
-            /* 顏色調整：不再是純白，帶一點點藍灰，且有頂部邊框 */
             background: linear-gradient(to bottom, #ffffff, #f0f8ff); 
-            border-top: 5px solid var(--primary); /* 明顯的頂部識別色 */
+            border-top: 5px solid var(--primary);
             border-bottom: 1px solid #dbeafa;
-            border-radius: 0 0 16px 16px; /* 下方圓角 */
-            
+            border-radius: 0 0 16px 16px;
             padding: 12px 25px;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15); /* 帶有顏色的陰影 */
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
             position: sticky; top: 0; z-index: 1000;
             margin-bottom: 20px;
         }
         .header-brand { font-size: 1.3rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; letter-spacing: 1px; }
-        
         .nav-group { display: flex; gap: 15px; align-items: center; }
 
         /* 導航按鈕 */
@@ -103,26 +100,37 @@
         .nav-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
         .nav-btn.active-tab { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* 🆕 懸浮下拉選單 (Hover Dropdown) */
-        .nav-dropdown-wrapper { position: relative; display: inline-block; }
+        /* 🆕 懸浮下拉選單 (Hover Dropdown) - 修正版 */
+        .nav-dropdown-wrapper { position: relative; display: inline-block; padding-bottom: 10px; margin-bottom: -10px; /* 增加下方感應區 */ }
         
-        /* 隱藏的選單 */
         .nav-dropdown-menu {
             display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
             background: white; min-width: 180px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            border-radius: 12px; padding: 8px 0; margin-top: 10px; border: 1px solid #eee;
+            border-radius: 12px; padding: 8px 0; border: 1px solid #eee;
             z-index: 1001;
+            /* 修正：把 margin-top 拿掉，改用 invisible bridge */
+            margin-top: 5px; 
         }
-        /* 小箭頭 */
+
+        /* 🌉 隱形橋：填補按鈕與選單的空隙，防止游標迷路 */
+        .nav-dropdown-menu::after {
+            content: "";
+            position: absolute;
+            top: -20px; /* 往上延伸覆蓋空隙 */
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: transparent;
+        }
+
+        /* 小箭頭 (維持原樣，用 before) */
         .nav-dropdown-menu::before {
             content: ""; position: absolute; bottom: 100%; left: 50%; margin-left: -8px;
             border-width: 8px; border-style: solid; border-color: transparent transparent white transparent;
         }
         
-        /* 滑鼠移過 Wrapper 時顯示選單 */
         .nav-dropdown-wrapper:hover .nav-dropdown-menu { display: block; animation: fadeIn 0.2s; }
 
-        /* 選單項目 */
         .nav-dropdown-item {
             padding: 10px 20px; color: var(--text-main); cursor: pointer; font-size: 0.9rem; font-weight: bold;
             transition: 0.1s; display: block; text-align: left;
@@ -132,7 +140,6 @@
 
 
         .screen { 
-            /* 內容區樣式 */
             display: none; flex: 1; animation: fadeIn 0.3s; 
             background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
@@ -232,7 +239,7 @@
 
         /* 個別弱點分析全覽 */
         .student-analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .student-card-view { background: white; border: 1px solid #ddd; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; height: auto; box-shadow: 0 3px 0 #eee; }
+        .student-card-view { background: white; border: 1px solid #ddd; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; height: 100%; box-shadow: 0 3px 0 #eee; }
         .student-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 2px solid #f4f6f8; padding-bottom: 8px; }
         .student-card-body { flex: 1; }
         .weak-word-tag { display: inline-block; background: #fadbd8; color: #c0392b; padding: 4px 8px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; margin: 3px 0; width: 100%; }
@@ -355,7 +362,7 @@
             <div class="nav-group">
                 <div class="nav-dropdown-wrapper">
                     <button class="nav-btn" id="nav-dash" onclick="showScreen('dashboardScreen'); setActiveTab(this);">
-                        🏠 首頁 (選單)
+                        🏠 首頁
                     </button>
                     <div class="nav-dropdown-menu">
                         <span class="nav-dropdown-item" onclick="showScreen('setupScreen')">🤖 AI 隨機測驗</span>
