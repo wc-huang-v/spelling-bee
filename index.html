@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v24.0</title>
+    <title>智慧單字小考官 v25.0</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -21,9 +21,9 @@
             --radius-btn: 8px;
             
             /* 視覺化熱點 */
-            --heat-critical: #c0392b; /* 急救紅 */
-            --heat-high: #e67e22;     /* 警戒橘 */
-            --heat-med: #f1c40f;      /* 注意黃 */
+            --heat-critical: #c0392b;
+            --heat-high: #e67e22;
+            --heat-med: #f1c40f;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -90,7 +90,7 @@
         .screen { padding: 30px; display: none; flex: 1; }
         .screen.active { display: block; animation: fadeIn 0.3s; }
 
-        /* 儀表板 & 安全離開 */
+        /* 儀表板 */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
         .dash-section-title { font-size: 1.1rem; color: var(--text-sub); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-top: 30px; }
         .dash-section-title:first-child { margin-top: 0; }
@@ -118,6 +118,7 @@
         .section-header { margin-bottom: 15px; display:flex; align-items:center; justify-content: space-between; }
         .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
         .btn-tool { padding: 8px 16px; border-radius: 6px; border: 1px solid #ccc; font-weight: 600; cursor: pointer; font-size: 0.9rem; background:white; color:#555;}
+        
         .session-panel { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 25px; }
         .quick-select-bar { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
         .btn-pill { padding: 8px 16px; background: #fff; border: 1px solid #dcdcdc; border-radius: 20px; color: var(--text-sub); cursor: pointer; font-weight: 600; transition: 0.2s; flex-grow: 1; text-align: center; }
@@ -127,16 +128,24 @@
         .session-label { display: flex; align-items: center; padding: 10px; background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; cursor: pointer; font-size: 0.95rem; color: var(--text-main); transition: all 0.2s; }
         .session-label:has(.sess-cb:checked) { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); font-weight: bold; }
         .sess-cb { width: 18px; height: 18px; margin-right: 8px; accent-color: var(--primary); cursor: pointer; }
+        
         select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dcdcdc; font-size: 1rem; background: #fff; }
         .btn-big { width: 100%; padding: 16px; margin-top: 20px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; font-size: 1.3rem; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4); transition: all 0.2s; }
         .btn-big:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5); }
         .btn-big:disabled { background: #bdc3c7; cursor: not-allowed; }
 
+        /* 🔥 急救按鈕 (Hotspot Button) */
+        .btn-quick-fix {
+            background: linear-gradient(135deg, #e67e22, #d35400); color: white; border: none;
+            padding: 12px; border-radius: 12px; cursor: pointer; width: 100%;
+            font-size: 1.1rem; font-weight: bold; margin-bottom: 20px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 8px rgba(230, 126, 34, 0.3); transition: 0.2s;
+        }
+        .btn-quick-fix:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(230, 126, 34, 0.4); }
+        .btn-quick-fix:active { transform: translateY(1px); box-shadow: none; }
+
         /* 指定測驗 UI */
-        .selection-bar { display: flex; justify-content: space-between; align-items: center; background: #f5eef8; padding: 10px 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #ebdef0; }
-        .selection-count { font-weight: bold; color: #8e44ad; }
-        .btn-clear-selection { background: #fff; border: 1px solid #8e44ad; color: #8e44ad; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
-        .btn-clear-selection:hover { background: #8e44ad; color: white; }
         .custom-word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; }
         .custom-word-label { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .custom-word-label:has(input:checked) { border-color: #9b59b6; background: #fdfaff; color: #8e44ad; box-shadow: 0 2px 5px rgba(155, 89, 182, 0.2); }
@@ -169,18 +178,12 @@
         .btn-auto-speak { background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; box-shadow: 0 3px 0 #d68910; }
         .btn-speak-small { background: #f0f2f5; border: none; color: var(--text-main); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; margin-left: 10px; transition: 0.2s; }
 
-        /* --- 🚨 急救單字卡 (Critical Cards) --- */
+        /* 🚨 急救單字卡 */
         .critical-section { margin-bottom: 30px; animation: fadeIn 0.5s; }
         .critical-header { color: var(--heat-critical); font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; }
         .critical-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
-        .critical-card {
-            background: #fff; border: 2px solid var(--heat-critical); border-radius: 12px; padding: 15px;
-            text-align: center; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.1); position: relative; overflow: hidden;
-        }
-        .critical-card::before {
-            content: "SOS"; position: absolute; top: 0; right: 0; background: var(--heat-critical); color: white;
-            font-size: 0.7rem; padding: 2px 8px; border-bottom-left-radius: 8px; font-weight: bold;
-        }
+        .critical-card { background: #fff; border: 2px solid var(--heat-critical); border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.1); position: relative; overflow: hidden; }
+        .critical-card::before { content: "SOS"; position: absolute; top: 0; right: 0; background: var(--heat-critical); color: white; font-size: 0.7rem; padding: 2px 8px; border-bottom-left-radius: 8px; font-weight: bold; }
         .crit-word { display: block; font-size: 1.8rem; font-weight: 900; color: var(--text-main); margin-bottom: 5px; }
         .crit-info { font-size: 0.9rem; color: var(--heat-critical); font-weight: bold; }
 
@@ -191,13 +194,11 @@
         .btn-backup { background: #8e44ad; }
         .btn-import { background: #34495e; }
         .btn-clear { background: transparent; color: var(--danger); border: 1px solid var(--danger); margin-left: auto; }
-        
+        .stat-card { background: white; border: 1px solid #eee; border-radius: 12px; padding: 20px; flex: 1; margin-bottom: 20px; }
         .table-container { max-height: 400px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
         th { text-align: left; padding: 12px; color: var(--text-sub); background: #f8f9fa; position: sticky; top: 0; }
         td { padding: 12px; border-bottom: 1px solid #f0f0f0; color: var(--text-main); }
-        
-        /* 視覺化表格效果 */
         .rank-high { font-weight: bold; color: var(--danger); }
         .rank-bar-bg { width: 100px; height: 8px; background: #eee; border-radius: 4px; display: inline-block; margin-right: 8px; }
         .rank-bar-fill { height: 100%; background: var(--danger); border-radius: 4px; }
@@ -249,10 +250,7 @@
         @media (max-width: 600px) { .install-grid { grid-template-columns: 1fr; } }
 
         /* Tag UI for AI Weight */
-        .ai-tag {
-            position: absolute; top: 5px; right: 5px; font-size: 0.7rem; font-weight: bold; 
-            padding: 2px 6px; border-radius: 4px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        .ai-tag { position: absolute; top: 5px; right: 5px; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -281,7 +279,7 @@
                 <button class="nav-btn" id="nav-list" onclick="renderFullWordList(); showScreen('wordListScreen'); setActiveTab(this);">📖 總表</button>
                 <button class="nav-btn" id="nav-history" onclick="showHistory(); setActiveTab(this);">📊 紀錄</button>
                 <button class="nav-btn" onclick="openHelp('teacher')">❓ 說明</button>
-                </div>
+            </div>
         </header>
 
         <div id="dashboardScreen" class="screen active">
@@ -354,12 +352,19 @@
             <div class="section-header"><span class="section-title">🎯 指定單字測驗</span><button class="btn-tool" onclick="showScreen('dashboardScreen')">⬅ 回選單</button></div>
             
             <div class="session-panel">
-                <label style="font-weight:bold; display:block; margin-bottom:10px;">步驟 1: 選擇單元</label>
+                <label style="font-weight:bold; display:block; margin-bottom:10px;">✨ 快速功能</label>
+                <button class="btn-quick-fix" onclick="startTopErrorTest()">
+                    <span>⚡ 一鍵測驗全班常錯字 (AI Top 30)</span>
+                </button>
+
+                <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
+
+                <label style="font-weight:bold; display:block; margin-bottom:10px;">手動選擇單元</label>
                 <select id="customSessionSelect" onchange="renderCustomWordSelection()"></select>
                 
                 <div style="margin-top:20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <label style="font-weight:bold;">步驟 2: 勾選要考的單字</label>
+                        <label style="font-weight:bold;">勾選要考的單字</label>
                         <div style="font-size:0.9rem; display:flex; align-items:center; gap:10px;">
                             <span id="customSelectionCount" style="color:var(--primary); font-weight:bold;">已選 0 題</span>
                             <button class="btn-tool" style="padding:4px 10px; font-size:0.8rem;" onclick="clearCustomSelection()">清除全選</button>
@@ -420,6 +425,11 @@
 
         <div id="classAnalysisScreen" class="screen">
             <div class="section-header"><span class="section-title">🏫 全班弱點分析</span><button class="btn-tool" onclick="showScreen('dashboardScreen')">⬅ 回選單</button></div>
+            
+            <button class="btn-quick-fix" style="margin-bottom:30px;" onclick="startTopErrorTest()">
+                <span>⚡ 一鍵測驗 Top 30 常錯字</span>
+            </button>
+
             <div class="analysis-container">
                 <div>
                     <h4 style="margin:0 0 10px 0; color:#555;">⚠️ 錯誤熱點排行 (答錯次數最多單元)</h4>
@@ -469,7 +479,7 @@
                     <ul class="help-list">
                         <li><strong>AI 隨機測驗</strong>：自動加強常錯字。</li>
                         <li><strong>指定單字測驗</strong>：老師手動勾選單字，結果同樣影響 AI 權重。</li>
-                        <li><strong>數據分析</strong>：急救單字卡會顯示每位學生最需要加強的字。</li>
+                        <li><strong>一鍵快篩</strong>：直接抓出全班常錯 Top 30 進行隨機 5 題測驗。</li>
                     </ul>
                 </div>
                 <div id="tab-student" class="help-tab-content" style="display:none;">
@@ -553,7 +563,7 @@
     }
     function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
 
-    // --- Custom Quiz Logic (Enhanced) ---
+    // --- Custom Quiz Logic ---
     function renderCustomWordSelection() {
         const sid = parseInt(document.getElementById('customSessionSelect').value);
         const container = document.getElementById('customWordGrid');
@@ -568,7 +578,6 @@
         words.forEach(w => {
             const label = document.createElement('label');
             label.className = 'custom-word-label';
-            // Add onchange to update counter
             label.innerHTML = `<span>${w.word}</span> <input type="checkbox" value="${w.word}" class="custom-word-cb" onchange="updateSelectionCounter()">`;
             container.appendChild(label);
         });
@@ -587,10 +596,71 @@
     function startCustomTest() {
         const selectedWords = Array.from(document.querySelectorAll('.custom-word-cb:checked')).map(cb => cb.value);
         if(selectedWords.length === 0) { alert("請至少選擇一個單字"); return; }
-        
         testList = db.filter(w => selectedWords.includes(w.word));
         testList.sort(() => 0.5 - Math.random());
+        currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
+    }
+
+    // --- ⚡ TOP ERROR TEST (New) ---
+    function startTopErrorTest() {
+        // 1. Calculate weights for ALL words
+        const weightedDB = [];
+        const history = getHistory();
+        const logs = getTestLogs();
+        const errorMap = {};
+        const individualErrorMap = {};
+
+        // Pre-calc errors
+        history.forEach(h => {
+            if(!errorMap[h.word]) errorMap[h.word] = 0; errorMap[h.word]++;
+            const key = h.word + "_" + h.student;
+            if(!individualErrorMap[key]) individualErrorMap[key] = 0; individualErrorMap[key]++;
+        });
+
+        // Loop all db
+        db.forEach(item => {
+            let weight = 1; 
+            const classErrors = errorMap[item.word] || 0;
+            const isClassWeak = classErrors > 5;
+            let isIndivWeak = false;
+            for(let i=1; i<=5; i++) { if((individualErrorMap[item.word + "_" + i] || 0) > 3) isIndivWeak = true; }
+
+            const wordLogs = logs.filter(l => l.word === item.word).sort((a,b) => b.timestamp - a.timestamp);
+
+            // Same weight logic as random test
+            if (isClassWeak) {
+                if (wordLogs.length >= 3) {
+                    const recent3 = wordLogs.slice(0, 3);
+                    const avgAcc = recent3.reduce((sum, l) => sum + l.accuracy, 0) / 3;
+                    if (avgAcc >= 0.8) weight = 1; else if (avgAcc > 0.4) weight += 10; else weight += 30;
+                } else { weight += 10; }
+            } else if (isIndivWeak) {
+                if (wordLogs.length >= 2) {
+                    const recent2 = wordLogs.slice(0, 2);
+                    const avgAcc = recent2.reduce((sum, l) => sum + l.accuracy, 0) / 2;
+                    if (avgAcc === 1) weight = 1; else if (avgAcc >= 0.8) weight += 2; else if (avgAcc > 0.4) weight += 5; else weight += 15;
+                } else { weight += 5; }
+            }
+            weightedPoolItem = { ...item, currentWeight: weight };
+            weightedDB.push(weightedPoolItem);
+        });
+
+        // 2. Sort by weight DESC
+        weightedDB.sort((a, b) => b.currentWeight - a.currentWeight);
+
+        // 3. Take Top 30
+        const top30 = weightedDB.slice(0, 30);
         
+        if (top30.length === 0 || top30[0].currentWeight <= 1) {
+            // Optional: check if there are any high weight words
+            // alert("目前沒有高頻錯字！隨機出題...");
+        }
+
+        // 4. Randomly pick 5 from these 30
+        top30.sort(() => 0.5 - Math.random());
+        testList = top30.slice(0, 5);
+
+        // Start
         currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
     }
 
@@ -601,10 +671,8 @@
     function getIndividualWeight(word, studentId) {
         const history = getHistory();
         const logs = getTestLogs();
-        
         const errorCount = history.filter(h => h.word === word && h.student === studentId).length;
         if (errorCount <= 3) return 1; 
-
         const wordLogs = logs.filter(l => l.word === word).sort((a,b) => b.timestamp - a.timestamp);
         if (wordLogs.length >= 2) {
             const recent2 = wordLogs.slice(0, 2);
@@ -787,7 +855,6 @@
             const weight = getIndividualWeight(word, sid);
             if (weight > 1) {
                 hasWeakness = true;
-                // 用卡片樣式呈現
                 weakHtml += `
                     <div class="critical-card">
                         <span class="crit-word">${word}</span>
@@ -810,12 +877,11 @@
         if(h.length===0){c.innerHTML="<p style='text-align:center;color:#999'>無紀錄</p>";return;}
         let counts={}; h.forEach(x=>{if(!counts[x.word])counts[x.word]=0;counts[x.word]++;});
         let s = Object.keys(counts).map(k=>({w:k,c:counts[k]})).sort((a,b)=>b.c-a.c).slice(0,50);
-        let maxCount = s[0]?.c || 1; // For bar chart relative width
+        let maxCount = s[0]?.c || 1; 
 
         let html="<table><tr><th width='60%'>常錯單字 (Top 50)</th><th>錯誤次數</th></tr>";
         s.forEach(i=>{
             const widthPct = (i.c / maxCount) * 100;
-            // Add visual bar
             html+=`<tr>
                 <td style="font-weight:bold; font-size:1.1rem; color:#2c3e50;">${i.w}</td>
                 <td>
