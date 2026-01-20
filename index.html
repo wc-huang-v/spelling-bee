@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v46.1 (Center Fix)</title>
+    <title>智慧單字小考官 v49.0 (Teacher Pro)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         /* --- 🎨 視覺風格：現代復古像素風 (Pixel Lite) --- */
@@ -67,7 +67,7 @@
         .btn-danger { background: #ff7675; color: white; }
         .btn-warning { background: #ffeaa7; }
 
-        /* --- 🚪 入口大廳 (像素風) --- */
+        /* --- 🚪 入口大廳 --- */
         #landing-page {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             width: 100%; min-height: 100vh;
@@ -91,9 +91,7 @@
             border-radius: 12px; font-size: 2rem; font-weight: 900;
             cursor: pointer; box-shadow: 8px 8px 0 #000;
             transition: all 0.1s; display: flex; align-items: center; justify-content: center; gap: 15px;
-            
-            /* 修正：加入自動邊距以置中 */
-            margin: 0 auto; 
+            margin: 0 auto; /* Center fix */
         }
         .btn-student-hero:active { transform: translate(6px, 6px); box-shadow: 2px 2px 0 #000; }
 
@@ -116,7 +114,7 @@
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Header (Pixel) */
+        /* Header */
         header {
             background: #fff; border: 3px solid #000; border-radius: 8px; padding: 10px 20px;
             display: flex; justify-content: space-between; align-items: center;
@@ -242,7 +240,7 @@
 
         /* Switch UI */
         .switch-wrapper { display: flex; align-items: center; gap: 8px; font-weight: bold; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 22px; cursor: pointer; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .2s; border-radius: 4px; border: 2px solid #000; }
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background-color: white; transition: .2s; border: 2px solid #000; }
@@ -294,6 +292,13 @@
         .heatmap-orange { background-color: var(--heat-orange-bg); border-color: var(--heat-orange-bd); }
         .heatmap-red { background-color: var(--heat-red-bg); border-color: var(--heat-red-bd); }
         
+        /* 1. 單字卡標籤修復 */
+        .wi-word { font-size: 1.3rem; font-weight: 800; color: var(--text-main); display: block; margin-bottom: 8px; }
+        .badge-unit {
+            display: inline-block; background: #eee; border: 1px solid #aaa; color: #555;
+            padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; font-family: monospace;
+        }
+
         .page-bottom-actions { margin-top: 40px; padding-top: 20px; border-top: 2px dashed #000; text-align: center; }
         .btn-safe-exit { background: transparent; border: none; color: #555; padding: 8px 15px; cursor: pointer; font-size: 0.9rem; margin-top: 10px; text-decoration: underline; font-weight: bold; }
 
@@ -303,6 +308,15 @@
         .close-modal-btn { position: absolute; top: 10px; right: 20px; font-size: 2rem; cursor: pointer; color: #000; font-family: monospace; }
 
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* Report Screen Styles */
+        .report-grid { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; border: 3px solid #000; padding: 10px; background: #f9f9f9; }
+        .report-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: white; border-bottom: 1px dashed #ccc; }
+        .report-item.error { background: #ffebee; }
+        .report-word { font-size: 1.5rem; font-weight: bold; }
+        .report-stat { display: flex; align-items: center; gap: 10px; }
+        .badge-err-list { display: flex; gap: 5px; }
+        .badge-student { background: #ff7675; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #d63031; }
 
     </style>
 </head>
@@ -467,6 +481,21 @@
             </div>
         </div>
 
+        <div id="reportScreen" class="screen">
+            <div class="pixel-card" style="text-align:center;">
+                <div style="font-size:4rem; margin-bottom:10px;">📊</div>
+                <h2 style="font-size:2.5rem; margin:0;">測驗結束</h2>
+                <p style="font-size:1.2rem; color:#666; margin-bottom:20px;">本次測驗檢討</p>
+                
+                <div id="battleReportList" class="report-grid"></div>
+                
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button class="btn-pixel btn-primary" style="flex:1;" onclick="showClassStats()">查看全班統計</button>
+                    <button class="btn-pixel" style="flex:1;" onclick="showScreen('dashboardScreen')">回首頁</button>
+                </div>
+            </div>
+        </div>
+
         <div id="studentAnalysisScreen" class="screen">
             <div class="section-header"><span class="section-title">🧑‍🎓 個別弱點</span></div>
             <div id="studentAnalysisGrid" class="student-analysis-grid"></div>
@@ -527,9 +556,42 @@
 
 <script src="words.js" onerror="document.getElementById('loadError').style.display='block'"></script>
 <script>
-    let db = [], testList = [], currentIndex = 0;
+    let db = [], testList = [], currentIndex = 0, currentSessionMistakes = [];
     let timerValue = 8, timerInterval = null, isTimerRunning = false;
     let currentListFilter = 'all';
+    
+    // Voice List (Apple Fix)
+    let availableVoices = [];
+    function initVoices() {
+        availableVoices = window.speechSynthesis.getVoices();
+        if (availableVoices.length === 0) { setTimeout(initVoices, 500); }
+    }
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = initVoices;
+    }
+    initVoices();
+
+    function getBestVoice() {
+         const all = window.speechSynthesis.getVoices();
+         let best = all.find(v => v.name.includes("Google US English"));
+         if (!best) best = all.find(v => v.lang === 'en-US' && v.name.includes("Samantha")); // macOS
+         if (!best) best = all.find(v => v.lang === 'en-US' && v.name.includes("Daniel")); // iOS
+         if (!best) best = all.find(v => v.lang === 'en-US' && v.localService); 
+         if (!best) best = all.find(v => v.lang.startsWith('en'));
+         return best;
+    }
+
+    function speakText(type) { 
+        const item = testList[currentIndex]; 
+        const text = (type === 'word' ? item.word : item.sentence);
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        u.rate = 0.6; // Slower rate
+        const v = getBestVoice();
+        if(v) u.voice = v;
+        window.speechSynthesis.speak(u);
+    }
 
     window.onload = function() { 
         if (typeof masterWordList !== 'undefined') db = masterWordList; 
@@ -661,14 +723,14 @@
         testList.sort(() => 0.5 - Math.random());
         if (testList.length > testCount) testList = testList.slice(0, testCount);
 
-        currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
+        startTestSequence();
     }
 
     function startCustomTest() {
         const selectedWords = Array.from(document.querySelectorAll('.custom-word-cb:checked')).map(cb => cb.value);
         if(selectedWords.length === 0) { alert("請至少選擇一個單字"); return; }
         testList = db.filter(w => selectedWords.includes(w.word)); testList.sort(() => 0.5 - Math.random());
-        currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
+        startTestSequence();
     }
 
     function startTopErrorTest() {
@@ -687,7 +749,7 @@
         if(top30.length > 0) {
             top30.sort(() => 0.5 - Math.random()); 
             testList = top30.slice(0, 10); 
-            currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
+            startTestSequence();
         } else { alert("目前沒有足夠的錯誤數據！"); }
     }
 
@@ -710,7 +772,15 @@
         
         const count = parseInt(document.getElementById('wordCount').value);
         testList = getSmartWordList(pool, count);
-        currentIndex = 0; showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
+        startTestSequence();
+    }
+    
+    function startTestSequence() {
+        currentIndex = 0;
+        currentSessionMistakes = []; // Clear previous report data
+        showScreen('testScreen'); 
+        document.getElementById('totalNum').innerText = testList.length; 
+        loadCard();
     }
 
     function loadCard() {
@@ -722,21 +792,19 @@
         
         playQuestionSequence();
     }
-
-    function speakText(type) { 
-        const item = testList[currentIndex]; 
-        const text = (type === 'word' ? item.word : item.sentence);
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-US';
-        window.speechSynthesis.speak(u);
-    }
     
     function playQuestionSequence() {
         resetTimer();
-        const item = testList[currentIndex]; window.speechSynthesis.cancel();
-        const u1 = new SpeechSynthesisUtterance(item.word); u1.lang='en-US';
-        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.lang='en-US';
-        const u3 = new SpeechSynthesisUtterance(item.word); u3.lang='en-US';
+        const item = testList[currentIndex]; 
+        window.speechSynthesis.cancel();
+        
+        const u1 = new SpeechSynthesisUtterance(item.word); u1.lang='en-US'; u1.rate=0.6;
+        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.lang='en-US'; u2.rate=0.6;
+        const u3 = new SpeechSynthesisUtterance(item.word); u3.lang='en-US'; u3.rate=0.6;
+        
+        const v = getBestVoice();
+        if(v) { u1.voice=v; u2.voice=v; u3.voice=v; }
+
         u3.onend = function() { if(document.getElementById('autoTimerSwitch').checked) startTimer(); };
         window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3);
     }
@@ -750,19 +818,76 @@
             if(timerValue <= 0) { clearInterval(timerInterval); isTimerRunning = false; btn.classList.remove('ticking'); }
         }, 1000);
     }
-    function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; const btn = document.getElementById('timerBtn'); btn.innerText = "⏱️"; btn.classList.remove('active', 'ticking'); }
+    function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; const btn = document.getElementById('timerBtn'); btn.innerText = "8"; btn.classList.remove('active', 'ticking'); }
     function updateTimerDisplay() { document.getElementById('timerBtn').innerText = timerValue; }
 
     function toggleStudent(id) { document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong'); }
     function nextWord() {
         const item = testList[currentIndex]; const date = new Date().toLocaleDateString('zh-TW'); let errorCount = 0;
-        for(let i=1; i<=5; i++) { if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) { saveMistake(i, item, date); errorCount++; } }
+        let wrongStudents = [];
+        
+        for(let i=1; i<=5; i++) { 
+            if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) { 
+                saveMistake(i, item, date); 
+                errorCount++; 
+                wrongStudents.push(i);
+            } 
+        }
+        
+        // Log for report
+        currentSessionMistakes.push({
+            word: item.word,
+            wrongCount: errorCount,
+            students: wrongStudents
+        });
+
         saveTestLog(item.word, errorCount, 5); 
-        currentIndex++; if(currentIndex < testList.length) loadCard(); else { alert("測驗結束"); showClassStats(); }
+        currentIndex++; 
+        if(currentIndex < testList.length) {
+            loadCard(); 
+        } else { 
+            showBattleReport(); 
+        }
+    }
+    
+    function showBattleReport() {
+        showScreen('reportScreen');
+        const list = document.getElementById('battleReportList');
+        list.innerHTML = "";
+        
+        if(currentSessionMistakes.length === 0) {
+            list.innerHTML = "<div style='padding:20px; text-align:center;'>尚未開始測驗</div>";
+            return;
+        }
+
+        currentSessionMistakes.forEach(log => {
+            const div = document.createElement('div');
+            div.className = `report-item ${log.wrongCount > 0 ? 'error' : ''}`;
+            
+            let badges = "";
+            if (log.wrongCount > 0) {
+                log.students.forEach(sid => {
+                    badges += `<span class="badge-student">${sid}</span>`;
+                });
+            } else {
+                badges = "<span style='color:var(--student); font-weight:bold;'>全對 ✅</span>";
+            }
+
+            div.innerHTML = `
+                <span class="report-word">${log.word}</span>
+                <div class="report-stat">
+                    ${log.wrongCount > 0 ? `<span style="color:red; font-weight:bold;">❌ ${log.wrongCount}人錯</span>` : ''}
+                    <div class="badge-err-list">${badges}</div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
     }
     
     function saveMistake(sid, w, d) { let h = JSON.parse(localStorage.getItem('spellingHistory')) || []; h.push({ student: sid, word: w.word, session: w.session, sentence: w.sentence, date: d }); localStorage.setItem('spellingHistory', JSON.stringify(h)); }
     function saveTestLog(word, errCount, totalStudents) { let logs = JSON.parse(localStorage.getItem('spellingTestLogs')) || []; logs.push({ word: word, timestamp: Date.now(), accuracy: (totalStudents - errCount) / totalStudents }); localStorage.setItem('spellingTestLogs', JSON.stringify(logs)); }
+
+    // --- Restored & Fixed Functions ---
 
     function renderAllStudentOverview() {
         const container = document.getElementById('studentAnalysisGrid'); container.innerHTML = "";
@@ -800,7 +925,7 @@
         let counts={}; h.forEach(x=>{if(!counts[x.word])counts[x.word]=0;counts[x.word]++;});
         let s = Object.keys(counts).map(k=>({w:k,c:counts[k]})).sort((a,b)=>b.c-a.c).slice(0,50);
         let maxCount = s[0]?.c || 1; 
-        let html="<table><tr><th width='60%'>Top 50 弱點</th><th>次數</th></tr>";
+        let html="<table><tr><th width='60%'>常錯單字 (Top 50)</th><th>錯誤次數</th></tr>";
         s.forEach(i=>{
             const widthPct = (i.c / maxCount) * 100;
             html+=`<tr><td>${i.w}</td><td><div style="display:flex; align-items:center;"><span class="rank-bar-bg"><span class="rank-bar-fill" style="width:${widthPct}%"></span></span><span class="rank-high">${i.c}</span></div></td></tr>`
@@ -875,13 +1000,18 @@
             else if (errData.total >= 5) div.classList.add('heatmap-orange');
             else if (errData.total > 0) div.classList.add('heatmap-yellow');
             if(errData.total > 0) { const names = Array.from(errData.students).join(", "); div.setAttribute('data-tooltip', `錯誤:${errData.total}次 (學生:${names})`); }
-            div.innerHTML = `<span class="wi-word">${item.word}</span><span class="wi-session">U${item.session}</span>`;
+            
+            // Fix: Separate Unit label from word
+            div.innerHTML = `
+                <span class="wi-word">${item.word}</span>
+                <span class="badge-unit">Unit ${item.session}</span>
+            `;
             container.appendChild(div);
         });
     }
 
     function exportToCSV() { const h = getHistory(); if(h.length===0){alert("無資料");return;} const n = {1:"水牛",2:"水豚",3:"樹懶",4:"河馬",5:"無尾熊"}; let csv = "data:text/csv;charset=utf-8,\uFEFF日期,學生,代號,單元,單字,例句\n"; h.forEach(r => { csv+=`${r.date},${n[r.student]},${r.student},${r.session},${r.word},${(r.sentence||"").replace(/,/g,"，")}\n` }); const a = document.createElement("a"); a.href=encodeURI(csv); a.download="錯題紀錄.csv"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
-    function clearHistory(){ if(confirm("確定清空所有紀錄？")) { localStorage.removeItem('spellingHistory'); localStorage.removeItem('spellingTestLogs'); showScreen('dashboardScreen'); } }
+    function clearHistory(){ if(confirm("確定清空所有歷史與AI學習紀錄？")) { localStorage.removeItem('spellingHistory'); localStorage.removeItem('spellingTestLogs'); showScreen('dashboardScreen'); } }
 
 </script>
 </body>
