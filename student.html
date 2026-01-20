@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v35.0</title>
+    <title>學生自主學習平板 v36.1</title>
     <style>
         /* --- 🎨 視覺風格：平板學習 App --- */
         :root {
@@ -16,7 +16,7 @@
             --card-radius: 20px;
             --success: #66bb6a;
             --danger: #ef5350;
-            --read-color: #e8f5e9; /* 已讀背景色 */
+            --read-color: #e8f5e9;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Microsoft JhengHei', 'Varela Round', sans-serif; }
@@ -69,14 +69,13 @@
             position: relative;
         }
         .word-overview-card h4 { margin: 0; font-size: 1.1rem; color: var(--text-main); }
-        /* 已讀樣式 */
         .word-overview-card.read { background-color: var(--read-color); border-color: var(--success); }
         .word-overview-card.read::after { 
             content: "✓"; position: absolute; top: 5px; right: 5px; 
             color: var(--success); font-weight: bold; font-size: 0.9rem; 
         }
 
-        /* --- 4. 背單字 - 單字卡模式 (Flashcard Detail) --- */
+        /* --- 4. 背單字 - 單字卡模式 (Detail Flashcard) --- */
         .detail-container { 
             background: white; border-radius: 25px; padding: 30px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
@@ -103,9 +102,15 @@
         .toggle-group { display: flex; background: #f0f0f0; border-radius: 30px; padding: 5px; overflow: hidden; }
         .toggle-btn { flex: 1; border: none; background: transparent; padding: 12px; font-weight: bold; color: #777; cursor: pointer; border-radius: 30px; transition: 0.2s; }
         .toggle-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .range-selector { display: flex; flex-wrap: wrap; gap: 8px; max-height: 200px; overflow-y: auto; }
-        .range-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid #ddd; background: white; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
-        .range-btn.active { background: var(--accent); color: white; border-color: var(--accent); font-weight: bold; }
+        
+        .range-selector { display: flex; flex-wrap: wrap; gap: 8px; max-height: 250px; overflow-y: auto; }
+        .range-btn { 
+            padding: 10px 15px; border-radius: 12px; border: 1px solid #ddd; background: white; 
+            cursor: pointer; font-size: 0.95rem; transition: 0.2s; display: flex; align-items: center; gap: 5px; flex-grow: 1; justify-content: center;
+        }
+        .range-btn.has-data { border-color: var(--accent); background: #fff8e1; color: #d35400; font-weight: bold; }
+        .badge-count { background: var(--accent); color: white; font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px; }
+
         .timer-row { display: flex; justify-content: space-between; align-items: center; }
         .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -113,7 +118,28 @@
         .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(22px); }
+        
         .btn-start-quiz { width: 100%; background: linear-gradient(to right, #f5a623, #f76b1c); color: white; padding: 18px; border: none; border-radius: 15px; font-size: 1.3rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 15px rgba(245, 166, 35, 0.4); margin-top: 10px; }
+
+        /* --- 單字勾選 Modal --- */
+        .word-picker-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; margin-top: 10px; }
+        .picker-item { 
+            background: #f9f9f9; border: 1px solid #eee; padding: 10px; border-radius: 8px; 
+            text-align: center; cursor: pointer; font-size: 0.9rem; position: relative; overflow: hidden;
+        }
+        .picker-item.picked { background: #e3f2fd; border-color: var(--primary); color: var(--primary-dark); font-weight: bold; }
+        .picker-item.picked::after { content: "✓"; position: absolute; top: 2px; right: 4px; font-size: 0.8rem; }
+        
+        .picker-actions { display: flex; gap: 8px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; }
+        .btn-picker-action { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
+        .btn-picker-action:active { background: #f0f0f0; }
+        .btn-picker-action.accent { color: var(--primary); border-color: var(--primary); background: #e3f2fd; }
+
+        /* 快速測驗模式按鈕 */
+        .quick-quiz-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-quick-start { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; color: white; cursor: pointer; font-size: 1rem; }
+        .btn-quick-start.choice { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .btn-quick-start.spelling { background: linear-gradient(135deg, #f093fb, #f5576c); }
 
         /* --- 6. 測驗進行中 (Quiz) --- */
         .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
@@ -136,6 +162,11 @@
         .result-box { background: white; border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .score-display { font-size: 5rem; font-weight: 900; color: var(--primary); margin: 10px 0; text-shadow: 3px 3px 0 #eee; }
 
+        /* Modal 通用 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; animation: fadeIn 0.2s; }
+        .modal-content { background: white; margin: 10% auto; padding: 20px; width: 90%; max-width: 500px; border-radius: 20px; position: relative; max-height: 80vh; overflow-y: auto; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #aaa; }
+
     </style>
 </head>
 <body>
@@ -155,7 +186,7 @@
             <button class="dash-btn quiz-mode" onclick="openQuizSetup()">
                 <span class="dash-icon">📝</span>
                 <h2>自我測驗</h2>
-                <p>限時 8 秒，挑戰自己</p>
+                <p>挑選單字，限時挑戰</p>
             </button>
         </div>
 
@@ -187,7 +218,7 @@
         <div id="overviewGrid" class="word-overview-grid"></div>
 
         <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px;">
-            <button class="btn-start-quiz" style="background: linear-gradient(to right, #4caf50, #2e7d32); box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);" onclick="quickQuizFromStudy()">
+            <button class="btn-start-quiz" style="background: linear-gradient(to right, #4caf50, #2e7d32); box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);" onclick="openQuickQuizPicker()">
                 ⚡ 背完了！馬上測驗
             </button>
         </div>
@@ -236,8 +267,11 @@
 
         <div class="setup-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span class="setup-title" style="margin:0;">2. 選擇範圍 (可複選)</span>
-                <button class="btn-icon" style="font-size:0.9rem; color:var(--primary);" onclick="selectAllUnits()">全選</button>
+                <span class="setup-title" style="margin:0;">2. 選擇單字 (點擊單元勾選)</span>
+                <button class="btn-icon" style="font-size:0.9rem; color:var(--danger);" onclick="clearAllSelectedWords()">清空</button>
+            </div>
+            <div style="margin-bottom:10px; font-size:0.9rem; color:#666;">
+                目前已選：<b id="totalSelectedCount" style="color:var(--primary); font-size:1.2rem;">0</b> 個字
             </div>
             <div id="quizRangeGrid" class="range-selector"></div>
         </div>
@@ -253,6 +287,30 @@
         </div>
 
         <button class="btn-start-quiz" onclick="startConfiguredQuiz()">🚀 開始測驗</button>
+    </div>
+
+    <div id="wordPickerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeWordPicker()">&times;</span>
+            <h3 id="pickerTitle" style="margin-top:0; color:var(--text-main);">挑選單字</h3>
+            
+            <div class="picker-actions">
+                <button class="btn-picker-action accent" onclick="pickerSelectViewed()">僅選已讀</button>
+                <button class="btn-picker-action" onclick="pickerSelectAll()">全選</button>
+                <button class="btn-picker-action" onclick="pickerSelectNone()">全取消</button>
+            </div>
+
+            <div id="pickerGrid" class="word-picker-container"></div>
+            
+            <div id="btnPickerSave" style="display:block;">
+                <button class="btn-start-quiz" style="margin-top:15px;" onclick="closeWordPicker()">完成選取</button>
+            </div>
+            
+            <div id="btnPickerQuickStart" class="quick-quiz-actions" style="display:none;">
+                <button class="btn-quick-start choice" onclick="startQuickQuizDirect('choice')">開始選擇題</button>
+                <button class="btn-quick-start spelling" onclick="startQuickQuizDirect('spelling')">開始拼字題</button>
+            </div>
+        </div>
     </div>
 
     <div id="quizScreen" class="screen">
@@ -288,12 +346,12 @@
         </div>
     </div>
 
-    <div id="mistakeModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
-        <div class="modal-content" style="background:white; margin:10% auto; padding:20px; width:90%; max-width:500px; border-radius:20px; text-align:center;">
+    <div id="mistakeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="document.getElementById('mistakeModal').style.display='none'">&times;</span>
             <h2>📕 我的錯題本</h2>
             <div id="mistakeList" style="text-align:left; max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
-            <button class="btn-back" onclick="document.getElementById('mistakeModal').style.display='none'">關閉</button>
-            <button class="btn-back" style="color:var(--danger); border-color:var(--danger); margin-left:10px;" onclick="clearMistakes()">清空</button>
+            <button class="btn-back" onclick="clearMistakes()" style="color:var(--danger); border-color:var(--danger); width:100%; justify-content:center;">清空紀錄</button>
         </div>
     </div>
 
@@ -312,8 +370,12 @@
     };
 
     // 測驗相關
-    let quizConfig = { mode: 'choice', units: [], timer: false };
+    let quizConfig = { mode: 'choice', selectedWords: new Set(), timer: false };
     let quizData = { list: [], index: 0, score: 0, timerId: null };
+    
+    // Word Picker 暫存
+    let currentPickerSid = null;
+    let isQuickQuizPicker = false; // 判斷是否為快速測驗模式
 
     // --- 初始化 ---
     window.onload = function() {
@@ -323,9 +385,6 @@
         // 取得所有 Unit 並排序
         sessions = [...new Set(masterWordList.map(item => item.session))].sort();
         
-        // 嘗試讀取已讀紀錄 (Optional, 這裡簡單實作重整後歸零，若要持久化可用 localStorage)
-        // viewedWords = new Set(JSON.parse(localStorage.getItem('viewedWords') || '[]'));
-
         goHome();
     };
 
@@ -337,7 +396,7 @@
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         window.scrollTo(0,0);
-        clearInterval(quizData.timerId); // 切換頁面時確保 Timer 停止
+        clearInterval(quizData.timerId); 
     }
 
     // 🔊 語音
@@ -371,12 +430,8 @@
         studyData.sid = sid;
         studyData.list = masterWordList.filter(w => w.session === sid);
         
-        // 更新標題
         document.getElementById('overviewTitle').innerText = `Unit ${sid}`;
         
-        // 設定測驗範圍 (方便背完直接測)
-        quizConfig.units = [sid]; 
-
         renderOverviewGrid();
         showScreen('studyOverviewScreen');
     }
@@ -389,7 +444,6 @@
             const card = document.createElement('div');
             card.className = 'word-overview-card';
             
-            // 檢查是否已讀
             if (viewedWords.has(item.word)) {
                 card.classList.add('read');
             }
@@ -400,10 +454,20 @@
         });
     }
 
-    function quickQuizFromStudy() {
-        quizConfig.mode = 'choice';
-        quizConfig.timer = false;
-        startConfiguredQuiz();
+    // ⚡ 快速測驗入口：打開 Picker
+    function openQuickQuizPicker() {
+        // 設定為快速測驗模式
+        isQuickQuizPicker = true;
+        // 清空之前的選擇
+        quizConfig.selectedWords.clear();
+        
+        // 預設選取：當前單元中「已讀」的字
+        studyData.list.forEach(w => {
+            if (viewedWords.has(w.word)) quizConfig.selectedWords.add(w.word);
+        });
+
+        // 打開 Picker (傳入目前 Unit)
+        openWordPicker(studyData.sid);
     }
 
     // --- 3. 背單字邏輯 (單卡 Detail) ---
@@ -427,7 +491,6 @@
         document.getElementById('cardSentEn').innerText = item.sentence;
         document.getElementById('cardSentZh').innerText = item.sentence_zh || '';
 
-        // 自動播放單字
         setTimeout(() => speak(item.word), 300);
     }
 
@@ -456,34 +519,47 @@
     }
 
     function backToOverview() {
-        renderOverviewGrid(); // 重新渲染以更新已讀狀態
+        renderOverviewGrid(); 
         showScreen('studyOverviewScreen');
     }
 
     // --- 4. 測驗設定邏輯 ---
     function openQuizSetup() {
         quizConfig.mode = 'choice';
-        quizConfig.units = [];
         quizConfig.timer = false;
         
         updateModeUI();
         document.getElementById('timerSwitch').checked = false;
         
+        renderQuizRangeGrid();
+        updateTotalCount();
+        
+        showScreen('quizSetupScreen');
+    }
+
+    function renderQuizRangeGrid() {
         const grid = document.getElementById('quizRangeGrid');
         grid.innerHTML = "";
         sessions.forEach(sid => {
-            const btn = document.createElement('button');
+            const btn = document.createElement('div');
             btn.className = 'range-btn';
-            btn.innerText = `Unit ${sid}`;
+            
+            // 計算該單元被選了幾個字
+            const unitWords = masterWordList.filter(w => w.session === sid);
+            let pickedCount = 0;
+            unitWords.forEach(w => {
+                if (quizConfig.selectedWords.has(w.word)) pickedCount++;
+            });
+
+            if (pickedCount > 0) btn.classList.add('has-data');
+
+            btn.innerHTML = `Unit ${sid} ${pickedCount > 0 ? `<span class="badge-count">${pickedCount}</span>` : ''}`;
             btn.onclick = () => {
-                btn.classList.toggle('active');
-                const idx = quizConfig.units.indexOf(sid);
-                if (idx > -1) quizConfig.units.splice(idx, 1);
-                else quizConfig.units.push(sid);
+                isQuickQuizPicker = false; // 一般設定模式
+                openWordPicker(sid);
             };
             grid.appendChild(btn);
         });
-        showScreen('quizSetupScreen');
     }
 
     function setQuizMode(mode) {
@@ -496,31 +572,113 @@
         document.getElementById('modeSpelling').classList.toggle('active', quizConfig.mode === 'spelling');
     }
 
-    function selectAllUnits() {
-        const btns = document.querySelectorAll('.range-btn');
-        const allSelected = quizConfig.units.length === sessions.length;
-        if (allSelected) {
-            quizConfig.units = [];
-            btns.forEach(b => b.classList.remove('active'));
-        } else {
-            quizConfig.units = [...sessions];
-            btns.forEach(b => b.classList.add('active'));
+    function clearAllSelectedWords() {
+        if(confirm("確定清除所有已選單字？")) {
+            quizConfig.selectedWords.clear();
+            renderQuizRangeGrid();
+            updateTotalCount();
         }
     }
 
+    function updateTotalCount() {
+        document.getElementById('totalSelectedCount').innerText = quizConfig.selectedWords.size;
+    }
+
+    // --- Word Picker Modal Logic ---
+    function openWordPicker(sid) {
+        currentPickerSid = sid;
+        document.getElementById('pickerTitle').innerText = `挑選單字 (Unit ${sid})`;
+        
+        // 切換按鈕顯示：快速測驗顯示直接開始，一般設定顯示完成選取
+        if (isQuickQuizPicker) {
+            document.getElementById('btnPickerSave').style.display = 'none';
+            document.getElementById('btnPickerQuickStart').style.display = 'flex';
+        } else {
+            document.getElementById('btnPickerSave').style.display = 'block';
+            document.getElementById('btnPickerQuickStart').style.display = 'none';
+        }
+
+        document.getElementById('wordPickerModal').style.display = 'block';
+        renderPickerGrid();
+    }
+
+    function closeWordPicker() {
+        document.getElementById('wordPickerModal').style.display = 'none';
+        // 如果是一般設定模式，關閉時要更新外層 UI
+        if (!isQuickQuizPicker) {
+            renderQuizRangeGrid();
+            updateTotalCount();
+        }
+    }
+
+    function renderPickerGrid() {
+        const container = document.getElementById('pickerGrid');
+        container.innerHTML = "";
+        
+        const unitWords = masterWordList.filter(w => w.session === currentPickerSid);
+        
+        unitWords.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'picker-item';
+            if (quizConfig.selectedWords.has(item.word)) div.classList.add('picked');
+            
+            div.innerText = item.word;
+            div.onclick = () => {
+                if (quizConfig.selectedWords.has(item.word)) {
+                    quizConfig.selectedWords.delete(item.word);
+                    div.classList.remove('picked');
+                } else {
+                    quizConfig.selectedWords.add(item.word);
+                    div.classList.add('picked');
+                }
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function pickerSelectAll() {
+        const unitWords = masterWordList.filter(w => w.session === currentPickerSid);
+        unitWords.forEach(w => quizConfig.selectedWords.add(w.word));
+        renderPickerGrid();
+    }
+
+    function pickerSelectNone() {
+        const unitWords = masterWordList.filter(w => w.session === currentPickerSid);
+        unitWords.forEach(w => quizConfig.selectedWords.delete(w.word));
+        renderPickerGrid();
+    }
+
+    function pickerSelectViewed() {
+        const unitWords = masterWordList.filter(w => w.session === currentPickerSid);
+        unitWords.forEach(w => {
+            if (viewedWords.has(w.word)) quizConfig.selectedWords.add(w.word);
+            else quizConfig.selectedWords.delete(w.word);
+        });
+        renderPickerGrid();
+    }
+
     // --- 5. 測驗引擎 ---
+    function startQuickQuizDirect(mode) {
+        // 從 Picker 直接開始
+        quizConfig.mode = mode;
+        quizConfig.timer = false; // 快速測驗預設不計時，降低壓力
+        closeWordPicker();
+        startConfiguredQuiz();
+    }
+
     function startConfiguredQuiz() {
-        if (quizConfig.units.length === 0) { alert("請選擇範圍！"); return; }
+        // 檢查數量
+        if (quizConfig.selectedWords.size === 0) { alert("請至少選擇 1 個單字！"); return; }
         
         if (document.getElementById('quizSetupScreen').classList.contains('active')) {
             quizConfig.timer = document.getElementById('timerSwitch').checked;
         }
 
-        let questions = masterWordList.filter(w => quizConfig.units.includes(w.session));
-        if (questions.length === 0) { alert("無單字"); return; }
+        // 從 selectedWords Set 轉回 Object Array
+        let questions = masterWordList.filter(w => quizConfig.selectedWords.has(w.word));
         
         questions.sort(() => 0.5 - Math.random());
-        if (questions.length > 20) questions = questions.slice(0, 20);
+        // 自主測驗不限題數，全測
 
         quizData.list = questions;
         quizData.index = 0;
@@ -558,7 +716,7 @@
     // Timer: 8 秒
     function startTimer() {
         clearInterval(quizData.timerId);
-        let timeLeft = 8; // 改為 8 秒
+        let timeLeft = 8;
         document.getElementById('timeLeft').innerText = timeLeft;
         
         quizData.timerId = setInterval(() => {
@@ -591,10 +749,14 @@
     function renderChoices(correctItem) {
         const container = document.getElementById('choiceArea');
         container.innerHTML = "";
+        
         let opts = [correctItem];
+        // 產生干擾項：優先從本次測驗範圍找，不夠則從全域找
+        let pool = quizData.list.length >= 4 ? quizData.list : masterWordList;
+        
         while(opts.length < 4) {
-            const rand = masterWordList[Math.floor(Math.random() * masterWordList.length)];
-            if (!opts.includes(rand)) opts.push(rand);
+            const rand = pool[Math.floor(Math.random() * pool.length)];
+            if (!opts.some(o => o.word === rand.word)) opts.push(rand);
         }
         opts.sort(() => 0.5 - Math.random());
 
