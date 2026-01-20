@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v47.3 (Switch Fixed)</title>
+    <title>學生自主學習平板 v47.5 (Voice Fix)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         /* --- 🎨 視覺風格：現代復古像素風 (Pixel Lite) --- */
@@ -128,15 +128,15 @@
         .range-btn.selected { border-color: #000; background: #feca57; color: #000; box-shadow: 3px 3px 0 #000; }
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem; }
         
-        /* Switch */
-        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        /* Switch (Fixed) */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; cursor: pointer; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .2s; border-radius: 4px; border: 2px solid #000; }
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border: 3px solid #000; }
         input:checked + .slider { background-color: var(--success); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* --- 6. 測驗進行中 (In-Game Settings) --- */
+        /* --- 6. 測驗進行中 --- */
         .quiz-settings-bar { display: flex; justify-content: center; gap: 20px; background: #eee; padding: 10px; border-radius: 8px; border: 3px solid #000; margin-bottom: 15px; }
         .mini-setting { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
         .quiz-status { display: flex; justify-content: space-between; font-weight: bold; color: #fff; margin-bottom: 10px; font-size: 1.4rem; background: #000; padding: 5px 10px; border-radius: 4px; }
@@ -202,8 +202,9 @@
     <div id="homeScreen" class="screen active">
         <div class="hero-banner">
             <div class="hero-title">VOCAB HERO</div>
-            <div class="hero-sub">單字大冒險 v47.3</div>
+            <div class="hero-sub">單字大冒險 v47.5</div>
         </div>
+
         <div class="dashboard-grid">
             <div class="dash-btn study" onclick="openUnitSelector('study')">
                 <div class="dash-icon">📖</div>
@@ -226,6 +227,7 @@
                 <p>WEAKNESS</p>
             </div>
         </div>
+        
         <div class="safe-exit-area">
             <a href="index.html" class="btn-safe-exit">🔌 離開遊戲 (回老師/首頁)</a>
         </div>
@@ -259,6 +261,7 @@
             <div style="font-weight:bold; color:#fff; text-shadow:2px 2px 0 #000; font-size:1.5rem;">Word <span id="detailIdx">1</span> / <span id="detailTotal">20</span></div>
             <div style="width:80px;"></div>
         </div>
+
         <div class="pixel-card detail-box">
             <div style="display:flex; align-items:center; justify-content:center; gap:15px; margin:20px 0 10px;">
                 <div class="detail-word" id="cardWord">Apple</div>
@@ -283,6 +286,7 @@
             <h2 class="page-title">SETUP</h2>
             <div style="width:80px;"></div>
         </div>
+
         <div class="pixel-card">
             <div class="setup-label">1. 選擇武器 (題型)</div>
             <div class="toggle-group">
@@ -290,6 +294,7 @@
                 <button class="toggle-btn" id="modeSpelling" onclick="setQuizMode('spelling')">⌨️ 拼字題</button>
             </div>
         </div>
+
         <div class="pixel-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div class="setup-label" style="margin:0; border:none;">2. 選擇戰場 (範圍)</div>
@@ -298,17 +303,19 @@
             <div style="margin:10px 0;">目前已選：<b id="totalSelectedCount" style="color:var(--primary); font-size:1.5rem;">0</b> 個字</div>
             <div id="quizRangeGrid" class="range-selector"></div>
         </div>
+
         <div class="pixel-card">
             <div class="setup-label">3. 難度設定</div>
             <div class="setting-row">
                 <span>自動下一關</span>
-                <div class="switch"><input type="checkbox" id="setupAutoNext" checked><span class="slider"></span></div>
+                <label class="switch"><input type="checkbox" id="setupAutoNext" checked><span class="slider"></span></label>
             </div>
             <div class="setting-row">
                 <span>8秒限時</span>
-                <div class="switch"><input type="checkbox" id="setupTimer"><span class="slider"></span></div>
+                <label class="switch"><input type="checkbox" id="setupTimer"><span class="slider"></span></label>
             </div>
         </div>
+
         <button class="btn-pixel btn-danger" style="width:100%; font-size:1.8rem;" onclick="startConfiguredQuiz()">🚀 FIGHT!</button>
     </div>
 
@@ -342,11 +349,11 @@
         <div class="quiz-settings-bar">
             <div class="mini-setting">
                 <span>⏩ 自動換題</span>
-                <div class="switch"><input type="checkbox" id="ingameAutoNext" onchange="toggleAutoNext(this.checked)"><span class="slider"></span></div>
+                <label class="switch"><input type="checkbox" id="ingameAutoNext" onchange="toggleAutoNext(this.checked)"><span class="slider"></span></label>
             </div>
             <div class="mini-setting">
                 <span>⏱️ 計時器</span>
-                <div class="switch"><input type="checkbox" id="ingameTimer" onchange="toggleTimer(this.checked)"><span class="slider"></span></div>
+                <label class="switch"><input type="checkbox" id="ingameTimer" onchange="toggleTimer(this.checked)"><span class="slider"></span></label>
             </div>
         </div>
         <div class="quiz-status">
@@ -400,6 +407,16 @@
     let currentPickerSid = null, isQuickQuizPicker = false, tempSelectedWords = new Set(); 
     let userStats = { wordsViewedCount: 0, quizCount: 0, totalCorrect: 0, totalMistakes: 0 };
     let unlockedTitles = new Set();
+    
+    // Voice List (Lazy Load)
+    let availableVoices = [];
+    function initVoices() {
+        availableVoices = window.speechSynthesis.getVoices();
+    }
+    window.speechSynthesis.onvoiceschanged = initVoices;
+    // Try init immediately
+    initVoices();
+
     const achievements = [
         { id: 'view_5', category: 'learn', tier: 'common', icon: '🪵', title: '單字小萌新', desc: '看過 5 個單字', check: (s) => s.wordsViewedCount >= 5 },
         { id: 'view_20', category: 'learn', tier: 'common', icon: '🕯️', title: '充滿好奇', desc: '看過 20 個單字', check: (s) => s.wordsViewedCount >= 20 },
@@ -438,7 +455,7 @@
         goHome();
     };
     
-    // --- In-Game Toggle Functions (Missed previously) ---
+    // --- In-Game Toggle Functions (Fixed) ---
     function toggleAutoNext(checked) { quizConfig.autoNext = checked; }
     function toggleTimer(checked) { 
         quizConfig.timer = checked; 
@@ -467,7 +484,26 @@
     function showToast(t,i){ const toast=document.getElementById('toastNotification'); toast.querySelector('div').innerText=i||'🎁'; document.getElementById('toastMsg').innerText=t; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3000); }
     function goHome(){ showScreen('homeScreen'); }
     function showScreen(id){ document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); clearInterval(quizData.timerId); window.speechSynthesis.cancel(); }
-    function speak(t){ const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.9; window.speechSynthesis.speak(u); }
+    
+    // Enhanced Speak Function
+    function getBestVoice() {
+         return availableVoices.find(v => 
+            (v.name.includes("Google US English")) || 
+            (v.name.includes("Samantha")) || 
+            (v.name.includes("Microsoft Zira")) || 
+            (v.lang === 'en-US')
+        );
+    }
+    
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        u.rate = 0.9; 
+        const v = getBestVoice();
+        if(v) u.voice = v;
+        window.speechSynthesis.speak(u);
+    }
     
     function openAchievementScreen(){
         const grid=document.getElementById('badgeGrid'); grid.innerHTML=""; const cats={ 'learn':'📚 勤學之路','unit':'🏫 Unit 制霸','alpha':'🔡 字母蒐集','quiz':'⚔️ 試煉戰場','milestone':'💎 傳奇里程碑','secret':'✨ 神秘彩蛋' };
@@ -559,7 +595,21 @@
         if(quizConfig.mode==='choice')renderChoices(i); else renderSpelling(); playQuizSequence();
     }
     function showHint(){ document.getElementById('qHint').style.display='block'; document.getElementById('btnShowHint').style.display='none'; }
-    function playQuizSequence(){ const i=quizData.list[quizData.index]; window.speechSynthesis.cancel(); const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.9; const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.9; const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.9; u3.onend=function(){if(quizConfig.timer)startTimer();}; window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3); }
+    
+    function playQuizSequence(){ 
+        const i=quizData.list[quizData.index]; 
+        window.speechSynthesis.cancel(); 
+        const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.9; u1.lang='en-US';
+        const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.9; u2.lang='en-US';
+        const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.9; u3.lang='en-US';
+        
+        // Voice selection
+        const v = getBestVoice();
+        if(v) { u1.voice=v; u2.voice=v; u3.voice=v; }
+
+        u3.onend=function(){if(quizConfig.timer)startTimer();}; 
+        window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3); 
+    }
     
     function startTimer(){ clearInterval(quizData.timerId); let t=8; document.getElementById('timeLeft').innerText=t; document.getElementById('timerBadge').style.display='inline-block'; quizData.timerId=setInterval(()=>{ t--; document.getElementById('timeLeft').innerText=t; if(t<=0){clearInterval(quizData.timerId); handleTimeUp();} },1000); }
     
@@ -570,7 +620,7 @@
         handleNextStep();
     }
 
-    function handleNextStep(){ if(quizConfig.autoNext)setTimeout(nextQuestion,1500); else document.getElementById('btnNextQ').style.display='block'; }
+    function handleNextStep(){ if(quizConfig.autoNext)setTimeout(nextQuestion,2000); else document.getElementById('btnNextQ').style.display='block'; }
     function nextQuestion(){ quizData.index++; if(quizData.index<quizData.list.length)loadQuestion(); else showResult(); }
 
     function renderChoices(item){
