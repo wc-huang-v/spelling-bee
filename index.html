@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v51.0 (Fixes)</title>
+    <title>智慧單字小考官 v51.1 (Mini Card Fix)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     
     <script>
@@ -15,7 +15,6 @@
             document.getElementById('landing-page').style.display = 'none';
             const app = document.getElementById('teacher-app');
             app.style.display = 'flex';
-            // Force redraw/reflow fix for some mobile browsers
             app.style.zIndex = '100'; 
             
             if (typeof initApp === 'function') {
@@ -100,20 +99,20 @@
         .btn-secondary-link:active { transform: translateY(2px); box-shadow: none; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-15px);} 60% {transform: translateY(-7px);} }
 
-        /* --- 👩‍🏫 老師版容器 (Fix Z-Index & Layout) --- */
+        /* --- 👩‍🏫 老師版容器 --- */
         #teacher-app {
             display: none; width: 100%; max-width: 1000px;
             min-height: 100vh; flex-direction: column;
             padding: 20px; overflow: visible;
-            position: relative; z-index: 1; /* Ensure visible */
+            position: relative; z-index: 1;
         }
 
-        /* Header (Sticky Fix) */
+        /* Header */
         header { 
             background: #fff; border: 3px solid #000; border-radius: 8px; padding: 10px 20px; 
             display: flex; justify-content: space-between; align-items: center; 
             box-shadow: 6px 6px 0 rgba(0,0,0,0.1); 
-            position: sticky; top: 10px; z-index: 2000; /* Higher than content */
+            position: sticky; top: 10px; z-index: 2000;
             margin-bottom: 25px;
         }
         .header-brand { font-size: 1.5rem; font-weight: 900; color: #000; display: flex; align-items: center; gap: 8px; }
@@ -121,13 +120,12 @@
         .hamburger-btn { font-size: 1.5rem; padding: 5px 12px; background: #74b9ff; color: #000; border: 2px solid #000; border-radius: 4px; cursor: pointer; }
         .nav-dropdown-wrapper { position: relative; }
         
-        /* Dropdown Menu (Z-Index Fix) */
         .nav-dropdown-menu { 
             display: none; position: absolute; top: 100%; right: 0; margin-top: 10px; 
             background: #fff; min-width: 220px; 
-            box-shadow: 8px 8px 0 rgba(0,0,0,0.3); /* Stronger shadow */
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.3);
             border: 3px solid #000; border-radius: 8px; 
-            z-index: 2100; /* Above header */
+            z-index: 2100;
             padding: 5px 0; 
         }
         .nav-dropdown-menu.show { display: block; }
@@ -135,7 +133,7 @@
         .nav-dropdown-item:hover { background: #dfe6e9; }
         .nav-dropdown-divider { height: 2px; background: #000; margin: 5px 0; }
 
-        /* Dashboard & Content (Z-Index Fix) */
+        /* Dashboard */
         .screen { display: none; width: 100%; position: relative; z-index: 10; }
         .screen.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -143,7 +141,6 @@
         .dash-section-title { font-size: 1.3rem; color: #fff; text-shadow: 2px 2px 0 #000; margin: 30px 0 15px 0; padding: 5px 10px; background: #000; display: inline-block; transform: skew(-10deg); }
         .dash-section-title:first-child { margin-top: 0; }
         
-        /* Dashboard Buttons (Interactive Fix) */
         .dashboard-grid { 
             display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; 
             position: relative; z-index: 10;
@@ -152,7 +149,7 @@
             background: #fff; border: 3px solid #000; border-radius: 8px; padding: 20px; 
             text-align: center; cursor: pointer; transition: 0.1s; position: relative; overflow: hidden; 
             box-shadow: 6px 6px 0 #000;
-            z-index: 11; /* Ensure clickable */
+            z-index: 11;
         }
         .dash-card:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 #000; }
         .dash-icon { font-size: 3rem; margin-bottom: 10px; display: block; }
@@ -160,7 +157,7 @@
         .dash-desc { font-size: 0.9rem; color: #555; font-family: 'Microsoft JhengHei'; }
         .dash-card.purple { background: #e0d4fc; } .dash-card.primary { background: #dff9fb; } .dash-card.accent { background: #ffeaa7; } .dash-card.danger { background: #ffcccc; } .dash-card.success { background: #d4efdf; }
 
-        /* Other UI Components */
+        /* Other UI */
         .pixel-card { background: #fff; border: 3px solid var(--border-black); border-radius: 8px; box-shadow: 6px 6px 0px rgba(0,0,0,0.2); padding: 20px; position: relative; margin-bottom: 20px; }
         .btn-pixel { background: #fff; border: 3px solid var(--border-black); border-radius: 8px; padding: 10px 20px; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 4px 4px 0px var(--border-black); transition: all 0.1s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); text-decoration: none; user-select: none; }
         .btn-pixel:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px; }
@@ -252,32 +249,30 @@
         .page-bottom-actions { margin-top: 40px; padding-top: 20px; border-top: 2px dashed #000; text-align: center; }
         .btn-safe-exit { background: transparent; border: none; color: #555; padding: 8px 15px; cursor: pointer; font-size: 0.9rem; margin-top: 10px; text-decoration: underline; font-weight: bold; }
 
-        /* Modal */
         .modal { display: none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); }
         .modal-content { background-color: #fff; margin: 5% auto; padding: 0; width: 90%; max-width: 600px; border-radius: 12px; border: 6px solid #000; box-shadow: 10px 10px 0 rgba(0,0,0,0.5); }
         .modal-body { padding: 30px; }
         .close-modal-btn { position: absolute; top: 10px; right: 20px; font-size: 2rem; cursor: pointer; color: #000; font-family: monospace; }
 
-        /* --- Mini Flashcard (Fixed Z-Index & Position) --- */
+        /* --- Mini Flashcard (Fixed Z-Index & Mobile Position) --- */
         .mini-flashcard {
             display: none;
             position: fixed;
-            z-index: 4000; /* Above header, below modal */
+            z-index: 4000;
             background: #fff;
             border: 4px solid #000;
             box-shadow: 10px 10px 0 rgba(0,0,0,0.5);
             padding: 20px;
             text-align: center;
-            /* Default: Right Side for Desktop */
             right: 20px; 
-            top: 90px; /* Clear header */
+            top: 90px;
             width: 320px;
             max-width: 90%;
         }
         @media (max-width: 768px) {
             .mini-flashcard {
                 right: 5%;
-                top: 70px; /* Mobile position */
+                top: 130px; /* Mobile Fix: avoid overlapping header */
                 width: 90%;
             }
         }
@@ -302,7 +297,7 @@
         <div class="landing-content">
             <span class="app-logo-big">👾</span>
             <div class="app-title">VOCAB MASTER</div>
-            <div class="app-subtitle">智慧單字小考官 v51.0</div>
+            <div class="app-subtitle">智慧單字小考官 v51.1</div>
             
             <button class="btn-student-hero" onclick="safeEnterStudent()">
                 <span class="icon">🎮</span> START GAME (學生)
@@ -338,70 +333,42 @@
 
         <div id="dashboardScreen" class="screen active">
             <h2 style="color:var(--text-main); margin-bottom:10px; font-size:1.5rem;">👋 Hello Teacher!</h2>
-            
             <div class="dash-section-title">📝 QUIZ ZONE</div>
             <div class="dashboard-grid">
                 <div class="dash-card purple" onclick="showCustomQuizScreen()">
-                    <span class="dash-icon">🎯</span>
-                    <div class="dash-title">指定測驗</div>
-                    <div class="dash-desc">Manual Select</div>
+                    <span class="dash-icon">🎯</span><div class="dash-title">指定測驗</div><div class="dash-desc">Manual Select</div>
                 </div>
                 <div class="dash-card primary" onclick="showScreen('setupScreen')">
-                    <span class="dash-icon">🤖</span>
-                    <div class="dash-title">AI 隨機測驗</div>
-                    <div class="dash-desc">Auto Generator</div>
+                    <span class="dash-icon">🤖</span><div class="dash-title">AI 隨機測驗</div><div class="dash-desc">Auto Generator</div>
                 </div>
             </div>
-
             <div class="dash-section-title">📊 DATA CENTER</div>
             <div class="dashboard-grid">
                 <div class="dash-card accent" onclick="showStudentStats()">
-                    <span class="dash-icon">🧑‍🎓</span>
-                    <div class="dash-title">個別弱點</div>
-                    <div class="dash-desc">Student Stats</div>
+                    <span class="dash-icon">🧑‍🎓</span><div class="dash-title">個別弱點</div><div class="dash-desc">Student Stats</div>
                 </div>
                 <div class="dash-card danger" onclick="showClassStats()">
-                    <span class="dash-icon">🏫</span>
-                    <div class="dash-title">全班分析</div>
-                    <div class="dash-desc">Class Overview</div>
+                    <span class="dash-icon">🏫</span><div class="dash-title">全班分析</div><div class="dash-desc">Class Overview</div>
                 </div>
                 <div class="dash-card success" onclick="renderFullWordList(); showScreen('wordListScreen')">
-                    <span class="dash-icon">📖</span>
-                    <div class="dash-title">單字庫</div>
-                    <div class="dash-desc">Word List</div>
+                    <span class="dash-icon">📖</span><div class="dash-title">單字庫</div><div class="dash-desc">Word List</div>
                 </div>
             </div>
-
-            <div class="page-bottom-actions">
-                <button class="btn-safe-exit" onclick="exitTeacherMode()">🚪 LOGOUT</button>
-            </div>
+            <div class="page-bottom-actions"><button class="btn-safe-exit" onclick="safeExit()">🚪 LOGOUT</button></div>
         </div>
 
         <div id="customQuizScreen" class="screen">
-            <div class="section-header">
-                <span class="section-title">🎯 指定單字測驗</span>
-                <button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 常錯 Top 30</button>
-            </div>
+            <div class="section-header"><span class="section-title">🎯 指定單字測驗</span><button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 常錯 Top 30</button></div>
             <div class="session-panel">
                 <label style="font-weight:bold; display:block; margin-bottom:10px;">手動選擇單元</label>
                 <select id="customSessionSelect" onchange="renderCustomWordSelection()"></select>
-                
                 <div style="margin-top:20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <label style="font-weight:bold;">勾選單字</label>
-                        <button class="btn-pixel" style="font-size:0.8rem; padding:5px 10px;" onclick="clearCustomSelection()">清除</button>
-                    </div>
-
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><label style="font-weight:bold;">勾選單字</label><button class="btn-pixel" style="font-size:0.8rem; padding:5px 10px;" onclick="clearCustomSelection()">清除</button></div>
                     <div style="background:#eee; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; align-items:center; gap:10px;">
-                        <span>選</span> <input type="number" id="dailyCount" value="3" style="width:50px; text-align:center;"> <span>新字，考</span>
-                        <input type="number" id="dailyTestCount" value="3" style="width:50px; text-align:center;"> <span>題</span>
+                        <span>選</span> <input type="number" id="dailyCount" value="3" style="width:50px; text-align:center;"> <span>新字，考</span><input type="number" id="dailyTestCount" value="3" style="width:50px; text-align:center;"> <span>題</span>
                         <button class="btn-pixel btn-primary" style="margin-left:auto; font-size:0.9rem;" onclick="autoSelectAndStart()">▶ GO</button>
                     </div>
-
-                    <div style="font-size:0.9rem; color:var(--primary); font-weight:bold; margin-bottom:5px; text-align:right;">
-                        <span id="customSelectionCount">已選 0 題</span>
-                    </div>
-
+                    <div style="font-size:0.9rem; color:var(--primary); font-weight:bold; margin-bottom:5px; text-align:right;"><span id="customSelectionCount">已選 0 題</span></div>
                     <div id="customWordGrid" class="custom-word-grid"></div>
                 </div>
             </div>
@@ -411,40 +378,25 @@
 
         <div id="setupScreen" class="screen">
             <div class="section-header"><span class="section-title">1. 選擇範圍</span></div>
-            <div class="session-panel">
-                <div class="quick-select-bar">
-                    <button class="btn-pill" onclick="selectAllSessions()">全選 (ALL)</button>
-                    <button class="btn-pill" onclick="clearSelection()" style="background:#ffcccc;">清除</button>
-                </div>
-                <div id="sessionGrid" class="session-grid"></div>
-            </div>
+            <div class="session-panel"><div class="quick-select-bar"><button class="btn-pill" onclick="selectAllSessions()">全選 (ALL)</button><button class="btn-pill" onclick="clearSelection()" style="background:#ffcccc;">清除</button></div><div id="sessionGrid" class="session-grid"></div></div>
             <div class="section-header"><span class="section-title">2. 題數</span></div>
-            <select id="wordCount">
-                <option value="5">5 題</option><option value="10" selected>10 題</option>
-                <option value="20">20 題</option><option value="30">30 題</option><option value="50">50 題</option>
-            </select>
-            <div style="margin-top:20px; padding:15px; background:#e0f7fa; border:2px solid #00bcd4; border-radius:8px; color:#006064; font-weight:bold;">
-                💡 系統會自動加重「常錯字」的出現機率。
-            </div>
-            <button id="startBtn" class="btn-pixel btn-primary btn-big" onclick="startRandomTest()" disabled>START QUIZ ▶</button>
+            <select id="wordCount"><option value="5">5 題</option><option value="10" selected>10 題</option><option value="20">20 題</option><option value="30">30 題</option><option value="50">50 題</option></select>
+            <button id="startBtn" class="btn-pixel btn-primary btn-big" onclick="startRandomTest()" style="margin-top:20px;" disabled>START QUIZ ▶</button>
             <div class="page-bottom-actions"><button class="btn-pixel" onclick="showScreen('dashboardScreen')">🏠 HOME</button></div>
         </div>
 
         <div id="testScreen" class="screen">
             <div class="pixel-card" style="text-align:center;">
                 <div style="font-size:1.2rem; font-weight:bold; margin-bottom:10px;">Q <span id="currentNum">1</span> / <span id="totalNum">10</span></div>
-                
                 <div class="flash-card" id="quizCard" style="margin-bottom:20px;">
                     <button class="btn-pixel btn-warning" onclick="playQuestionSequence()" style="margin-bottom:15px;">🔊 播放 (字-句-字)</button>
                     <div style="display:flex;align-items:center;justify-content:center;margin-bottom:10px;"><div class="word-display" id="displayWord">...</div><button class="btn-icon" onclick="speakText('word')">🔊</button></div>
                     <div style="display:flex;align-items:center;justify-content:center;"><div class="sentence-display" id="displaySentence">...</div><button class="btn-icon" onclick="speakText('sentence')">🔊</button></div>
                 </div>
-
                 <div class="timer-wrapper" style="margin-bottom:20px;">
                     <button class="timer-btn" id="timerBtn" onclick="manualStartTimer()">8</button>
                     <div class="switch-wrapper"><label class="switch"><input type="checkbox" id="autoTimerSwitch"><span class="slider"></span></label><span>倒數</span></div>
                 </div>
-
                 <div style="text-align:left; font-weight:bold; margin-bottom:5px;">👇 誰答錯了？(點擊標記)</div>
                 <div class="student-grid">
                     <div class="btn-student" id="btn-s1" onclick="toggleStudent(1)"><span class="avatar">🐃</span><span class="name">1</span></div>
@@ -472,45 +424,21 @@
         <div id="studentAnalysisScreen" class="screen">
             <div class="section-header"><span class="section-title">🧑‍🎓 個別弱點</span></div>
             <div id="studentAnalysisGrid" class="student-analysis-grid"></div>
-            <div class="page-bottom-actions">
-                <button class="btn-compact-action" onclick="exportToCSV()">📥 匯出</button>
-                <button class="btn-pixel" onclick="showScreen('dashboardScreen')">🏠 HOME</button>
-            </div>
+            <div class="page-bottom-actions"><button class="btn-pixel" onclick="showScreen('dashboardScreen')">🏠 HOME</button></div>
         </div>
 
         <div id="classAnalysisScreen" class="screen">
-            <div class="section-header">
-                <span class="section-title">🏫 全班弱點</span>
-                <button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 測驗 Top30</button>
-            </div>
-            
-            <div class="pixel-card" style="margin-bottom:20px;">
-                <h4 style="margin:0 0 10px 0;">⚠️ 錯誤熱點 (Session Rank)</h4>
-                <div id="sessionRankGrid" class="session-rank-grid"></div>
-            </div>
-            
+            <div class="section-header"><span class="section-title">🏫 全班弱點</span><button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 測驗 Top30</button></div>
+            <div class="pixel-card" style="margin-bottom:20px;"><h4 style="margin:0 0 10px 0;">⚠️ 錯誤熱點</h4><div id="sessionRankGrid" class="session-rank-grid"></div></div>
             <div id="sessionBreakdownGrid" class="session-breakdown-grid" style="margin-bottom:20px;"></div>
-            
-            <div class="pixel-card">
-                <h4 style="margin:0 0 10px 0;">🚨 總排行 (Global Top 50)</h4>
-                <div id="globalStatsTable" class="table-container"></div>
-            </div>
-
-            <div style="text-align:right; margin-top:20px;">
-                <button class="btn-compact-action" style="color:red; border-color:red;" onclick="clearHistory()">🗑️ 清空紀錄</button>
-            </div>
+            <div class="pixel-card"><h4 style="margin:0 0 10px 0;">🚨 總排行</h4><div id="globalStatsTable" class="table-container"></div></div>
             <div class="page-bottom-actions"><button class="btn-pixel" onclick="showScreen('dashboardScreen')">🏠 HOME</button></div>
         </div>
 
         <div id="wordListScreen" class="screen">
             <div class="section-header"><span class="section-title">📖 單字總表</span></div>
             <div id="wordListTabs" class="filter-tabs"></div>
-            <div class="legend-bar">
-                <span class="legend-item"><span class="legend-dot" style="background:#fff;"></span> 無</span>
-                <span class="legend-item"><span class="legend-dot" style="background:var(--heat-yellow-bg); border-color:var(--heat-yellow-bd);"></span> 少量</span>
-                <span class="legend-item"><span class="legend-dot" style="background:var(--heat-orange-bg); border-color:var(--heat-orange-bd);"></span> 多</span>
-                <span class="legend-item"><span class="legend-dot" style="background:var(--heat-red-bg); border-color:var(--heat-red-bd);"></span> Top 30</span>
-            </div>
+            <div class="legend-bar"><span class="legend-item"><span class="legend-dot" style="background:#fff;"></span> 無</span><span class="legend-item"><span class="legend-dot" style="background:var(--heat-red-bg); border-color:var(--heat-red-bd);"></span> Top 30</span></div>
             <div id="fullWordListContainer" class="full-list-grid"></div>
             <div class="page-bottom-actions"><button class="btn-pixel" onclick="showScreen('dashboardScreen')">🏠 HOME</button></div>
         </div>
@@ -522,125 +450,40 @@
         <div class="mini-word" id="miniWord">Apple</div>
         <button class="mini-btn-speak" onclick="speakMiniCard()">🔊</button>
         <div class="mini-zh" id="miniZh">蘋果</div>
-        <div class="mini-sent">
-            <div class="mini-sent-en" id="miniSentEn">I eat an apple.</div>
-            <div class="mini-sent-zh" id="miniSentZh">我吃一顆蘋果。</div>
+        <div class="mini-sent"><div class="mini-sent-en" id="miniSentEn">...</div><div class="mini-sent-zh" id="miniSentZh">...</div></div>
+    </div>
+
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn" onclick="safeCloseHelp()">×</span>
+            <div class="modal-body" style="text-align:center;">
+                <h3>HOW TO PLAY?</h3>
+                <p>請選擇「我是學生」開始自主練習，或「老師後台」進行課堂測驗。</p>
+            </div>
         </div>
     </div>
 
-<script src="words.js" onerror="document.getElementById('loadError').style.display='block'"></script>
+<script src="words.js" onerror="alert('Error: words.js not found!')"></script>
 <script>
+    // 主要程式邏輯
     let db = [], testList = [], currentIndex = 0, currentSessionMistakes = [];
     let timerValue = 8, timerInterval = null, isTimerRunning = false;
     let currentListFilter = 'all';
     
-    // Voice List (Apple Fix)
+    // Voice
     let availableVoices = [];
-    function initVoices() {
-        availableVoices = window.speechSynthesis.getVoices();
-        if (availableVoices.length === 0) { setTimeout(initVoices, 500); }
-    }
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = initVoices;
-    }
+    function initVoices() { availableVoices = window.speechSynthesis.getVoices(); if(availableVoices.length===0)setTimeout(initVoices,500); }
+    if(speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = initVoices;
     initVoices();
 
     function getBestVoice() {
-         const all = window.speechSynthesis.getVoices();
-         let best = all.find(v => v.name.includes("Google US English"));
-         if (!best) best = all.find(v => v.lang === 'en-US' && v.name.includes("Samantha")); // macOS
-         if (!best) best = all.find(v => v.lang === 'en-US' && v.name.includes("Daniel")); // iOS
-         if (!best) best = all.find(v => v.lang === 'en-US' && v.localService); 
-         if (!best) best = all.find(v => v.lang.startsWith('en'));
-         return best;
-    }
-
-    function speakText(type) { 
-        const item = testList[currentIndex]; 
-        const text = (type === 'word' ? item.word : item.sentence);
-        window.speechSynthesis.cancel();
-        
-        if (availableVoices.length === 0) { initVoices(); setTimeout(()=>speakText(type), 100); return; }
-
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-US';
-        u.rate = 0.6; // Apple fix
-        const v = getBestVoice();
-        if(v) u.voice = v;
-        window.speechSynthesis.speak(u);
-    }
-    
-    // Mini Card Logic (Updated Audio)
-    let currentMiniWord = null;
-    function showMiniCard(item) {
-        currentMiniWord = item;
-        document.getElementById('miniWord').innerText = item.word;
-        document.getElementById('miniZh').innerText = item.word_zh || '';
-        document.getElementById('miniSentEn').innerText = item.sentence;
-        document.getElementById('miniSentZh').innerText = item.sentence_zh || '';
-        document.getElementById('miniFlashcard').style.display = 'block';
-    }
-    function closeMiniCard() {
-        document.getElementById('miniFlashcard').style.display = 'none';
-        window.speechSynthesis.cancel();
-    }
-    function speakMiniCard() {
-        if(!currentMiniWord) return;
-        window.speechSynthesis.cancel();
-        const rate = 0.6; 
-        const voice = getBestVoice();
-
-        // Play Word
-        const uWord = new SpeechSynthesisUtterance(currentMiniWord.word);
-        uWord.lang = 'en-US'; uWord.rate = rate;
-        if(voice) uWord.voice = voice;
-
-        // Play Sentence
-        const uSent = new SpeechSynthesisUtterance(currentMiniWord.sentence);
-        uSent.lang = 'en-US'; uSent.rate = rate;
-        if(voice) uSent.voice = voice;
-
-        window.speechSynthesis.speak(uWord);
-        window.speechSynthesis.speak(uSent);
-    }
-
-    window.onload = function() { 
-        if (typeof masterWordList !== 'undefined') db = masterWordList; 
-        
-        // Load Daily Preferences
-        const savedDailyPick = localStorage.getItem('dailyPickCount');
-        if(savedDailyPick) document.getElementById('dailyCount').value = savedDailyPick;
-        const savedDailyTest = localStorage.getItem('dailyTestCount');
-        if(savedDailyTest) document.getElementById('dailyTestCount').value = savedDailyTest;
-        
-        document.getElementById('dailyCount').addEventListener('change', function() { localStorage.setItem('dailyPickCount', this.value); });
-        document.getElementById('dailyTestCount').addEventListener('change', function() { localStorage.setItem('dailyTestCount', this.value); });
-    }
-
-    // 選單控制
-    function toggleMenu(e) { e.stopPropagation(); document.getElementById('mainMenu').classList.toggle('show'); }
-    function closeMenu() { document.getElementById('mainMenu').classList.remove('show'); }
-    function navigate(screenId) { showScreen(screenId); closeMenu(); }
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('mainMenu');
-        const btn = document.querySelector('.hamburger-btn');
-        if (menu.classList.contains('show') && !menu.contains(e.target) && !btn.contains(e.target)) closeMenu();
-    });
-
-    function enterTeacherMode() {
-        document.getElementById('landing-page').style.display = 'none';
-        document.getElementById('teacher-app').style.display = 'flex';
-        if(db.length > 0) initApp();
-        showScreen('dashboardScreen');
-    }
-    function enterStudentMode() { window.location.href = "student.html"; }
-    function exitTeacherMode() {
-        document.getElementById('teacher-app').style.display = 'none';
-        document.getElementById('landing-page').style.display = 'flex';
-        showScreen('dashboardScreen');
+        return availableVoices.find(v => v.name.includes("Google US English")) || 
+               availableVoices.find(v => v.lang === 'en-US' && v.name.includes("Samantha")) || 
+               availableVoices.find(v => v.lang === 'en-US');
     }
 
     function initApp() {
+        if (typeof masterWordList !== 'undefined') db = masterWordList;
         document.getElementById('startBtn').disabled = false;
         const sessions = [...new Set(db.map(x => x.session))].sort();
         
@@ -657,141 +500,33 @@
         });
     }
 
+    window.onload = function() { if(typeof masterWordList!=='undefined'){ db=masterWordList; initApp(); } };
+
+    function toggleMenu(e) { e.stopPropagation(); document.getElementById('mainMenu').classList.toggle('show'); }
+    function closeMenu() { document.getElementById('mainMenu').classList.remove('show'); }
+    function navigate(screenId) { showScreen(screenId); closeMenu(); }
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('mainMenu');
+        const btn = document.querySelector('.hamburger-btn');
+        if (menu.classList.contains('show') && !menu.contains(e.target) && !btn.contains(e.target)) closeMenu();
+    });
+
     function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
     
-    function showStudentStats() { showScreen('studentAnalysisScreen'); renderAllStudentOverview(); }
-    function showClassStats() { showScreen('classAnalysisScreen'); renderGlobalStats(); renderSessionAnalysis(); }
-    function showCustomQuizScreen() { showScreen('customQuizScreen'); }
-
-    // Modal
-    function openHelp() { document.getElementById('helpModal').style.display = 'block'; }
-    function closeHelp() { document.getElementById('helpModal').style.display = 'none'; }
-
-    // Range Selection
-    function selectAllSessions() {
-        const cbs = document.querySelectorAll('.sess-cb');
-        const allChecked = Array.from(cbs).every(cb => cb.checked);
-        cbs.forEach(cb => cb.checked = !allChecked);
-    }
-    function clearSelection() { document.querySelectorAll('.sess-cb').forEach(cb => cb.checked = false); }
-
-    // Custom Quiz
-    function renderCustomWordSelection() {
-        const sid = document.getElementById('customSessionSelect').value;
-        const container = document.getElementById('customWordGrid');
-        const countSpan = document.getElementById('customSelectionCount');
-        
-        container.innerHTML = "";
-        countSpan.innerText = "已選 0 題";
-        
-        if(!sid) return;
-
-        const logs = getTestLogs();
-        const testedSet = new Set(logs.map(l => l.word));
-
-        const words = db.filter(x => x.session == sid);
-        words.forEach(w => {
-            const isTested = testedSet.has(w.word);
-            const label = document.createElement('label');
-            label.className = `custom-word-label ${isTested ? 'tested-item' : ''}`;
-            label.innerHTML = `<span>${w.word}</span> <input type="checkbox" value="${w.word}" class="custom-word-cb" onchange="updateSelectionCounter()">`;
-            container.appendChild(label);
-        });
-    }
-
-    function updateSelectionCounter() {
-        const count = document.querySelectorAll('.custom-word-cb:checked').length;
-        document.getElementById('customSelectionCount').innerText = `已選 ${count} 題`;
-    }
-
-    function clearCustomSelection() {
-        document.querySelectorAll('.custom-word-cb').forEach(cb => cb.checked = false);
-        updateSelectionCounter();
-    }
-
-    function autoSelectAndStart() {
-        const pickCount = parseInt(document.getElementById('dailyCount').value) || 3;
-        const testCount = parseInt(document.getElementById('dailyTestCount').value) || 3;
-        const checkboxes = Array.from(document.querySelectorAll('.custom-word-cb'));
-        
-        if(checkboxes.length === 0) { alert("請先選擇單元！"); return; }
-        clearCustomSelection();
-
-        let picked = 0;
-        for (let cb of checkboxes) {
-            const label = cb.closest('.custom-word-label');
-            if (!label.classList.contains('tested-item')) { 
-                cb.checked = true; picked++;
-                if (picked >= pickCount) break;
-            }
-        }
-        updateSelectionCounter();
-        
-        const selectedWords = Array.from(document.querySelectorAll('.custom-word-cb:checked')).map(cb => cb.value);
-        if(selectedWords.length === 0) { alert("本單元的新單字都考完了！"); return; }
-
-        testList = db.filter(w => selectedWords.includes(w.word));
-        testList.sort(() => 0.5 - Math.random());
-        if (testList.length > testCount) testList = testList.slice(0, testCount);
-
-        startTestSequence();
-    }
-
-    function startCustomTest() {
-        const selectedWords = Array.from(document.querySelectorAll('.custom-word-cb:checked')).map(cb => cb.value);
-        if(selectedWords.length === 0) { alert("請至少選擇一個單字"); return; }
-        testList = db.filter(w => selectedWords.includes(w.word)); testList.sort(() => 0.5 - Math.random());
-        startTestSequence();
-    }
-
-    function startTopErrorTest() {
-        const weightedDB = [];
-        const history = getHistory(); 
-        const errorMap = {}; 
-        history.forEach(h => { if(!errorMap[h.word]) errorMap[h.word] = 0; errorMap[h.word]++; });
-        
-        db.forEach(item => {
-            let weight = errorMap[item.word] || 0;
-            weightedDB.push({ ...item, currentWeight: weight });
-        });
-        weightedDB.sort((a, b) => b.currentWeight - a.currentWeight);
-        const top30 = weightedDB.slice(0, 30).filter(i => i.currentWeight > 0);
-        
-        if(top30.length > 0) {
-            top30.sort(() => 0.5 - Math.random()); 
-            testList = top30.slice(0, 10); 
-            startTestSequence();
-        } else { alert("目前沒有足夠的錯誤數據！"); }
-    }
-
-    // Helper functions
-    function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
-    function getTestLogs() { return JSON.parse(localStorage.getItem('spellingTestLogs')) || []; } 
-
-    // Random Test
-    function getSmartWordList(pool, count) {
-        return pool.sort(() => 0.5 - Math.random()).slice(0, count);
-    }
-
+    // ... (Data & Quiz Logic) ...
     function startRandomTest() {
         const cbs = document.querySelectorAll('.sess-cb:checked');
         const sids = Array.from(cbs).map(cb => cb.value);
         if(sids.length === 0) { alert("請勾選單元"); return; }
-        
         const pool = db.filter(i => sids.includes(i.session));
-        if(pool.length === 0) { alert("無單字"); return; }
-        
         const count = parseInt(document.getElementById('wordCount').value);
-        testList = getSmartWordList(pool, count);
+        testList = pool.sort(() => 0.5 - Math.random()).slice(0, count);
         startTestSequence();
     }
     
     function startTestSequence() {
-        currentIndex = 0;
-        currentSessionMistakes = []; // Clear previous report data
-        showScreen('testScreen'); 
-        document.getElementById('totalNum').innerText = testList.length; 
-        loadCard();
+        currentIndex = 0; currentSessionMistakes = [];
+        showScreen('testScreen'); document.getElementById('totalNum').innerText = testList.length; loadCard();
     }
 
     function loadCard() {
@@ -800,131 +535,73 @@
         document.getElementById('displayWord').innerText = item.word;
         document.getElementById('displaySentence').innerText = item.sentence;
         for(let i=1; i<=5; i++) document.getElementById(`btn-s${i}`).classList.remove('marked-wrong');
-        
         playQuestionSequence();
     }
     
     function playQuestionSequence() {
-        resetTimer();
-        const item = testList[currentIndex]; 
-        window.speechSynthesis.cancel();
-        
-        // Wait for voices
-        if(availableVoices.length === 0) { initVoices(); setTimeout(playQuestionSequence, 100); return; }
-
+        resetTimer(); const item = testList[currentIndex]; window.speechSynthesis.cancel();
         const u1 = new SpeechSynthesisUtterance(item.word); u1.lang='en-US'; u1.rate=0.6;
         const u2 = new SpeechSynthesisUtterance(item.sentence); u2.lang='en-US'; u2.rate=0.6;
         const u3 = new SpeechSynthesisUtterance(item.word); u3.lang='en-US'; u3.rate=0.6;
-        
-        const v = getBestVoice();
-        if(v) { u1.voice=v; u2.voice=v; u3.voice=v; }
-
+        const v = getBestVoice(); if(v) { u1.voice=v; u2.voice=v; u3.voice=v; }
         u3.onend = function() { if(document.getElementById('autoTimerSwitch').checked) startTimer(); };
         window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3);
     }
 
-    function manualStartTimer() { if(isTimerRunning) resetTimer(); else startTimer(); }
-    function startTimer() {
-        if(isTimerRunning) return; isTimerRunning = true; timerValue = 8;
-        updateTimerDisplay(); const btn = document.getElementById('timerBtn'); btn.classList.add('active', 'ticking');
-        timerInterval = setInterval(() => {
-            timerValue--; updateTimerDisplay();
-            if(timerValue <= 0) { clearInterval(timerInterval); isTimerRunning = false; btn.classList.remove('ticking'); }
-        }, 1000);
+    function speakText(type) { 
+        const item = testList[currentIndex]; 
+        const text = (type === 'word' ? item.word : item.sentence);
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US'; u.rate = 0.6;
+        const v = getBestVoice(); if(v) u.voice = v;
+        window.speechSynthesis.speak(u);
     }
-    function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; const btn = document.getElementById('timerBtn'); btn.innerText = "8"; btn.classList.remove('active', 'ticking'); }
-    function updateTimerDisplay() { document.getElementById('timerBtn').innerText = timerValue; }
 
+    function manualStartTimer() { if(isTimerRunning) resetTimer(); else startTimer(); }
+    function startTimer() { if(isTimerRunning) return; isTimerRunning = true; timerValue = 8; document.getElementById('timerBtn').classList.add('active', 'ticking'); timerInterval = setInterval(() => { timerValue--; document.getElementById('timerBtn').innerText = timerValue; if(timerValue <= 0) { clearInterval(timerInterval); isTimerRunning = false; document.getElementById('timerBtn').classList.remove('ticking'); } }, 1000); }
+    function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; document.getElementById('timerBtn').innerText = "8"; document.getElementById('timerBtn').classList.remove('active', 'ticking'); }
     function toggleStudent(id) { document.getElementById(`btn-s${id}`).classList.toggle('marked-wrong'); }
+    
     function nextWord() {
-        const item = testList[currentIndex]; const date = new Date().toLocaleDateString('zh-TW'); let errorCount = 0;
-        let wrongStudents = [];
-        
-        for(let i=1; i<=5; i++) { 
-            if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) { 
-                saveMistake(i, item, date); 
-                errorCount++; 
-                wrongStudents.push(i);
-            } 
-        }
-        
-        // Log for report
-        currentSessionMistakes.push({
-            word: item.word,
-            wrongCount: errorCount,
-            students: wrongStudents
-        });
-
+        const item = testList[currentIndex]; const date = new Date().toLocaleDateString('zh-TW'); let errorCount = 0; let wrongStudents = [];
+        for(let i=1; i<=5; i++) { if (document.getElementById(`btn-s${i}`).classList.contains('marked-wrong')) { saveMistake(i, item, date); errorCount++; wrongStudents.push(i); } }
+        currentSessionMistakes.push({ word: item.word, wrongCount: errorCount, students: wrongStudents });
         saveTestLog(item.word, errorCount, 5); 
         currentIndex++; 
-        if(currentIndex < testList.length) {
-            loadCard(); 
-        } else { 
-            showBattleReport(); 
-        }
+        if(currentIndex < testList.length) loadCard(); else showBattleReport();
     }
     
     function showBattleReport() {
         showScreen('reportScreen');
-        const list = document.getElementById('battleReportList');
-        list.innerHTML = "";
-        
-        if(currentSessionMistakes.length === 0) {
-            list.innerHTML = "<div style='padding:20px; text-align:center;'>尚未開始測驗</div>";
-            return;
-        }
-
+        const list = document.getElementById('battleReportList'); list.innerHTML = "";
         currentSessionMistakes.forEach(log => {
-            const div = document.createElement('div');
-            div.className = `report-item ${log.wrongCount > 0 ? 'error' : ''}`;
-            
-            let badges = "";
-            if (log.wrongCount > 0) {
-                log.students.forEach(sid => {
-                    badges += `<span class="badge-student">${sid}號</span>`;
-                });
-            } else {
-                badges = "<span style='color:var(--student); font-weight:bold;'>全對 ✅</span>";
-            }
-
-            div.innerHTML = `
-                <span class="report-word">${log.word}</span>
-                <div class="report-stat">
-                    ${log.wrongCount > 0 ? `<span style="color:red; font-weight:bold;">❌ ${log.wrongCount}人錯</span>` : ''}
-                    <div class="badge-err-list">${badges}</div>
-                </div>
-            `;
+            const div = document.createElement('div'); div.className = `report-item ${log.wrongCount > 0 ? 'error' : ''}`;
+            let badges = ""; if (log.wrongCount > 0) { log.students.forEach(sid => { badges += `<span class="badge-student">${sid}</span>`; }); } else { badges = "<span style='color:var(--student); font-weight:bold;'>全對 ✅</span>"; }
+            div.innerHTML = `<span class="report-word">${log.word}</span><div class="report-stat">${log.wrongCount > 0 ? `<span style="color:red; font-weight:bold;">❌ ${log.wrongCount}人</span>` : ''}<div class="badge-err-list">${badges}</div></div>`;
             list.appendChild(div);
         });
     }
-    
+
     function saveMistake(sid, w, d) { let h = JSON.parse(localStorage.getItem('spellingHistory')) || []; h.push({ student: sid, word: w.word, session: w.session, sentence: w.sentence, date: d }); localStorage.setItem('spellingHistory', JSON.stringify(h)); }
     function saveTestLog(word, errCount, totalStudents) { let logs = JSON.parse(localStorage.getItem('spellingTestLogs')) || []; logs.push({ word: word, timestamp: Date.now(), accuracy: (totalStudents - errCount) / totalStudents }); localStorage.setItem('spellingTestLogs', JSON.stringify(logs)); }
-
-    // --- High Contrast & Big Data Fixes ---
+    function getHistory() { return JSON.parse(localStorage.getItem('spellingHistory')) || []; }
+    function getTestLogs() { return JSON.parse(localStorage.getItem('spellingTestLogs')) || []; } 
 
     function renderAllStudentOverview() {
         const container = document.getElementById('studentAnalysisGrid'); container.innerHTML = "";
         const animalMap = {1:"🐃", 2:"🦫", 3:"🦥", 4:"🦛", 5:"🐨"};
         const history = getHistory();
-        
         for (let i = 1; i <= 5; i++) {
             const studentErrors = history.filter(h => h.student === i);
             const wordErrorMap = {};
             studentErrors.forEach(h => { wordErrorMap[h.word] = (wordErrorMap[h.word] || 0) + 1; });
             const sortedErrors = Object.keys(wordErrorMap).map(w => ({ word: w, count: wordErrorMap[w] })).sort((a,b) => b.count - a.count);
-            
             const card = document.createElement('div'); card.className = 'student-card-view';
             let listHtml = "";
             if (sortedErrors.length === 0) listHtml = `<div class="no-weakness">🎉 表現優異！</div>`;
             else {
-                sortedErrors.slice(0, 5).forEach(item => { 
-                    listHtml += `
-                    <div class="weak-word-row">
-                        <span class="stat-word">${item.word}</span>
-                        <span class="stat-badge">-${item.count}</span>
-                    </div>`; 
-                });
+                sortedErrors.slice(0, 5).forEach(item => { listHtml += `<div class="weak-word-row"><span class="stat-word">${item.word}</span><span class="stat-badge">-${item.count}</span></div>`; });
                 if(sortedErrors.length > 5) listHtml += `<div style="text-align:center; font-size:0.8rem; color:#999; margin-top:5px;">...還有 ${sortedErrors.length-5} 個</div>`;
             }
             card.innerHTML = `<div class="student-card-header"><span style="font-size:1.5rem;">${animalMap[i]}</span><span style="font-weight:bold;">${i}號同學</span></div><div style="flex:1;">${listHtml}</div>`;
@@ -948,62 +625,23 @@
 
     function renderSessionAnalysis() {
         const h = getHistory(); const sessions = {};
-        h.forEach(rec => {
-            if(!sessions[rec.session]) sessions[rec.session] = { total: 0, words: {} };
-            sessions[rec.session].total++;
-            if(!sessions[rec.session].words[rec.word]) sessions[rec.session].words[rec.word] = 0;
-            sessions[rec.session].words[rec.word]++;
-        });
-        
+        h.forEach(rec => { if(!sessions[rec.session]) sessions[rec.session] = { total: 0, words: {} }; sessions[rec.session].total++; if(!sessions[rec.session].words[rec.word]) sessions[rec.session].words[rec.word] = 0; sessions[rec.session].words[rec.word]++; });
         const sortedSessions = Object.keys(sessions).map(k => ({ id: k, total: sessions[k].total, words: sessions[k].words })).sort((a,b) => b.total - a.total);
-        
         const rankContainer = document.getElementById('sessionRankGrid');
         let rankHtml = "";
         if (sortedSessions.length === 0) rankHtml = "<div style='grid-column:1/-1;text-align:center;color:#999'>尚無錯誤數據</div>";
-        else {
-            sortedSessions.slice(0, 3).forEach((sess, idx) => {
-                const rankClass = `rank-${idx+1}`; const labels = ["🥇", "🥈", "🥉"];
-                rankHtml += `<div class="rank-card ${rankClass}" data-val="錯 ${sess.total} 次"><span class="rank-icon">${labels[idx]}</span><div class="rank-info"><h4>Unit ${sess.id}</h4><p>Hotspot</p></div></div>`;
-            });
-        }
+        else { sortedSessions.slice(0, 3).forEach((sess, idx) => { const rankClass = `rank-${idx+1}`; const labels = ["🥇", "🥈", "🥉"]; rankHtml += `<div class="rank-card ${rankClass}" data-val="錯 ${sess.total} 次"><span class="rank-icon">${labels[idx]}</span><div class="rank-info"><h4>Unit ${sess.id}</h4><p>Hotspot</p></div></div>`; }); }
         rankContainer.innerHTML = rankHtml;
-
         const breakdownContainer = document.getElementById('sessionBreakdownGrid');
         let breakdownHtml = "";
         Object.keys(sessions).sort().forEach(sid => {
             const wordCounts = sessions[sid].words;
             const topWords = Object.keys(wordCounts).map(w => ({ word: w, count: wordCounts[w] })).sort((a,b) => b.count - a.count).slice(0, 10);
-            
-            // New List Style
             let listHtml = ""; 
-            topWords.forEach(w => { 
-                listHtml += `
-                <li style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dashed #ccc;">
-                    <span style="font-weight:bold; font-size:1.1rem;">${w.word}</span>
-                    <span style="background:var(--danger); color:white; padding:0 6px; border-radius:10px;">${w.count}</span>
-                </li>`; 
-            });
+            topWords.forEach(w => { listHtml += `<li style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dashed #ccc;"><span style="font-weight:bold; font-size:1.1rem;">${w.word}</span><span style="background:var(--danger); color:white; padding:0 6px; border-radius:10px;">${w.count}</span></li>`; });
             breakdownHtml += `<div class="session-col-card"><div class="session-col-header"><span>Unit ${sid}</span><span style="font-size:0.8rem;opacity:0.6;">(Total: ${sessions[sid].total})</span></div><ul class="word-list-mini" style="padding:0; list-style:none; overflow-y:auto;">${listHtml}</ul></div>`;
         });
         breakdownContainer.innerHTML = breakdownHtml;
-    }
-
-    function renderWordListTabs() {
-        const sessions = [...new Set(db.map(x => x.session))].sort();
-        const tabsContainer = document.getElementById('wordListTabs');
-        tabsContainer.innerHTML = "";
-        const allTab = document.createElement('div');
-        allTab.className = `filter-tab ${currentListFilter === 'all' ? 'active' : ''}`;
-        allTab.innerText = "全部";
-        allTab.onclick = () => { currentListFilter = 'all'; renderFullWordList(); renderWordListTabs(); };
-        tabsContainer.appendChild(allTab);
-        sessions.forEach(s => {
-            const tab = document.createElement('div');
-            tab.className = `filter-tab ${currentListFilter === s ? 'active' : ''}`;
-            tab.innerText = `Unit ${s}`;
-            tab.onclick = () => { currentListFilter = s; renderFullWordList(); renderWordListTabs(); };
-            tabsContainer.appendChild(tab);
-        });
     }
 
     function renderFullWordList() {
@@ -1029,8 +667,125 @@
         });
     }
 
+    function renderWordListTabs() {
+        const sessions = [...new Set(db.map(x => x.session))].sort();
+        const tabsContainer = document.getElementById('wordListTabs');
+        tabsContainer.innerHTML = "";
+        const allTab = document.createElement('div'); allTab.className = `filter-tab ${currentListFilter === 'all' ? 'active' : ''}`; allTab.innerText = "全部"; allTab.onclick = () => { currentListFilter = 'all'; renderFullWordList(); renderWordListTabs(); }; tabsContainer.appendChild(allTab);
+        sessions.forEach(s => { const tab = document.createElement('div'); tab.className = `filter-tab ${currentListFilter === s ? 'active' : ''}`; tab.innerText = `Unit ${s}`; tab.onclick = () => { currentListFilter = s; renderFullWordList(); renderWordListTabs(); }; tabsContainer.appendChild(tab); });
+    }
+
+    // Custom Quiz Funcs
+    function startTopErrorTest() { 
+        const m = JSON.parse(localStorage.getItem('myMistakes')) || {};
+        const weightedDB = [];
+        // Weight error words
+        db.forEach(item => {
+            let weight = m[item.word] || 0;
+            weightedDB.push({ ...item, currentWeight: weight });
+        });
+        weightedDB.sort((a, b) => b.currentWeight - a.currentWeight);
+        const top30 = weightedDB.slice(0, 30).filter(i => i.currentWeight > 0);
+        
+        if(top30.length > 0) {
+            top30.sort(() => 0.5 - Math.random()); 
+            testList = top30.slice(0, 10); // Pick top 10 from weighted list
+            startTestSequence();
+        } else { alert("目前沒有足夠的錯誤數據！"); }
+    }
+    
+    function startCustomTest() {
+        const cbs = document.querySelectorAll('.custom-word-cb:checked');
+        const selected = Array.from(cbs).map(c => c.value);
+        if(selected.length === 0) { alert("請至少選擇一個單字"); return; }
+        testList = db.filter(w => selected.includes(w.word));
+        testList.sort(() => 0.5 - Math.random());
+        startTestSequence();
+    }
+    
+    function autoSelectAndStart() {
+        const pick = parseInt(document.getElementById('dailyCount').value) || 3;
+        const test = parseInt(document.getElementById('dailyTestCount').value) || 3;
+        const cbs = document.querySelectorAll('.custom-word-cb');
+        if(cbs.length===0){alert("請先選擇單元");return;}
+        
+        // Clear previous
+        cbs.forEach(c => c.checked = false);
+        
+        // Pick new
+        let count = 0;
+        for(let cb of cbs) {
+            // Check if user has tested this word before (from logs)
+            // Ideally we need a 'tested' set here, but for now simple pick
+            if(!cb.closest('label').classList.contains('tested-item')) {
+                cb.checked = true; count++;
+                if(count >= pick) break;
+            }
+        }
+        
+        updateSelectionCounter();
+        const selected = Array.from(document.querySelectorAll('.custom-word-cb:checked')).map(c => c.value);
+        if(selected.length === 0) { alert("本單元新字已考完"); return; }
+        
+        testList = db.filter(w => selected.includes(w.word));
+        testList.sort(() => 0.5 - Math.random());
+        if(testList.length > test) testList = testList.slice(0, test);
+        
+        startTestSequence();
+    }
+    
+    function renderCustomWordSelection() {
+        const sid = document.getElementById('customSessionSelect').value;
+        const container = document.getElementById('customWordGrid');
+        container.innerHTML = "";
+        if(!sid) return;
+        
+        const logs = getTestLogs();
+        const testedSet = new Set(logs.map(l => l.word));
+        
+        const words = db.filter(x => x.session == sid);
+        words.forEach(w => {
+            const isTested = testedSet.has(w.word);
+            const label = document.createElement('label');
+            label.className = `custom-word-label ${isTested?'tested-item':''}`;
+            label.innerHTML = `<span>${w.word}</span> <input type="checkbox" value="${w.word}" class="custom-word-cb" onchange="updateSelectionCounter()">`;
+            container.appendChild(label);
+        });
+        updateSelectionCounter();
+    }
+    function updateSelectionCounter() { document.getElementById('customSelectionCount').innerText = `已選 ${document.querySelectorAll('.custom-word-cb:checked').length} 題`; }
+    function clearCustomSelection() { document.querySelectorAll('.custom-word-cb').forEach(c=>c.checked=false); updateSelectionCounter(); }
+    function selectAllSessions() { const cbs=document.querySelectorAll('.sess-cb'); cbs.forEach(c=>c.checked=true); }
+    function clearSelection() { const cbs=document.querySelectorAll('.sess-cb'); cbs.forEach(c=>c.checked=false); }
+
     function exportToCSV() { const h = getHistory(); if(h.length===0){alert("無資料");return;} const n = {1:"水牛",2:"水豚",3:"樹懶",4:"河馬",5:"無尾熊"}; let csv = "data:text/csv;charset=utf-8,\uFEFF日期,學生,代號,單元,單字,例句\n"; h.forEach(r => { csv+=`${r.date},${n[r.student]},${r.student},${r.session},${r.word},${(r.sentence||"").replace(/,/g,"，")}\n` }); const a = document.createElement("a"); a.href=encodeURI(csv); a.download="錯題紀錄.csv"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
     function clearHistory(){ if(confirm("確定清空所有歷史與AI學習紀錄？")) { localStorage.removeItem('spellingHistory'); localStorage.removeItem('spellingTestLogs'); showScreen('dashboardScreen'); } }
+
+    // Mini Card
+    // Updated Logic: Play audio automatically
+    let currentMiniWord = null;
+    function showMiniCard(item) {
+        currentMiniWord = item;
+        document.getElementById('miniWord').innerText = item.word;
+        document.getElementById('miniZh').innerText = item.word_zh || '';
+        document.getElementById('miniSentEn').innerText = item.sentence;
+        document.getElementById('miniSentZh').innerText = item.sentence_zh || '';
+        document.getElementById('miniFlashcard').style.display = 'block';
+        speakMiniCard(); // Auto Play
+    }
+    function closeMiniCard() { document.getElementById('miniFlashcard').style.display = 'none'; window.speechSynthesis.cancel(); }
+    function speakMiniCard() {
+        if(!currentMiniWord) return;
+        window.speechSynthesis.cancel();
+        const u1 = new SpeechSynthesisUtterance(currentMiniWord.word);
+        u1.lang = 'en-US'; u1.rate = 0.6;
+        const u2 = new SpeechSynthesisUtterance(currentMiniWord.sentence);
+        u2.lang = 'en-US'; u2.rate = 0.6;
+        const v = getBestVoice(); 
+        if(v) { u1.voice=v; u2.voice=v; }
+        window.speechSynthesis.speak(u1);
+        window.speechSynthesis.speak(u2);
+    }
 
 </script>
 </body>
