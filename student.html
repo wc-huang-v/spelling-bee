@@ -3,227 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v45.2 (Time Adjustment)</title>
+    <title>學生自主學習平板 v46.0 (8-Bit RPG)</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        /* --- 🎨 視覺風格：高對比、明確按鈕 --- */
+        /* --- 🎨 視覺風格：8-Bit NES 風格 --- */
         :root {
-            --bg-color: #a8dadc;
-            --panel-bg: #ffffff;
-            --primary: #457b9d;
-            --accent: #e63946;
-            --text-main: #1d3557;
-            --border-color: #1d3557;
+            /* 經典遊戲機配色 */
+            --bg-color: #202020;       /* 深灰背景，凸顯介面 */
+            --panel-bg: #f8f8f8;       /* 遊戲卡帶白 */
+            --primary: #3b82f6;        /* 勇者藍 */
+            --accent: #f59e0b;         /* 金幣黃 */
+            --danger: #ef4444;         /* 敵人紅 */
+            --success: #22c55e;        /* 綠寶石 */
+            --border-black: #000000;   /* 純黑邊框 */
             
-            /* 稀有度顏色 */
+            /* 稀有度 */
             --tier-common: #cd7f32;
-            --tier-rare: #95a5a6;
-            --tier-epic: #ffb300;
+            --tier-rare: #bdc3c7;
+            --tier-epic: #f1c40f;
             --tier-legend: #9b59b6;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Microsoft JhengHei', sans-serif; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
+            font-family: 'VT323', 'Microsoft JhengHei', sans-serif;
             background-color: var(--bg-color); 
-            color: var(--text-main); margin: 0; padding: 20px; 
+            /* 點陣圖案背景 */
+            background-image: 
+                radial-gradient(#333 15%, transparent 16%),
+                radial-gradient(#333 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            color: var(--border-black); 
+            margin: 0; padding: 15px; 
             display: flex; flex-direction: column; align-items: center; min-height: 100vh; 
         }
 
-        /* --- 頁面切換特效 --- */
-        .screen { display: none; width: 100%; max-width: 700px; animation: fadeIn 0.3s; }
+        /* --- 頁面切換特效 (CRT 開機感) --- */
+        .screen { display: none; width: 100%; max-width: 650px; animation: turnOn 0.3s ease-out; }
         .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- 按鈕設計 --- */
-        .btn-solid {
-            background: #fff; border: 3px solid var(--border-color); border-radius: 12px;
-            padding: 12px 20px; font-size: 1.1rem; font-weight: 900; color: var(--text-main);
-            cursor: pointer; box-shadow: 0 4px 0 var(--border-color); transition: all 0.1s;
-            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+        @keyframes turnOn { 
+            0% { transform: scale(1, 0.01); opacity: 0; } 
+            50% { transform: scale(1, 1); opacity: 1; } 
+            100% { transform: scale(1, 1); opacity: 1; } 
         }
-        .btn-solid:active { transform: translateY(4px); box-shadow: 0 0 0 var(--border-color); }
-        
-        .btn-green { background: #d4edda; border-color: #155724; color: #155724; box-shadow: 0 4px 0 #155724; }
-        .btn-green:active { box-shadow: 0 0 0 #155724; }
-        .btn-yellow { background: #fff3cd; border-color: #856404; color: #856404; box-shadow: 0 4px 0 #856404; }
-        .btn-yellow:active { box-shadow: 0 0 0 #856404; }
-        .btn-red { background: #f8d7da; border-color: #721c24; color: #721c24; box-shadow: 0 4px 0 #721c24; }
-        .btn-red:active { box-shadow: 0 0 0 #721c24; }
 
-        .white-panel { background: white; border: 3px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 0 6px 0 rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .page-title { font-size: 1.8rem; font-weight: 900; color: var(--text-main); margin: 0; text-shadow: 1px 1px 0 #fff; }
-
-        /* --- 1. 首頁 --- */
-        .hero-banner { text-align: center; margin-bottom: 30px; margin-top: 10px; }
-        .hero-title { font-size: 2.5rem; font-weight: 900; color: #1d3557; margin-bottom: 5px; }
-        .hero-sub { background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid var(--border-color); display: inline-block; font-weight: bold; }
-        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-        .dash-btn {
-            background: white; border: 3px solid var(--border-color); border-radius: 20px;
-            padding: 20px 10px; text-align: center; cursor: pointer;
-            box-shadow: 0 6px 0 var(--border-color); transition: 0.1s; display: flex; flex-direction: column; align-items: center;
-        }
-        .dash-btn:active { transform: translateY(6px); box-shadow: 0 0 0; }
-        .dash-icon { font-size: 3.5rem; margin-bottom: 10px; }
-        .dash-btn h2 { font-size: 1.4rem; margin: 0; color: var(--text-main); font-weight: 900; }
-        .dash-btn p { font-size: 0.9rem; color: #666; margin: 5px 0 0; font-weight: bold; }
-        .dash-btn.study { border-color: #2e7d32; box-shadow: 0 6px 0 #2e7d32; }
-        .dash-btn.study h2 { color: #2e7d32; }
-        .dash-btn.quiz { border-color: #d84315; box-shadow: 0 6px 0 #d84315; }
-        .dash-btn.quiz h2 { color: #d84315; }
-
-        /* --- 稱號系統 (Updated) --- */
-        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        
-        .badge-card {
-            background: #f0f0f0; 
-            border: 3px dashed #bbb; 
-            border-radius: 15px; 
-            padding: 15px 10px; 
-            text-align: center;
-            opacity: 1; 
+        /* --- 像素風通用容器 (Retro Box) --- */
+        .retro-box {
+            background: var(--panel-bg);
+            border: 4px solid var(--border-black);
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.5); /* 硬陰影 */
+            padding: 20px;
+            margin-bottom: 20px;
             position: relative;
         }
-        
-        .badge-hint-box {
-            background: rgba(0,0,0,0.05);
-            border-radius: 8px;
-            padding: 5px;
-            margin-top: 5px;
-            font-size: 0.8rem;
-            color: #666;
-            font-weight: bold;
+        /* 裝飾性角落螺絲 */
+        .retro-box::after {
+            content: "::";
+            position: absolute; top: 5px; right: 5px;
+            font-family: monospace; font-weight: bold; color: #ccc;
+            letter-spacing: -2px;
         }
+
+        .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
+        .page-title { 
+            font-size: 2.2rem; font-weight: 900; color: #fff; margin: 0; 
+            text-shadow: 4px 4px 0 #000; letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        /* --- 像素按鈕 (Pixel Buttons) --- */
+        .btn-retro {
+            background: #fff;
+            border: 4px solid var(--border-black);
+            padding: 12px 15px;
+            font-size: 1.4rem; 
+            font-weight: 900;
+            color: var(--border-black);
+            cursor: pointer;
+            box-shadow: 6px 6px 0px var(--border-black);
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            text-transform: uppercase;
+            width: 100%;
+            position: relative;
+        }
+        .btn-retro:active {
+            transform: translate(6px, 6px); /* 深度下壓 */
+            box-shadow: 0px 0px 0px var(--border-black);
+        }
+        
+        .btn-blue { background: #60a3bc; color: white; text-shadow: 2px 2px 0 #000; }
+        .btn-green { background: #78e08f; }
+        .btn-yellow { background: #f6b93b; }
+        .btn-red { background: #eb4d4b; color: white; text-shadow: 2px 2px 0 #000; }
+        .btn-back { width: auto; font-size: 1.1rem; padding: 8px 12px; background: #dfe6e9; }
+
+        /* --- 1. 首頁 (Dashboard - The Menu) --- */
+        .hero-banner { text-align: center; margin-bottom: 30px; margin-top: 10px; }
+        .hero-title { 
+            font-size: 4rem; font-weight: 900; color: #feca57; 
+            text-shadow: 5px 5px 0 #000; margin-bottom: 5px; line-height: 1;
+            font-family: 'VT323', monospace;
+        }
+        .hero-sub { 
+            background: #000; color: #fff; padding: 5px 15px; 
+            display: inline-block; font-weight: bold; font-size: 1.2rem;
+            transform: skew(-10deg);
+        }
+
+        /* 2x2 Grid for BIG Buttons */
+        .dashboard-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; 
+        }
+        
+        .menu-card {
+            background: #fff; border: 4px solid var(--border-black);
+            padding: 25px 10px; text-align: center; cursor: pointer;
+            box-shadow: 8px 8px 0 #000;
+            transition: 0.1s; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 160px; /* 增加高度 */
+        }
+        .menu-card:active { transform: translate(6px, 6px); box-shadow: 2px 2px 0 #000; }
+        
+        .menu-icon { font-size: 3.5rem; margin-bottom: 10px; text-shadow: 3px 3px 0 rgba(0,0,0,0.2); }
+        .menu-title { font-size: 1.6rem; margin: 0; color: var(--border-black); font-weight: 900; }
+        .menu-desc { 
+            font-size: 0.9rem; color: #666; margin-top: 5px; 
+            font-weight: bold; font-family: 'Microsoft JhengHei'; 
+            background: #eee; padding: 2px 6px; border: 2px solid #ccc;
+        }
+        
+        /* Menu Colors */
+        .menu-study { background: #dff9fb; }
+        .menu-quiz { background: #ffcccc; }
+        .menu-achieve { background: #fff3cd; }
+        .menu-analysis { background: #d4efdf; }
+
+        /* --- 2. 單元選擇 (Map Select) --- */
+        .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+        .unit-card {
+            background: #fff; border: 4px solid #000; padding: 15px;
+            text-align: center; cursor: pointer; transition: 0.1s; 
+            box-shadow: 6px 6px 0 #ccc;
+        }
+        .unit-card:hover { transform: translate(-2px, -2px); background: #fff8e1; }
+        .unit-card:active { transform: translate(4px, 4px); box-shadow: 0 0 0; }
+        .unit-card h3 { margin: 0; font-size: 1.8rem; color: #000; }
+        .unit-card .action-hint { font-size: 0.9rem; color: #666; margin-top: 5px; font-weight: bold; display: block;}
+
+        /* --- 3. 背單字 (Overview) --- */
+        .word-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding-bottom: 100px; }
+        .word-card-pixel {
+            background: #fff; border: 3px solid #000; padding: 15px 10px; 
+            text-align: center; cursor: pointer; position: relative; box-shadow: 4px 4px 0 #999;
+        }
+        .word-card-pixel:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #999; }
+        .word-card-pixel h4 { margin: 0; font-size: 1.4rem; font-weight: 900; }
+        .word-card-pixel.read { background: #d1fae5; border-color: #065f46; color: #065f46; }
+        .word-card-pixel.read::after { content: "★"; position: absolute; top: 2px; right: 2px; font-size: 0.8rem; }
+
+        /* --- 4. 詳細卡片 (Item Detail) --- */
+        .detail-box { text-align: center; }
+        .detail-word { 
+            font-size: 4rem; font-weight: 900; color: #000; margin: 10px 0; 
+            text-shadow: 3px 3px 0 #ddd;
+        }
+        .detail-zh { 
+            font-size: 1.8rem; color: #333; margin-bottom: 20px; font-weight: bold; 
+            background: #eee; display: inline-block; padding: 5px 15px; border: 2px solid #000;
+        }
+        
+        .audio-btn-big { 
+            width: 70px; height: 70px; border-radius: 0; /* 方形按鈕 */
+            background: var(--primary); color: white;
+            border: 4px solid #000; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; cursor: pointer; box-shadow: 6px 6px 0 #000; margin: 0 auto 30px;
+        }
+        .audio-btn-big:active { transform: translate(4px, 4px); box-shadow: 2px 2px 0 #000; }
+
+        .detail-sent-box { 
+            background: #fff; padding: 20px; border: 4px solid #000; width: 100%; text-align: left; 
+            box-shadow: inset 4px 4px 0 rgba(0,0,0,0.1); position: relative;
+        }
+        .detail-sent-en { font-size: 1.4rem; font-weight: bold; color: #000; margin-bottom: 10px; font-family: 'VT323'; }
+        .detail-sent-zh { font-size: 1.1rem; color: #555; }
+        .btn-small-audio { 
+            position: absolute; right: 10px; top: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer; 
+        }
+
+        .nav-controls { display: flex; justify-content: space-between; width: 100%; margin-top: 25px; gap: 20px; }
+        .nav-controls button { flex: 1; }
+
+        /* --- 5. 測驗設定 (Setup) --- */
+        .setup-label { font-weight: 900; font-size: 1.3rem; margin-bottom: 10px; display: block; border-bottom: 4px solid #000; padding-bottom: 5px;}
+        
+        .toggle-group { display: flex; gap: 15px; margin-bottom: 20px; }
+        .toggle-btn {
+            flex: 1; padding: 15px; border: 4px solid #aaa; background: #fff; 
+            font-weight: bold; color: #aaa; cursor: pointer; font-size: 1.2rem;
+        }
+        .toggle-btn.active { 
+            border-color: #000; background: var(--primary); color: #fff; 
+            box-shadow: 4px 4px 0 #000; transform: translate(-2px, -2px);
+        }
+
+        .range-selector { display: flex; flex-wrap: wrap; gap: 10px; max-height: 200px; overflow-y: auto; margin-top: 15px; }
+        .range-btn { 
+            padding: 8px 12px; border: 3px solid #ccc; background: #fff; 
+            cursor: pointer; font-weight: bold; color: #555; font-size: 1rem;
+        }
+        .range-btn.selected { border-color: #000; background: #feca57; color: #000; box-shadow: 3px 3px 0 #000; }
+
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem; }
+        
+        /* Pixel Switch */
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .2s; border: 3px solid #000; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border: 3px solid #000; }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* --- 6. 測驗進行中 (Battle Mode) --- */
+        .quiz-status { 
+            display: flex; justify-content: space-between; font-weight: bold; color: #fff; 
+            margin-bottom: 10px; font-size: 1.4rem; background: #000; padding: 5px 10px;
+        }
+        .q-hint { 
+            font-size: 1.5rem; font-weight: 900; color: #000; margin: 20px 0; min-height: 1.5em; 
+            background: #eee; border: 2px dashed #000; padding: 10px;
+        }
+        
+        .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-choice {
+            background: #fff; border: 4px solid #000; padding: 20px;
+            font-size: 1.5rem; font-weight: bold; color: #000; cursor: pointer;
+            box-shadow: 6px 6px 0 #000; transition: 0.1s;
+        }
+        .btn-choice:active { transform: translate(6px, 6px); box-shadow: 0 0 0; }
+        .btn-choice.correct { background: #55efc4; }
+        .btn-choice.wrong { background: #ff7675; }
+
+        .input-spelling {
+            width: 100%; padding: 15px; font-size: 2rem; text-align: center; 
+            border: 4px solid #000; margin-bottom: 15px; background: #fffde7;
+            font-family: 'VT323', monospace; letter-spacing: 3px; text-transform: lowercase;
+        }
+
+        /* --- 稱號卡片 (Inventory) --- */
+        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+        .badge-card {
+            background: #ddd; border: 4px dashed #999; padding: 15px 10px; text-align: center;
+            opacity: 1; position: relative;
+        }
+        .badge-hint-box { background: rgba(0,0,0,0.1); font-size: 0.8rem; margin-top: 5px; padding: 5px; font-weight: bold; color: #555; }
         
         .badge-card.unlocked { 
-            opacity: 1; 
-            border-style: solid; 
-            border-width: 3px;
-            border-color: var(--gold); 
-            background: #fffde7; 
-            box-shadow: 0 4px 0 rgba(0,0,0,0.1); 
+            border-style: solid; border-color: #000;
+            background: #fff; box-shadow: 6px 6px 0 rgba(0,0,0,0.2); 
         }
-        
-        .badge-card.unlocked.common { border-color: var(--tier-common); background: #fff; }
-        .badge-card.unlocked.rare { border-color: var(--tier-rare); background: #f8f9fa; }
-        .badge-card.unlocked.epic { border-color: var(--tier-epic); background: #fffbe6; }
-        .badge-card.unlocked.legendary { border-color: var(--tier-legend); background: #f3e5f5; }
+        .badge-card.unlocked.common { background: #fff; }
+        .badge-card.unlocked.rare { background: #e0f2f1; }
+        .badge-card.unlocked.epic { background: #fff9c4; border-color: #f1c40f; }
+        .badge-card.unlocked.legendary { background: #f3e5f5; border-color: #9b59b6; box-shadow: 6px 6px 0 #9b59b6; }
 
         .badge-icon { font-size: 3rem; margin-bottom: 5px; display: block; }
-        .badge-title { font-weight: 900; font-size: 1rem; margin-bottom: 5px; color: var(--text-main); }
-        .badge-desc { font-size: 0.8rem; color: #555; line-height: 1.2; }
-        
-        .category-header {
-            grid-column: 1 / -1;
-            font-size: 1.1rem;
-            font-weight: 900;
-            margin: 20px 0 10px 0;
-            padding: 5px 10px;
-            background: var(--text-main);
-            color: white;
-            border-radius: 20px;
-            width: fit-content;
+        .badge-title { font-weight: 900; font-size: 1.1rem; margin-bottom: 5px; }
+
+        /* --- 弱點分析 (Weakness) --- */
+        .weak-header { font-size: 1.3rem; font-weight: 900; color: var(--danger); margin-bottom: 15px; text-transform: uppercase; border-bottom: 4px solid var(--danger); display: inline-block;}
+        .weak-item-card { 
+            background: #fff; border: 3px solid #000; padding: 10px; min-width: 110px; 
+            text-align: center; margin-right: 10px; box-shadow: 4px 4px 0 #ffcdd2;
+        }
+        .rank-num { font-family: 'VT323'; font-size: 1.5rem; font-weight: bold; }
+        .mistake-row { 
+            display: flex; justify-content: space-between; align-items: center; padding: 12px; 
+            border-bottom: 2px dashed #000; font-weight: bold; 
         }
 
-        /* --- 其他樣式保留 --- */
-        .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
-        .unit-card { background: white; border: 2px solid #ccc; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .unit-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .unit-card h3 { margin: 0; font-size: 1.3rem; color: var(--text-main); }
-        .unit-card .action-hint { font-size: 0.8rem; color: var(--primary); margin-top: 5px; font-weight: bold; }
-        .word-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding-bottom: 100px; }
-        .word-overview-card { background: white; border: 2px solid #ddd; border-radius: 12px; padding: 20px 10px; text-align: center; cursor: pointer; position: relative; }
-        .word-overview-card:hover { border-color: var(--primary); background: #f0f9ff; }
-        .word-overview-card h4 { margin: 0; font-size: 1.2rem; font-weight: bold; }
-        .word-overview-card.read { background: #e8f5e9; border-color: #66bb6a; }
-        .word-overview-card.read::after { content: "✔ 已讀"; position: absolute; top: 5px; right: 5px; color: #2e7d32; font-size: 0.7rem; font-weight: bold; }
-        .detail-container { text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .detail-word { font-size: 3.5rem; font-weight: 900; color: var(--text-main); margin: 10px 0; }
-        .detail-zh { font-size: 1.6rem; color: #555; margin-bottom: 30px; font-weight: bold; }
-        .audio-btn-big { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); color: white; border: 4px solid #1d3557; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; box-shadow: 0 4px 0 #1d3557; margin-bottom: 30px; }
-        .audio-btn-big:active { transform: translateY(4px); box-shadow: 0 0 0; }
-        .detail-sent-box { background: #f1f1f1; padding: 20px; border-radius: 15px; width: 100%; text-align: left; border-left: 6px solid var(--primary); }
-        .detail-sent-en { font-size: 1.3rem; font-weight: bold; color: #333; margin-bottom: 8px; }
-        .detail-sent-zh { font-size: 1.1rem; color: #666; }
-        .nav-controls { display: flex; justify-content: space-between; width: 100%; margin-top: 30px; gap: 20px; }
-        .nav-controls button { flex: 1; }
-        .setup-row { margin-bottom: 20px; }
-        .setup-label { font-weight: 900; font-size: 1.1rem; margin-bottom: 8px; display: block; }
-        .toggle-group { display: flex; gap: 10px; }
-        .toggle-btn { flex: 1; padding: 15px; border: 2px solid #ccc; background: white; border-radius: 12px; font-weight: bold; color: #777; cursor: pointer; font-size: 1rem; }
-        .toggle-btn.active { border-color: var(--primary); background: #e3f2fd; color: var(--primary); box-shadow: 0 0 0 2px var(--primary) inset; }
-        .range-selector { display: flex; flex-wrap: wrap; gap: 10px; max-height: 200px; overflow-y: auto; margin-top: 10px; }
-        .range-btn { padding: 10px 15px; border-radius: 20px; border: 2px solid #ddd; background: white; cursor: pointer; font-weight: bold; color: #555; }
-        .range-btn.selected { border-color: var(--accent); background: #fff3e0; color: #e65100; }
-        .quiz-status { display: flex; justify-content: space-between; font-weight: bold; color: #666; margin-bottom: 10px; }
-        .q-hint { font-size: 1.4rem; font-weight: 900; color: var(--text-main); margin: 20px 0; min-height: 1.5em; }
-        .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-choice { background: white; border: 3px solid #ccc; border-radius: 15px; padding: 20px; font-size: 1.2rem; font-weight: bold; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
-        .btn-choice:active { transform: translateY(4px); box-shadow: 0 0 0; }
-        .btn-choice.correct { background: #d4edda; border-color: #155724; color: #155724; box-shadow: 0 4px 0 #155724; }
-        .btn-choice.wrong { background: #f8d7da; border-color: #721c24; color: #721c24; box-shadow: 0 4px 0 #721c24; }
-        .input-spelling { width: 100%; padding: 15px; font-size: 1.8rem; text-align: center; border: 3px solid var(--text-main); border-radius: 12px; margin-bottom: 15px; }
-        .weak-stats-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .weak-header { font-size: 1.2rem; font-weight: bold; color: var(--danger); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .top-weak-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .weak-item-card { background: #fff5f5; border: 1px solid #ffcdd2; border-radius: 12px; padding: 15px; min-width: 100px; text-align: center; flex-shrink: 0; }
-        .weak-word { font-size: 1.2rem; font-weight: 900; color: var(--danger); display: block; }
-        .weak-count { font-size: 0.8rem; color: #888; margin-top: 5px; }
-        .full-mistake-list { max-height: 300px; overflow-y: auto; }
-        .mistake-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px dashed #eee; }
-        .rank-num { font-weight: 900; color: #ccc; width: 30px; font-style: italic; }
-        .rank-num.top1 { color: #f1c40f; font-size: 1.2rem; }
-        .rank-num.top2 { color: #95a5a6; font-size: 1.1rem; }
-        .rank-num.top3 { color: #d35400; font-size: 1.1rem; }
-        .mistake-word { font-weight: bold; font-size: 1.1rem; flex: 1; text-align: left; }
-        .mistake-val { color: var(--danger); font-weight: bold; background: #ffebee; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; }
-        .toast-notification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: white; padding: 15px 25px; border-radius: 50px; border: 3px solid var(--gold); z-index: 2000; display: flex; align-items: center; gap: 15px; transition: top 0.5s; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        /* Toast & Modal */
+        .toast-notification { 
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); 
+            background: #fff; padding: 15px 25px; border: 4px solid #000; 
+            z-index: 2000; display: flex; align-items: center; gap: 15px; 
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.5); transition: top 0.5s; 
+        }
         .toast-notification.show { top: 30px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
-        .modal-content { background: white; margin: 10% auto; padding: 25px; width: 90%; max-width: 500px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; }
+        .modal-content { 
+            background: #fff; margin: 10% auto; padding: 25px; width: 90%; max-width: 500px; 
+            border: 6px solid #000; box-shadow: 15px 15px 0 #222; 
+            text-align: center; max-height: 80vh; overflow-y: auto; 
+        }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 2.5rem; cursor: pointer; color: #000; line-height: 0.8; }
 
     </style>
 </head>
 <body>
 
     <div id="toastNotification" class="toast-notification">
-        <div style="font-size:2rem;">🏆</div>
-        <div>
-            <h4 style="margin:0; color:var(--text-main);">恭喜獲得稱號！</h4>
-            <p id="toastMsg" style="margin:0; color:var(--accent); font-weight:bold;">單字小學徒</p>
+        <div style="font-size:3rem;">🎁</div>
+        <div style="text-align:left;">
+            <h4 style="margin:0; font-size:1.5rem; color:#f1c40f; text-shadow:1px 1px 0 #000;">LEVEL UP!</h4>
+            <p id="toastMsg" style="margin:0; font-weight:bold; font-family:'Microsoft JhengHei';">獲得新稱號</p>
         </div>
     </div>
 
     <div id="homeScreen" class="screen active">
         <div class="hero-banner">
-            <div class="hero-title">智慧單字小考官</div>
-            <div class="hero-sub">今天想做什麼呢？</div>
+            <div class="hero-title">VOCAB HERO</div>
+            <div class="hero-sub">單字大冒險 v46.0</div>
         </div>
 
         <div class="dashboard-grid">
-            <button class="dash-btn study" onclick="openUnitSelector('study')">
-                <span class="dash-icon">📖</span>
-                <h2>我要背單字</h2>
-                <p>瀏覽單字卡、聽發音</p>
-            </button>
-            <button class="dash-btn quiz" onclick="openQuizSetup()">
-                <span class="dash-icon">✍️</span>
-                <h2>我要測驗</h2>
-                <p>挑戰題目、拚速度</p>
-            </button>
+            <div class="menu-card menu-study" onclick="openUnitSelector('study')">
+                <div class="menu-icon">📖</div>
+                <div class="menu-title">背單字</div>
+                <div class="menu-desc">STUDY</div>
+            </div>
+            <div class="menu-card menu-quiz" onclick="openQuizSetup()">
+                <div class="menu-icon">⚔️</div>
+                <div class="menu-title">挑戰魔王</div>
+                <div class="menu-desc">QUIZ</div>
+            </div>
+            <div class="menu-card menu-achieve" onclick="openAchievementScreen()">
+                <div class="menu-icon">🏆</div>
+                <div class="menu-title">榮譽殿堂</div>
+                <div class="menu-desc">AWARDS</div>
+            </div>
+            <div class="menu-card menu-analysis" onclick="openAnalysisScreen()">
+                <div class="menu-icon">🩹</div>
+                <div class="menu-title">醫療中心</div>
+                <div class="menu-desc">WEAKNESS</div>
+            </div>
         </div>
-
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button class="btn-solid" onclick="openAchievementScreen()">🏆 稱號蒐集</button>
-            <button class="btn-solid" onclick="openAnalysisScreen()">📊 弱點分析</button>
+        
+        <div style="text-align:center; margin-top:20px;">
+            <button class="btn-retro btn-back" style="display:inline-flex; width:auto; font-size:1rem;" onclick="location.reload()">🔄 RELOAD GAME</button>
         </div>
     </div>
 
     <div id="unitSelectScreen" class="screen">
         <div class="page-header">
-            <button class="btn-solid" style="width:auto;" onclick="goHome()">⬅ 回首頁</button>
-            <h2 class="page-title">選擇單元</h2>
+            <button class="btn-retro btn-back" onclick="goHome()">⬅ MENU</button>
+            <h2 class="page-title">SELECT MAP</h2>
             <div style="width: 80px;"></div>
         </div>
         <div id="unitGridContainer" class="unit-grid"></div>
@@ -231,25 +357,27 @@
 
     <div id="studyOverviewScreen" class="screen">
         <div class="page-header">
-            <button class="btn-solid" style="width:auto;" onclick="openUnitSelector('study')">⬅ 回選單</button>
+            <button class="btn-retro btn-back" onclick="openUnitSelector('study')">⬅ MAP</button>
             <h2 class="page-title" id="overviewTitle">Unit A</h2>
             <div style="width:60px;"></div>
         </div>
-        <div style="text-align:center; color:#666; margin-bottom:15px; font-weight:bold;">👇 點擊單字卡開始學習</div>
+        <div class="retro-box" style="text-align:center; padding:10px;">
+            <span style="font-weight:bold;">👇 點擊卡片開始修練</span>
+        </div>
         <div id="overviewGrid" class="word-overview-grid"></div>
         <div style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:90%; max-width:600px;">
-            <button class="btn-solid btn-green" onclick="quickQuizFromStudy()">⚡ 背完了！馬上測驗此單元</button>
+            <button class="btn-retro btn-green" onclick="quickQuizFromStudy()">⚡ 立即戰鬥 (測驗此單元)</button>
         </div>
     </div>
 
     <div id="studyDetailScreen" class="screen">
         <div class="page-header">
-            <button class="btn-solid" style="width:auto;" onclick="backToOverview()">⬅ 回列表</button>
-            <div style="font-weight:bold; color:#777;">Word <span id="detailIdx">1</span> / <span id="detailTotal">20</span></div>
+            <button class="btn-retro btn-back" onclick="backToOverview()">⬅ LIST</button>
+            <div style="font-weight:bold; color:#fff; text-shadow:2px 2px 0 #000; font-size:1.5rem;">Word <span id="detailIdx">1</span> / <span id="detailTotal">20</span></div>
             <div style="width:80px;"></div>
         </div>
 
-        <div class="white-panel detail-container">
+        <div class="retro-box detail-container">
             <div class="detail-word" id="cardWord">Apple</div>
             <div class="detail-zh" id="cardZh">蘋果</div>
             
@@ -258,120 +386,118 @@
             <div class="detail-sent-box">
                 <div class="detail-sent-en" id="cardSentEn">I eat an apple.</div>
                 <div class="detail-sent-zh" id="cardSentZh">我吃一顆蘋果。</div>
-                <button class="btn-icon" style="float:right; margin-top:-30px; color:var(--primary);" onclick="playCurrentCardSent()">🔊</button>
+                <button class="btn-small-audio" onclick="playCurrentCardSent()">🔊</button>
             </div>
-
-            <div class="nav-controls">
-                <button class="btn-solid" onclick="prevCard()">◀ 上一個</button>
-                <button class="btn-solid" onclick="nextCard()">下一個 ▶</button>
-            </div>
+        </div>
+        
+        <div class="nav-controls">
+            <button class="btn-retro" onclick="prevCard()">◀ PREV</button>
+            <button class="btn-retro" onclick="nextCard()">NEXT ▶</button>
         </div>
     </div>
 
     <div id="quizSetupScreen" class="screen">
         <div class="page-header">
-            <button class="btn-solid" style="width:auto;" onclick="goHome()">⬅ 回首頁</button>
-            <h2 class="page-title">測驗設定</h2>
+            <button class="btn-retro btn-back" onclick="goHome()">⬅ MENU</button>
+            <h2 class="page-title">SETUP</h2>
             <div style="width:80px;"></div>
         </div>
 
-        <div class="white-panel">
-            <div class="setup-row">
-                <span class="setup-label">1. 選擇題型</span>
-                <div class="toggle-group">
-                    <button class="toggle-btn active" id="modeChoice" onclick="setQuizMode('choice')">👆 選擇題</button>
-                    <button class="toggle-btn" id="modeSpelling" onclick="setQuizMode('spelling')">⌨️ 拼字題</button>
-                </div>
+        <div class="retro-box">
+            <div class="setup-label">1. 選擇武器 (題型)</div>
+            <div class="toggle-group">
+                <button class="toggle-btn active" id="modeChoice" onclick="setQuizMode('choice')">👆 選擇題</button>
+                <button class="toggle-btn" id="modeSpelling" onclick="setQuizMode('spelling')">⌨️ 拼字題</button>
             </div>
         </div>
 
-        <div class="white-panel">
-            <div class="setup-row" style="display:flex; justify-content:space-between;">
-                <span class="setup-label">2. 選擇範圍 (可複選)</span>
-                <button class="btn-icon" style="color:var(--danger); font-size:1rem; font-weight:bold;" onclick="clearAllSelectedWords()">[清空]</button>
+        <div class="retro-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="setup-label" style="margin:0; border:none;">2. 選擇戰場 (範圍)</div>
+                <button class="btn-retro btn-red" style="width:auto; font-size:0.8rem; padding:5px 10px;" onclick="clearAllSelectedWords()">RESET</button>
             </div>
-            <div style="margin-bottom:10px;">目前已選：<b id="totalSelectedCount" style="color:var(--primary); font-size:1.2rem;">0</b> 個字</div>
+            <div style="margin:10px 0;">目前已選：<b id="totalSelectedCount" style="color:var(--primary); font-size:1.5rem;">0</b> 個字</div>
             <div id="quizRangeGrid" class="range-selector"></div>
         </div>
 
-        <div class="white-panel">
-            <span class="setup-label">3. 進階設定</span>
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
-                <span>自動換題 (答對後自動下一題)</span>
-                <input type="checkbox" id="autoNextSwitch" checked style="transform:scale(1.5);">
+        <div class="retro-box">
+            <div class="setup-label">3. 難度設定</div>
+            <div class="setting-row">
+                <span>自動下一關</span>
+                <div class="switch"><input type="checkbox" id="autoNextSwitch" checked><span class="slider"></span></div>
             </div>
-            <div style="display:flex; align-items:center; justify-content:space-between;">
-                <span>限時挑戰 (每題8秒)</span>
-                <input type="checkbox" id="timerSwitch" style="transform:scale(1.5);">
+            <div class="setting-row">
+                <span>8秒限時</span>
+                <div class="switch"><input type="checkbox" id="timerSwitch"><span class="slider"></span></div>
             </div>
         </div>
 
-        <button class="btn-solid btn-red" onclick="startConfiguredQuiz()">🚀 開始測驗</button>
+        <button class="btn-retro btn-red" style="font-size:1.8rem;" onclick="startConfiguredQuiz()">🚀 FIGHT!</button>
     </div>
 
     <div id="wordPickerModal" class="modal">
         <div class="modal-content">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h3 id="pickerTitle" style="margin:0;">挑選單字</h3>
-                <span style="font-size:1.5rem; cursor:pointer;" onclick="closeWordPicker()">×</span>
+                <h3 id="pickerTitle" style="margin:0; font-size:1.5rem;">挑選單字</h3>
+                <span class="close-modal" onclick="closeWordPicker()">×</span>
             </div>
             <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <button class="btn-solid" style="padding:5px 10px; font-size:0.9rem;" onclick="pickerSelectViewed()">僅選已讀</button>
-                <button class="btn-solid" style="padding:5px 10px; font-size:0.9rem;" onclick="pickerSelectAll()">全選</button>
-                <button class="btn-solid" style="padding:5px 10px; font-size:0.9rem;" onclick="pickerSelectNone()">全取消</button>
+                <button class="btn-retro" style="padding:5px; font-size:0.9rem;" onclick="pickerSelectViewed()">僅已讀</button>
+                <button class="btn-retro" style="padding:5px; font-size:0.9rem;" onclick="pickerSelectAll()">全選</button>
+                <button class="btn-retro" style="padding:5px; font-size:0.9rem;" onclick="pickerSelectNone()">全消</button>
             </div>
             <div id="pickerGrid" class="word-picker-container"></div>
             
             <div id="btnPickerSave" style="margin-top:20px;">
-                <button class="btn-solid btn-green" onclick="closeWordPicker()">完成選取</button>
+                <button class="btn-retro btn-green" onclick="closeWordPicker()">OK</button>
             </div>
             <div id="btnPickerQuickStart" style="display:none; gap:10px; margin-top:20px;">
-                <button class="btn-solid btn-green" onclick="startQuickQuizDirect('choice')">開始選擇題</button>
-                <button class="btn-solid btn-yellow" onclick="startQuickQuizDirect('spelling')">開始拼字題</button>
+                <button class="btn-retro btn-green" onclick="startQuickQuizDirect('choice')">選</button>
+                <button class="btn-retro btn-yellow" onclick="startQuickQuizDirect('spelling')">拼</button>
             </div>
         </div>
     </div>
 
     <div id="quizScreen" class="screen">
         <div class="quiz-status">
-            <span>第 <span id="qIdx">1</span> / <span id="qTotal">10</span> 題</span>
-            <span id="timerBadge" style="color:var(--danger); display:none;">⏱️ <span id="timeLeft">8</span></span>
-            <button style="border:none; background:none; font-weight:bold; color:#888;" onclick="quitQuiz()">離開</button>
+            <span>Q: <span id="qIdx">1</span>/<span id="qTotal">10</span></span>
+            <span id="timerBadge" style="color:#ff5252; display:none;">⏱️ <span id="timeLeft">8</span></span>
+            <button style="border:none; background:none; color:#fff; font-weight:bold; cursor:pointer;" onclick="quitQuiz()">QUIT</button>
         </div>
 
-        <div class="white-panel" style="text-align:center; padding:40px 20px;">
+        <div class="retro-box" style="text-align:center; padding:30px 20px;">
             <div style="font-size:4rem; cursor:pointer;" onclick="playQuizSequence()">🔊</div>
-            <div id="qHint" class="q-hint" style="display:none; margin-top:20px; font-size:1.5rem; font-weight:bold; color:var(--text-main);"></div>
-            <button id="btnShowHint" class="btn-solid" style="margin-top:20px; width:auto; display:inline-block;" onclick="showHint()">💡 顯示中文提示</button>
+            <div id="qHint" class="q-hint" style="display:none;"></div>
+            <button id="btnShowHint" class="btn-retro" style="width:auto; margin:20px auto 0;" onclick="showHint()">💡 提示</button>
         </div>
 
         <div id="choiceArea" class="choice-grid" style="display:none;"></div>
 
         <div id="spellingArea" style="display:none; text-align:center;">
-            <input type="text" id="spellingInput" class="input-spelling" placeholder="請輸入單字..." autocomplete="off" style="width:100%; padding:15px; font-size:1.5rem; text-align:center; border:3px solid #ccc; border-radius:12px; margin-bottom:15px;">
-            <div id="spellingFeedback" style="height:25px; font-weight:bold; margin-bottom:10px; font-size:1.2rem;"></div>
-            <button class="btn-solid btn-green" onclick="checkSpelling()">送出答案</button>
+            <input type="text" id="spellingInput" class="input-spelling" placeholder="TYPE HERE..." autocomplete="off">
+            <div id="spellingFeedback" style="height:25px; font-weight:bold; margin-bottom:10px; font-size:1.5rem;"></div>
+            <button class="btn-retro btn-green" onclick="checkSpelling()">ATTACK (送出)</button>
         </div>
 
-        <button id="btnNextQ" class="btn-solid" style="margin-top:20px; display:none;" onclick="nextQuestion()">➡ 下一題</button>
+        <button id="btnNextQ" class="btn-retro" style="margin-top:20px; display:none;" onclick="nextQuestion()">➡ NEXT</button>
     </div>
 
     <div id="resultScreen" class="screen">
-        <div class="white-panel" style="text-align:center; padding:40px;">
+        <div class="retro-box" style="text-align:center; padding:40px;">
             <div style="font-size:5rem;">🏆</div>
-            <h2 style="font-size:2rem; margin:10px 0;">測驗完成！</h2>
-            <div id="finalScore" style="font-size:4rem; font-weight:900; color:var(--primary); margin:20px 0;">100</div>
-            <p id="finalMsg" style="font-size:1.2rem; color:#666; margin-bottom:40px;">太厲害了！</p>
+            <h2 style="font-size:3rem; margin:10px 0;">VICTORY!</h2>
+            <div id="finalScore" style="font-size:5rem; font-weight:900; color:var(--primary); margin:20px 0; text-shadow:4px 4px 0 #000;">100</div>
+            <p id="finalMsg" style="font-size:1.5rem; color:#555; margin-bottom:40px;">PERFECT!</p>
             
-            <button class="btn-solid btn-green" style="margin-bottom:15px;" onclick="goHome()">🏠 回首頁</button>
-            <button class="btn-solid" onclick="retryQuiz()">🔄 再測一次</button>
+            <button class="btn-retro btn-green" style="margin-bottom:15px;" onclick="goHome()">🏠 HOME</button>
+            <button class="btn-retro" onclick="retryQuiz()">🔄 RETRY</button>
         </div>
     </div>
 
     <div id="achievementScreen" class="screen">
         <div class="page-header">
-            <button class="btn-solid" style="width:auto;" onclick="goHome()">⬅ 回首頁</button>
-            <h2 class="page-title">稱號蒐集</h2>
+            <button class="btn-retro btn-back" onclick="goHome()">⬅ MENU</button>
+            <h2 class="page-title">TROPHIES</h2>
             <div style="width:80px;"></div>
         </div>
         <div class="achievement-container">
@@ -381,19 +507,22 @@
 
     <div id="analysisScreen" class="screen">
         <div class="page-header">
-            <button class="btn-solid" style="width:auto;" onclick="goHome()">⬅ 回首頁</button>
-            <h2 class="page-title">弱點分析</h2>
+            <button class="btn-retro btn-back" onclick="goHome()">⬅ MENU</button>
+            <h2 class="page-title">WEAKNESS</h2>
             <div style="width:80px;"></div>
         </div>
-        <div class="white-panel">
-            <div style="font-weight:bold; color:var(--danger); margin-bottom:10px;">⚠️ 最常錯 Top 3</div>
+        
+        <div class="retro-box">
+            <div class="weak-header">⚠️ BOSS (Top 3)</div>
             <div id="topWeakList" style="display:flex; gap:10px; overflow-x:auto;"></div>
         </div>
-        <div class="white-panel">
-            <div style="font-weight:bold; margin-bottom:10px;">📝 錯題列表</div>
+        
+        <div class="retro-box">
+            <div style="font-weight:bold; margin-bottom:10px;">📝 敗績紀錄</div>
             <div id="fullMistakeList" class="full-mistake-list" style="max-height:250px; overflow-y:auto;"></div>
         </div>
-        <button class="btn-solid btn-red" onclick="startTop30WeaknessQuiz()">🔥 挑戰 Top 30 常錯字</button>
+        
+        <button class="btn-retro btn-red" onclick="startTop30WeaknessQuiz()">🔥 挑戰魔王 (Top 30)</button>
     </div>
 
 <script src="words.js"></script>
@@ -418,7 +547,7 @@
         { id: 'view_100', category: 'learn', tier: 'rare', icon: '📘', title: '記憶超人', desc: '看過 100 個單字', check: (s) => s.wordsViewedCount >= 100 },
         { id: 'view_200', category: 'learn', tier: 'rare', icon: '🎓', title: '博學多聞', desc: '看過 200 個單字', check: (s) => s.wordsViewedCount >= 200 },
         { id: 'view_300', category: 'learn', tier: 'epic', icon: '🔮', title: '單字王者', desc: '看過 300 個單字', check: (s) => s.wordsViewedCount >= 300 },
-        { id: 'view_500', category: 'learn', tier: 'epic', icon: '🧙‍♂️', title: '行走字典', desc: '看過 500 個單字', check: (s) => s.wordsViewedCount >= 500 },
+        { id: 'view_500', category: 'learn', tier: 'epic', icon: '🧙‍♂️', title: '大賢者', desc: '看過 500 個單字', check: (s) => s.wordsViewedCount >= 500 },
         { id: 'view_all', category: 'learn', tier: 'legendary', icon: '🪐', title: '全知全能', desc: '看過所有單字', check: (s) => s.wordsViewedCount >= 800 },
         { id: 'unit_1', category: 'unit', tier: 'common', icon: '🚩', title: '初戰告捷', desc: '完成 1 個單元', check: () => checkUnitsCompleted(1) },
         { id: 'unit_3', category: 'unit', tier: 'rare', icon: '⛺', title: '三元及第', desc: '完成 3 個單元', check: () => checkUnitsCompleted(3) },
@@ -538,6 +667,7 @@
             header.className = `category-header cat-${cat}`;
             header.style.gridColumn = "1 / -1";
             header.innerText = categories[cat];
+            header.style.fontFamily = "'Microsoft JhengHei'";
             grid.appendChild(header);
 
             achievements.filter(a => a.category === cat).forEach(ach => {
@@ -630,7 +760,7 @@
         grid.innerHTML = "";
         studyData.list.forEach((item, index) => {
             const card = document.createElement('div');
-            card.className = 'word-overview-card';
+            card.className = 'word-card-pixel';
             if (viewedWords.has(item.word)) card.classList.add('read');
             card.innerHTML = `<h4>${item.word}</h4>`;
             card.onclick = () => openFlashcard(index);
@@ -848,7 +978,7 @@
     }
 
     function renderSpelling() {
-        const input = document.getElementById('spellingInput'); input.value = ""; input.disabled = false; input.style.borderColor = "#ccc"; document.getElementById('spellingFeedback').innerText = ""; input.focus();
+        const input = document.getElementById('spellingInput'); input.value = ""; input.disabled = false; input.style.borderColor = "#000"; document.getElementById('spellingFeedback').innerText = ""; input.focus();
     }
 
     function checkSpelling() {
