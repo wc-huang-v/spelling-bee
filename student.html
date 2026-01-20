@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v47.0 (UX Fixed)</title>
+    <title>學生自主學習平板 v47.1 (Clear Buttons)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         /* --- 🎨 視覺風格：現代復古像素風 (Pixel Lite) --- */
@@ -223,7 +223,7 @@
     <div id="homeScreen" class="screen active">
         <div class="hero-banner">
             <div class="hero-title">VOCAB HERO</div>
-            <div class="hero-sub">單字大冒險 v47.0</div>
+            <div class="hero-sub">單字大冒險 v47.1</div>
         </div>
 
         <div class="dashboard-grid">
@@ -365,8 +365,8 @@
                 </div>
                 <div id="btnPickerQuickStart" style="display:none; gap:10px;">
                     <button class="btn-pixel btn-cancel" style="flex:0.5;" onclick="closeWordPicker_Cancel()">❌</button>
-                    <button class="btn-pixel btn-success" style="flex:1;" onclick="startQuickQuizDirect('choice')">選</button>
-                    <button class="btn-pixel btn-warning" style="flex:1;" onclick="startQuickQuizDirect('spelling')">拼</button>
+                    <button class="btn-pixel btn-success" style="flex:1;" onclick="startQuickQuizDirect('choice')">選擇題</button>
+                    <button class="btn-pixel btn-warning" style="flex:1;" onclick="startQuickQuizDirect('spelling')">拼字題</button>
                 </div>
             </div>
         </div>
@@ -555,6 +555,7 @@
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
+    // Navigation
     function goHome() { showScreen('homeScreen'); }
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
@@ -579,6 +580,7 @@
         const grid = document.getElementById('badgeGrid');
         grid.innerHTML = "";
         const categories = { 'learn': '📚 勤學之路', 'unit': '🏫 Unit 制霸', 'alpha': '🔡 字母蒐集', 'quiz': '⚔️ 試煉戰場', 'milestone': '💎 傳奇里程碑', 'secret': '✨ 神秘彩蛋' };
+        
         for (let cat in categories) {
             const header = document.createElement('div');
             header.className = `category-header cat-${cat}`;
@@ -591,13 +593,24 @@
                 const isUnlocked = unlockedTitles.has(ach.id);
                 const div = document.createElement('div');
                 div.className = `badge-card ${isUnlocked ? 'unlocked' : ''} ${ach.tier}`;
+                
                 let icon = '🔒'; let title = ach.title; let hintLabel = "🎯 目標："; let desc = ach.desc;
+
                 if (isUnlocked) {
                     icon = ach.icon || '🏆';
                 } else {
-                    if (ach.category === 'secret') { title = '？？？'; hintLabel = "🕵️ 線索："; desc = ach.secretDesc; }
+                    if (ach.category === 'secret') {
+                        title = '？？？';
+                        hintLabel = "🕵️ 線索：";
+                        desc = ach.secretDesc;
+                    }
                 }
-                div.innerHTML = `<div class="badge-icon">${icon}</div><div class="badge-title">${title}</div>${!isUnlocked ? `<div class="badge-hint-box">${hintLabel}${desc}</div>` : `<div class="badge-desc">${desc}</div>`}`;
+                
+                div.innerHTML = `
+                    <div class="badge-icon">${icon}</div>
+                    <div class="badge-title">${title}</div>
+                    ${!isUnlocked ? `<div class="badge-hint-box">${hintLabel}${desc}</div>` : `<div class="badge-desc">${desc}</div>`}
+                `;
                 grid.appendChild(div);
             });
         }
@@ -609,8 +622,10 @@
         const topList = document.getElementById('topWeakList');
         const fullList = document.getElementById('fullMistakeList');
         let sorted = Object.keys(m).map(k => ({ word: k, count: m[k] })).sort((a,b) => b.count - a.count);
-        if (sorted.length === 0) { topList.innerHTML = "<div style='color:#999;'>無錯題紀錄</div>"; fullList.innerHTML = ""; } 
-        else {
+        if (sorted.length === 0) {
+            topList.innerHTML = "<div style='color:#999;'>無錯題紀錄</div>";
+            fullList.innerHTML = "";
+        } else {
             topList.innerHTML = "";
             sorted.slice(0, 3).forEach((item, idx) => {
                 let medal = idx===0?'🥇':(idx===1?'🥈':'🥉');
