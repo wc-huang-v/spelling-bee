@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v47.2 (Battle Report)</title>
+    <title>學生自主學習平板 v47.3 (Switch Fixed)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         /* --- 🎨 視覺風格：現代復古像素風 (Pixel Lite) --- */
@@ -137,13 +137,8 @@
         input:checked + .slider:before { transform: translateX(20px); }
 
         /* --- 6. 測驗進行中 (In-Game Settings) --- */
-        .quiz-settings-bar {
-            display: flex; justify-content: center; gap: 20px;
-            background: #eee; padding: 10px; border-radius: 8px; border: 3px solid #000;
-            margin-bottom: 15px;
-        }
+        .quiz-settings-bar { display: flex; justify-content: center; gap: 20px; background: #eee; padding: 10px; border-radius: 8px; border: 3px solid #000; margin-bottom: 15px; }
         .mini-setting { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; }
-
         .quiz-status { display: flex; justify-content: space-between; font-weight: bold; color: #fff; margin-bottom: 10px; font-size: 1.4rem; background: #000; padding: 5px 10px; border-radius: 4px; }
         .q-hint { font-size: 1.5rem; font-weight: 900; color: #000; margin: 20px 0; min-height: 1.5em; background: #eee; border: 2px dashed #000; padding: 10px; }
         .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -153,15 +148,9 @@
         .btn-choice.wrong { background: #ff7675; }
         .input-spelling { width: 100%; padding: 15px; font-size: 2rem; text-align: center; border: 4px solid #000; margin-bottom: 15px; background: #fffde7; font-family: 'VT323', monospace; letter-spacing: 3px; text-transform: lowercase; }
 
-        /* --- 7. 結果頁 (Battle Report) --- */
-        .result-list { 
-            text-align: left; background: #f9f9f9; border: 2px solid #ccc; padding: 10px; 
-            max-height: 200px; overflow-y: auto; margin-bottom: 20px; 
-        }
-        .result-row { 
-            display: flex; justify-content: space-between; padding: 8px 0; 
-            border-bottom: 1px dashed #ccc; font-weight: bold; font-size: 1.1rem;
-        }
+        /* --- 7. 結果頁 --- */
+        .result-list { text-align: left; background: #f9f9f9; border: 2px solid #ccc; padding: 10px; max-height: 200px; overflow-y: auto; margin-bottom: 20px; }
+        .result-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ccc; font-weight: bold; font-size: 1.1rem; }
         .res-icon { width: 30px; text-align: center; }
         .res-correct { color: var(--success); }
         .res-wrong { color: var(--danger); }
@@ -180,17 +169,16 @@
         .badge-hint-box { background: rgba(0,0,0,0.1); font-size: 0.8rem; margin-top: 5px; padding: 5px; font-weight: bold; color: #555; }
         .category-header { grid-column: 1/-1; font-size: 1.2rem; font-weight: 900; margin: 20px 0 10px; padding: 5px 15px; background: #000; color: #fff; width: fit-content; border-radius: 4px; transform: skew(-5deg); }
 
-        /* --- Word Picker Modal (密集的 Grid) --- */
+        /* --- Word Picker Modal --- */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; }
         .modal-content { background: #fff; margin: 5% auto; padding: 20px; width: 90%; max-width: 500px; border: 6px solid #000; box-shadow: 15px 15px 0 #222; text-align: center; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
         .close-modal { position: absolute; top: 10px; right: 15px; font-size: 2.5rem; cursor: pointer; color: #000; line-height: 0.8; }
-        
         .word-picker-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; margin-top: 10px; padding: 5px; overflow-y: auto; flex: 1; }
         .picker-item { background: #f9f9f9; border: 2px solid #ccc; padding: 8px 4px; border-radius: 4px; text-align: center; cursor: pointer; font-size: 0.9rem; font-weight: bold; position: relative; overflow: hidden; word-break: break-all; }
         .picker-item.picked { background: #fff3cd; border-color: #000; color: #000; box-shadow: 2px 2px 0 #000; transform: translate(-1px, -1px); }
         .picker-actions { display: flex; gap: 8px; margin-top: 15px; padding-top: 10px; border-top: 2px dashed #ccc; flex-shrink: 0; }
 
-        /* Safe Exit Button */
+        /* Safe Exit */
         .safe-exit-area { text-align: center; margin-top: auto; padding: 20px 0; width: 100%; }
         .btn-safe-exit { color: rgba(0,0,0,0.4); text-decoration: none; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(0,0,0,0.1); padding: 5px 10px; border-radius: 20px; transition: 0.2s; }
         .btn-safe-exit:hover { color: #d63031; border-color: #d63031; opacity: 1; }
@@ -214,9 +202,8 @@
     <div id="homeScreen" class="screen active">
         <div class="hero-banner">
             <div class="hero-title">VOCAB HERO</div>
-            <div class="hero-sub">單字大冒險 v47.2</div>
+            <div class="hero-sub">單字大冒險 v47.3</div>
         </div>
-
         <div class="dashboard-grid">
             <div class="dash-btn study" onclick="openUnitSelector('study')">
                 <div class="dash-icon">📖</div>
@@ -239,7 +226,6 @@
                 <p>WEAKNESS</p>
             </div>
         </div>
-        
         <div class="safe-exit-area">
             <a href="index.html" class="btn-safe-exit">🔌 離開遊戲 (回老師/首頁)</a>
         </div>
@@ -273,22 +259,18 @@
             <div style="font-weight:bold; color:#fff; text-shadow:2px 2px 0 #000; font-size:1.5rem;">Word <span id="detailIdx">1</span> / <span id="detailTotal">20</span></div>
             <div style="width:80px;"></div>
         </div>
-
         <div class="pixel-card detail-box">
             <div style="display:flex; align-items:center; justify-content:center; gap:15px; margin:20px 0 10px;">
                 <div class="detail-word" id="cardWord">Apple</div>
                 <button class="btn-speak-inline" onclick="playCurrentCardAudio()">🔊</button>
             </div>
-            
             <div class="detail-zh" id="cardZh">蘋果</div>
-
             <div class="detail-sent-box">
                 <div class="detail-sent-en" id="cardSentEn">I eat an apple.</div>
                 <div class="detail-sent-zh" id="cardSentZh">我吃一顆蘋果。</div>
                 <button class="btn-small-audio" onclick="playCurrentCardSent()">🔊</button>
             </div>
         </div>
-        
         <div class="nav-controls">
             <button class="btn-pixel" onclick="prevCard()">◀ PREV</button>
             <button class="btn-pixel" onclick="nextCard()">NEXT ▶</button>
@@ -301,7 +283,6 @@
             <h2 class="page-title">SETUP</h2>
             <div style="width:80px;"></div>
         </div>
-
         <div class="pixel-card">
             <div class="setup-label">1. 選擇武器 (題型)</div>
             <div class="toggle-group">
@@ -309,7 +290,6 @@
                 <button class="toggle-btn" id="modeSpelling" onclick="setQuizMode('spelling')">⌨️ 拼字題</button>
             </div>
         </div>
-
         <div class="pixel-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div class="setup-label" style="margin:0; border:none;">2. 選擇戰場 (範圍)</div>
@@ -318,7 +298,6 @@
             <div style="margin:10px 0;">目前已選：<b id="totalSelectedCount" style="color:var(--primary); font-size:1.5rem;">0</b> 個字</div>
             <div id="quizRangeGrid" class="range-selector"></div>
         </div>
-
         <div class="pixel-card">
             <div class="setup-label">3. 難度設定</div>
             <div class="setting-row">
@@ -330,7 +309,6 @@
                 <div class="switch"><input type="checkbox" id="setupTimer"><span class="slider"></span></div>
             </div>
         </div>
-
         <button class="btn-pixel btn-danger" style="width:100%; font-size:1.8rem;" onclick="startConfiguredQuiz()">🚀 FIGHT!</button>
     </div>
 
@@ -340,15 +318,12 @@
                 <h3 id="pickerTitle" style="margin:0; font-size:1.5rem;">挑選單字</h3>
                 <span style="font-size:2rem; cursor:pointer;" onclick="closeWordPicker_Cancel()">×</span>
             </div>
-            
             <div class="picker-actions">
                 <button class="btn-pixel" style="padding:5px; font-size:0.9rem;" onclick="pickerSelectViewed()">僅已讀</button>
                 <button class="btn-pixel" style="padding:5px; font-size:0.9rem;" onclick="pickerSelectAll()">全選</button>
                 <button class="btn-pixel" style="padding:5px; font-size:0.9rem;" onclick="pickerSelectNone()">全消</button>
             </div>
-
             <div id="pickerGrid" class="word-picker-container"></div>
-            
             <div style="margin-top:15px; flex-shrink:0;">
                 <div id="btnPickerSave" style="display:flex; gap:10px;">
                     <button class="btn-pixel btn-cancel" style="flex:1;" onclick="closeWordPicker_Cancel()">❌ 取消</button>
@@ -374,27 +349,22 @@
                 <div class="switch"><input type="checkbox" id="ingameTimer" onchange="toggleTimer(this.checked)"><span class="slider"></span></div>
             </div>
         </div>
-
         <div class="quiz-status">
             <span>Q: <span id="qIdx">1</span>/<span id="qTotal">10</span></span>
             <span id="timerBadge" style="color:#ff5252; display:none;">⏱️ <span id="timeLeft">8</span></span>
             <button style="border:none; background:none; color:#fff; font-weight:bold; cursor:pointer;" onclick="quitQuiz()">🏳️ 放棄</button>
         </div>
-
         <div class="pixel-card" style="text-align:center; padding:30px 20px;">
             <div style="font-size:4rem; cursor:pointer;" onclick="playQuizSequence()">🔊</div>
             <div id="qHint" class="q-hint" style="display:none;"></div>
             <button id="btnShowHint" class="btn-pixel" style="width:auto; margin:20px auto 0;" onclick="showHint()">💡 提示</button>
         </div>
-
         <div id="choiceArea" class="choice-grid" style="display:none;"></div>
-
         <div id="spellingArea" style="display:none; text-align:center;">
             <input type="text" id="spellingInput" class="input-spelling" placeholder="TYPE HERE..." autocomplete="off">
             <div id="spellingFeedback" style="height:25px; font-weight:bold; margin-bottom:10px; font-size:1.5rem;"></div>
             <button class="btn-pixel btn-success" style="width:100%;" onclick="checkSpelling()">ATTACK (送出)</button>
         </div>
-
         <button id="btnNextQ" class="btn-pixel" style="width:100%; margin-top:20px; display:none;" onclick="nextQuestion()">➡ NEXT</button>
     </div>
 
@@ -404,63 +374,32 @@
             <h2 style="font-size:3rem; margin:10px 0;">VICTORY!</h2>
             <div id="finalScore" style="font-size:5rem; font-weight:900; color:var(--primary); margin:10px 0; text-shadow:4px 4px 0 #000;">100</div>
             <p id="finalMsg" style="font-size:1.5rem; color:#555; margin-bottom:20px;">PERFECT!</p>
-            
             <div style="text-align:left; font-weight:bold; margin-bottom:5px;">📝 戰報 (Battle Report):</div>
             <div id="quizReviewList" class="result-list"></div>
-
             <button class="btn-pixel btn-success" style="width:100%; margin-bottom:15px;" onclick="goHome()">🏠 HOME</button>
             <button class="btn-pixel" style="width:100%;" onclick="retryQuiz()">🔄 RETRY</button>
         </div>
     </div>
 
     <div id="achievementScreen" class="screen">
-        <div class="page-header">
-            <button class="btn-pixel btn-back" onclick="goHome()">⬅ MENU</button>
-            <h2 class="page-title">TROPHIES</h2>
-            <div style="width:80px;"></div>
-        </div>
-        <div class="achievement-container">
-            <div id="badgeGrid" class="achievement-grid"></div>
-        </div>
+        <div class="page-header"><button class="btn-pixel btn-back" onclick="goHome()">⬅ MENU</button><h2 class="page-title">TROPHIES</h2><div style="width:80px;"></div></div>
+        <div class="achievement-container"><div id="badgeGrid" class="achievement-grid"></div></div>
     </div>
-
     <div id="analysisScreen" class="screen">
-        <div class="page-header">
-            <button class="btn-pixel btn-back" onclick="goHome()">⬅ MENU</button>
-            <h2 class="page-title">WEAKNESS</h2>
-            <div style="width:80px;"></div>
-        </div>
-        
-        <div class="pixel-card">
-            <div class="weak-header">⚠️ BOSS (Top 3)</div>
-            <div id="topWeakList" style="display:flex; gap:10px; overflow-x:auto;"></div>
-        </div>
-        
-        <div class="pixel-card">
-            <div style="font-weight:bold; margin-bottom:10px;">📝 敗績紀錄</div>
-            <div id="fullMistakeList" class="full-mistake-list" style="max-height:250px; overflow-y:auto;"></div>
-        </div>
-        
+        <div class="page-header"><button class="btn-pixel btn-back" onclick="goHome()">⬅ MENU</button><h2 class="page-title">WEAKNESS</h2><div style="width:80px;"></div></div>
+        <div class="pixel-card"><div class="weak-header">⚠️ BOSS (Top 3)</div><div id="topWeakList" style="display:flex; gap:10px; overflow-x:auto;"></div></div>
+        <div class="pixel-card"><div style="font-weight:bold; margin-bottom:10px;">📝 敗績紀錄</div><div id="fullMistakeList" class="full-mistake-list" style="max-height:250px; overflow-y:auto;"></div></div>
         <button class="btn-pixel btn-danger" style="width:100%;" onclick="startTop30WeaknessQuiz()">🔥 挑戰魔王 (Top 30)</button>
     </div>
 
 <script src="words.js"></script>
 <script>
-    let sessions = [];
-    let viewedWords = new Set(); 
-    let studyData = { sid: null, list: [], currentIndex: 0 };
+    let sessions = [], viewedWords = new Set(), studyData = { sid: null, list: [], currentIndex: 0 };
     let quizConfig = { mode: 'choice', selectedWords: new Set(), timer: false, autoNext: true };
     let quizData = { list: [], index: 0, score: 0, timerId: null, results: [] };
-    
-    // 暫存變數
-    let currentPickerSid = null;
-    let isQuickQuizPicker = false; 
-    let tempSelectedWords = new Set(); 
-
+    let currentPickerSid = null, isQuickQuizPicker = false, tempSelectedWords = new Set(); 
     let userStats = { wordsViewedCount: 0, quizCount: 0, totalCorrect: 0, totalMistakes: 0 };
     let unlockedTitles = new Set();
-
-    // 🏆 v43.0 稱號資料庫
     const achievements = [
         { id: 'view_5', category: 'learn', tier: 'common', icon: '🪵', title: '單字小萌新', desc: '看過 5 個單字', check: (s) => s.wordsViewedCount >= 5 },
         { id: 'view_20', category: 'learn', tier: 'common', icon: '🕯️', title: '充滿好奇', desc: '看過 20 個單字', check: (s) => s.wordsViewedCount >= 20 },
@@ -498,6 +437,14 @@
         loadUserData();
         goHome();
     };
+    
+    // --- In-Game Toggle Functions (Missed previously) ---
+    function toggleAutoNext(checked) { quizConfig.autoNext = checked; }
+    function toggleTimer(checked) { 
+        quizConfig.timer = checked; 
+        document.getElementById('timerBadge').style.display = checked ? 'inline-block' : 'none';
+        if(checked) startTimer(); else clearInterval(quizData.timerId);
+    }
 
     function loadUserData() {
         const savedViewed = localStorage.getItem('viewedWords');
@@ -513,510 +460,153 @@
         const savedTitles = localStorage.getItem('unlockedTitles');
         if (savedTitles) unlockedTitles = new Set(JSON.parse(savedTitles));
     }
-
-    function saveUserData() {
-        localStorage.setItem('viewedWords', JSON.stringify([...viewedWords]));
-        localStorage.setItem('userStats', JSON.stringify(userStats));
-        localStorage.setItem('unlockedTitles', JSON.stringify([...unlockedTitles]));
-    }
-
-    function checkUnitsCompleted(targetCount) {
-        let completed = 0;
-        sessions.forEach(sid => {
-            const words = masterWordList.filter(w => w.session === sid);
-            if (words.every(w => viewedWords.has(w.word))) completed++;
-        });
-        return completed >= targetCount;
-    }
-
-    function checkLettersCompleted(targetCount) {
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-        let completed = 0;
-        letters.forEach(char => {
-            const words = masterWordList.filter(w => w.word.toUpperCase().startsWith(char));
-            if (words.length > 0 && words.every(w => viewedWords.has(w.word))) completed++;
-        });
-        return completed >= targetCount;
-    }
-
-    function checkAchievements() {
-        let newUnlock = false;
-        userStats.wordsViewedCount = viewedWords.size;
-        achievements.forEach(ach => {
-            if (!unlockedTitles.has(ach.id) && ach.check(userStats)) {
-                unlockedTitles.add(ach.id);
-                showToast(ach.title, ach.icon);
-                newUnlock = true;
-            }
-        });
-        if (newUnlock) saveUserData();
-    }
-
-    function showToast(title, icon) {
-        const toast = document.getElementById('toastNotification');
-        toast.querySelector('div:first-child').innerText = icon || '🎁';
-        document.getElementById('toastMsg').innerText = title;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    // Navigation
-    function goHome() { showScreen('homeScreen'); }
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        window.scrollTo(0,0);
-        clearInterval(quizData.timerId); 
-        window.speechSynthesis.cancel(); 
-    }
-
-    function speak(text) {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-US';
-        u.rate = 0.9; 
-        const voices = window.speechSynthesis.getVoices();
-        const preferred = voices.find(v => v.name.includes("Google US English") || v.name.includes("Samantha"));
-        if (preferred) u.voice = preferred;
-        window.speechSynthesis.speak(u);
-    }
-
-    // Screens
-    function openAchievementScreen() {
-        const grid = document.getElementById('badgeGrid');
-        grid.innerHTML = "";
-        const categories = { 'learn': '📚 勤學之路', 'unit': '🏫 Unit 制霸', 'alpha': '🔡 字母蒐集', 'quiz': '⚔️ 試煉戰場', 'milestone': '💎 傳奇里程碑', 'secret': '✨ 神秘彩蛋' };
-        
-        for (let cat in categories) {
-            const header = document.createElement('div');
-            header.className = `category-header cat-${cat}`;
-            header.style.gridColumn = "1 / -1";
-            header.innerText = categories[cat];
-            header.style.fontFamily = "'Microsoft JhengHei'";
-            grid.appendChild(header);
-
-            achievements.filter(a => a.category === cat).forEach(ach => {
-                const isUnlocked = unlockedTitles.has(ach.id);
-                const div = document.createElement('div');
-                div.className = `badge-card ${isUnlocked ? 'unlocked' : ''} ${ach.tier}`;
-                let icon = '🔒'; let title = ach.title; let hintLabel = "🎯 目標："; let desc = ach.desc;
-                if (isUnlocked) { icon = ach.icon || '🏆'; } 
-                else if (ach.category === 'secret') { title = '？？？'; hintLabel = "🕵️ 線索："; desc = ach.secretDesc; }
-                div.innerHTML = `<div class="badge-icon">${icon}</div><div class="badge-title">${title}</div>${!isUnlocked ? `<div class="badge-hint-box">${hintLabel}${desc}</div>` : `<div class="badge-desc">${desc}</div>`}`;
-                grid.appendChild(div);
-            });
-        }
-        showScreen('achievementScreen');
-    }
-
-    function openAnalysisScreen() {
-        const m = JSON.parse(localStorage.getItem('myMistakes')) || {};
-        const topList = document.getElementById('topWeakList');
-        const fullList = document.getElementById('fullMistakeList');
-        let sorted = Object.keys(m).map(k => ({ word: k, count: m[k] })).sort((a,b) => b.count - a.count);
-        if (sorted.length === 0) {
-            topList.innerHTML = "<div style='color:#999;'>無錯題紀錄</div>";
-            fullList.innerHTML = "";
-        } else {
-            topList.innerHTML = "";
-            sorted.slice(0, 3).forEach((item, idx) => {
-                let medal = idx===0?'🥇':(idx===1?'🥈':'🥉');
-                topList.innerHTML += `<div class="weak-item-card"><div style="font-size:1.5rem;">${medal}</div><span class="weak-word">${item.word}</span><span class="weak-count">錯 ${item.count} 次</span></div>`;
-            });
-            let html = "";
-            sorted.forEach((item, idx) => {
-                let rankClass = idx < 3 ? `top${idx+1}` : '';
-                html += `<div class="mistake-row"><span class="rank-num ${rankClass}">#${idx+1}</span><span class="mistake-word">${item.word}</span><span class="mistake-val">錯 ${item.count} 次</span></div>`;
-            });
-            fullList.innerHTML = html;
-        }
-        showScreen('analysisScreen');
-    }
-
-    function startTop30WeaknessQuiz() {
-        const m = JSON.parse(localStorage.getItem('myMistakes')) || {};
-        const sorted = Object.keys(m).map(k => ({ word: k, count: m[k] })).sort((a,b) => b.count - a.count);
-        if (sorted.length === 0) { alert("沒有錯題！"); return; }
-        const top30 = sorted.slice(0, 30).map(i => i.word);
-        quizConfig.selectedWords = new Set(top30);
-        quizConfig.mode = 'choice'; quizConfig.timer = false; quizConfig.autoNext = true;
-        
-        // Sync UI toggles
-        document.getElementById('ingameTimer').checked = false;
-        document.getElementById('ingameAutoNext').checked = true;
-        
-        startConfiguredQuiz();
-    }
-
-    function openUnitSelector(targetMode) {
-        currentMode = targetMode; 
-        const grid = document.getElementById('unitGridContainer');
-        grid.innerHTML = "";
-        sessions.forEach(sid => {
-            const count = masterWordList.filter(w => w.session === sid).length;
-            const btn = document.createElement('div');
-            btn.className = 'unit-card';
-            btn.innerHTML = `<h3>Unit ${sid}</h3><span class="action-hint">${count} words ▶</span>`;
-            btn.onclick = () => loadStudyOverview(sid);
-            grid.appendChild(btn);
-        });
-        showScreen('unitSelectScreen');
-    }
-
-    function loadStudyOverview(sid) {
-        studyData.sid = sid;
-        studyData.list = masterWordList.filter(w => w.session === sid);
-        document.getElementById('overviewTitle').innerText = `Unit ${sid}`;
-        renderOverviewGrid();
-        showScreen('studyOverviewScreen');
-    }
-
-    function renderOverviewGrid() {
-        const grid = document.getElementById('overviewGrid');
-        grid.innerHTML = "";
-        studyData.list.forEach((item, index) => {
-            const card = document.createElement('div');
-            card.className = 'word-overview-card';
-            if (viewedWords.has(item.word)) card.classList.add('read');
-            card.innerHTML = `<h4>${item.word}</h4>`;
-            card.onclick = () => openFlashcard(index);
-            grid.appendChild(card);
-        });
-    }
-
-    function openFlashcard(index) {
-        studyData.currentIndex = index;
-        updateFlashcardUI();
-        showScreen('studyDetailScreen');
-    }
-
-    function updateFlashcardUI() {
-        const item = studyData.list[studyData.currentIndex];
-        if (!viewedWords.has(item.word)) {
-            viewedWords.add(item.word);
-            saveUserData();
-            checkAchievements(); 
-        }
-        document.getElementById('detailIdx').innerText = studyData.currentIndex + 1;
-        document.getElementById('detailTotal').innerText = studyData.list.length;
-        document.getElementById('cardWord').innerText = item.word;
-        document.getElementById('cardZh').innerText = item.word_zh || '';
-        document.getElementById('cardSentEn').innerText = item.sentence;
-        document.getElementById('cardSentZh').innerText = item.sentence_zh || '';
-        window.speechSynthesis.cancel();
-        setTimeout(() => speak(item.word), 300);
-    }
-
-    function prevCard() { if (studyData.currentIndex > 0) { studyData.currentIndex--; updateFlashcardUI(); } }
-    function nextCard() { if (studyData.currentIndex < studyData.list.length - 1) { studyData.currentIndex++; updateFlashcardUI(); } }
-    function backToOverview() { renderOverviewGrid(); showScreen('studyOverviewScreen'); }
-    function playCurrentCardAudio() { window.speechSynthesis.cancel(); speak(studyData.list[studyData.currentIndex].word); }
-    function playCurrentCardSent() { window.speechSynthesis.cancel(); speak(studyData.list[studyData.currentIndex].sentence); }
-
-    function quickQuizFromStudy() { openQuickQuizPicker(); }
-    function openQuickQuizPicker() { isQuickQuizPicker = true; openWordPicker(studyData.sid); }
-    function startQuickQuizDirect(mode) { 
-        quizConfig.mode = mode; 
-        
-        // 預設：手動、無計時
-        quizConfig.timer = false; 
-        quizConfig.autoNext = false; 
-        
-        // Sync UI toggles
-        document.getElementById('ingameTimer').checked = false;
-        document.getElementById('ingameAutoNext').checked = false;
-
-        closeWordPicker_Confirm(); 
-        startConfiguredQuiz(); 
-    }
-
-    function openQuizSetup() {
-        quizConfig.mode = 'choice'; quizConfig.timer = false; quizConfig.autoNext = true;
-        // Load clean selected words
-        quizConfig.selectedWords = new Set();
-        updateModeUI();
-        document.getElementById('setupTimer').checked = false;
-        document.getElementById('setupAutoNext').checked = true;
-        renderQuizRangeGrid();
-        updateTotalCount();
-        showScreen('quizSetupScreen');
-    }
-
-    function renderQuizRangeGrid() {
-        const grid = document.getElementById('quizRangeGrid');
-        grid.innerHTML = "";
-        sessions.forEach(sid => {
-            const btn = document.createElement('div');
-            btn.className = 'range-btn';
-            const unitWords = masterWordList.filter(w => w.session === sid);
-            let pickedCount = 0;
-            unitWords.forEach(w => { if (quizConfig.selectedWords.has(w.word)) pickedCount++; });
-            if (pickedCount > 0) btn.classList.add('has-data');
-            btn.innerHTML = `Unit ${sid} ${pickedCount > 0 ? `<span class="badge-count">${pickedCount}</span>` : ''}`;
-            btn.onclick = () => { isQuickQuizPicker = false; openWordPicker(sid); };
-            grid.appendChild(btn);
-        });
-    }
-
-    function setQuizMode(mode) { quizConfig.mode = mode; updateModeUI(); }
-    function updateModeUI() {
-        document.getElementById('modeChoice').classList.toggle('active', quizConfig.mode === 'choice');
-        document.getElementById('modeSpelling').classList.toggle('active', quizConfig.mode === 'spelling');
-    }
-    function clearAllSelectedWords() { if(confirm("清除所有？")) { quizConfig.selectedWords.clear(); renderQuizRangeGrid(); updateTotalCount(); } }
-    function updateTotalCount() { document.getElementById('totalSelectedCount').innerText = quizConfig.selectedWords.size; }
-
-    // --- Picker with Cancel Logic ---
-    function openWordPicker(sid) {
-        currentPickerSid = sid;
-        document.getElementById('pickerTitle').innerText = `挑選 (Unit ${sid})`;
-        
-        tempSelectedWords = new Set();
-        
-        if (isQuickQuizPicker) {
-            const unitWords = masterWordList.filter(w => w.session === sid);
-            unitWords.forEach(w => { if (viewedWords.has(w.word)) tempSelectedWords.add(w.word); });
-            document.getElementById('btnPickerSave').style.display = 'none';
-            document.getElementById('btnPickerQuickStart').style.display = 'flex';
-        } else {
-            const unitWords = masterWordList.filter(w => w.session === sid);
-            unitWords.forEach(w => {
-                if (quizConfig.selectedWords.has(w.word)) tempSelectedWords.add(w.word);
-            });
-            document.getElementById('btnPickerSave').style.display = 'flex';
-            document.getElementById('btnPickerQuickStart').style.display = 'none';
-        }
-        document.getElementById('wordPickerModal').style.display = 'block';
-        renderPickerGrid();
-    }
-
-    function closeWordPicker_Cancel() {
-        document.getElementById('wordPickerModal').style.display = 'none';
-    }
-
-    function closeWordPicker_Confirm() {
-        document.getElementById('wordPickerModal').style.display = 'none';
-        const unitWords = masterWordList.filter(w => w.session === currentPickerSid);
-        unitWords.forEach(w => quizConfig.selectedWords.delete(w.word));
-        tempSelectedWords.forEach(w => quizConfig.selectedWords.add(w));
-        if (!isQuickQuizPicker) { renderQuizRangeGrid(); updateTotalCount(); }
-    }
-
-    function renderPickerGrid() {
-        const container = document.getElementById('pickerGrid'); container.innerHTML = "";
-        const unitWords = masterWordList.filter(w => w.session === currentPickerSid);
-        unitWords.forEach(item => {
-            const div = document.createElement('div'); div.className = 'picker-item';
-            if (tempSelectedWords.has(item.word)) div.classList.add('picked');
-            div.innerText = item.word;
-            div.onclick = () => {
-                if (tempSelectedWords.has(item.word)) { tempSelectedWords.delete(item.word); div.classList.remove('picked'); }
-                else { tempSelectedWords.add(item.word); div.classList.add('picked'); }
-            };
-            container.appendChild(div);
-        });
-    }
+    function saveUserData() { localStorage.setItem('viewedWords', JSON.stringify([...viewedWords])); localStorage.setItem('userStats', JSON.stringify(userStats)); localStorage.setItem('unlockedTitles', JSON.stringify([...unlockedTitles])); }
+    function checkUnitsCompleted(t){ let c=0; sessions.forEach(s=>{ if(masterWordList.filter(w=>w.session===s).every(w=>viewedWords.has(w.word)))c++; }); return c>=t; }
+    function checkLettersCompleted(t){ const l="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""); let c=0; l.forEach(char=>{ const ws=masterWordList.filter(w=>w.word.toUpperCase().startsWith(char)); if(ws.length>0&&ws.every(w=>viewedWords.has(w.word)))c++; }); return c>=t; }
+    function checkAchievements(){ let n=false; userStats.wordsViewedCount=viewedWords.size; achievements.forEach(a=>{ if(!unlockedTitles.has(a.id)&&a.check(userStats)){ unlockedTitles.add(a.id); showToast(a.title,a.icon); n=true; } }); if(n)saveUserData(); }
+    function showToast(t,i){ const toast=document.getElementById('toastNotification'); toast.querySelector('div').innerText=i||'🎁'; document.getElementById('toastMsg').innerText=t; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3000); }
+    function goHome(){ showScreen('homeScreen'); }
+    function showScreen(id){ document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); clearInterval(quizData.timerId); window.speechSynthesis.cancel(); }
+    function speak(t){ const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.9; window.speechSynthesis.speak(u); }
     
-    function pickerSelectAll() { masterWordList.filter(w => w.session === currentPickerSid).forEach(w => tempSelectedWords.add(w.word)); renderPickerGrid(); }
-    function pickerSelectNone() { masterWordList.filter(w => w.session === currentPickerSid).forEach(w => tempSelectedWords.delete(w.word)); renderPickerGrid(); }
-    function pickerSelectViewed() {
-        masterWordList.filter(w => w.session === currentPickerSid).forEach(w => {
-            if (viewedWords.has(w.word)) tempSelectedWords.add(w.word); else tempSelectedWords.delete(w.word);
-        }); renderPickerGrid();
-    }
-
-    function startConfiguredQuiz() {
-        if (quizConfig.selectedWords.size === 0) { alert("請至少選擇 1 個單字！"); return; }
-        
-        // Load settings from Setup Screen toggles
-        if (document.getElementById('quizSetupScreen').classList.contains('active')) {
-            quizConfig.timer = document.getElementById('setupTimer').checked;
-            quizConfig.autoNext = document.getElementById('setupAutoNext').checked;
-            
-            // Sync UI to Game Screen
-            document.getElementById('ingameTimer').checked = quizConfig.timer;
-            document.getElementById('ingameAutoNext').checked = quizConfig.autoNext;
-        }
-
-        let questions = masterWordList.filter(w => quizConfig.selectedWords.has(w.word));
-        questions.sort(() => 0.5 - Math.random());
-        quizData.list = questions; quizData.index = 0; quizData.score = 0; quizData.results = [];
-        
-        document.getElementById('choiceArea').style.display = (quizConfig.mode === 'choice') ? 'grid' : 'none';
-        document.getElementById('spellingArea').style.display = (quizConfig.mode === 'spelling') ? 'block' : 'none';
-        
-        // Init UI based on settings
-        document.getElementById('timerBadge').style.display = quizConfig.timer ? 'inline-block' : 'none';
-        document.getElementById('btnNextQ').style.display = 'none';
-
-        showScreen('quizScreen');
-        loadQuestion();
-    }
-
-    // In-Game Toggles
-    function toggleAutoNext(checked) { quizConfig.autoNext = checked; }
-    function toggleTimer(checked) { 
-        quizConfig.timer = checked; 
-        document.getElementById('timerBadge').style.display = checked ? 'inline-block' : 'none';
-        if(checked) startTimer(); else clearInterval(quizData.timerId);
-    }
-
-    function loadQuestion() {
-        clearInterval(quizData.timerId);
-        document.getElementById('btnNextQ').style.display = 'none';
-        document.getElementById('qHint').style.display = 'none';
-        document.getElementById('btnShowHint').style.display = 'inline-block';
-
-        const item = quizData.list[quizData.index];
-        document.getElementById('qIdx').innerText = quizData.index + 1;
-        document.getElementById('qTotal').innerText = quizData.list.length;
-        document.getElementById('qHint').innerText = item.word_zh || "(無中文)";
-        if (quizConfig.mode === 'choice') renderChoices(item); else renderSpelling();
-        playQuizSequence();
-    }
-
-    function showHint() {
-        document.getElementById('qHint').style.display = 'block';
-        document.getElementById('btnShowHint').style.display = 'none';
-    }
-
-    function playQuizSequence() {
-        const item = quizData.list[quizData.index];
-        window.speechSynthesis.cancel();
-        const u1 = new SpeechSynthesisUtterance(item.word); u1.rate = 0.9; u1.lang = 'en-US';
-        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.rate = 0.9; u2.lang = 'en-US';
-        const u3 = new SpeechSynthesisUtterance(item.word); u3.rate = 0.9; u3.lang = 'en-US';
-        u3.onend = function() { if (quizConfig.timer) startTimer(); };
-        window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3);
-    }
-
-    function startTimer() {
-        clearInterval(quizData.timerId); let timeLeft = 8;
-        document.getElementById('timeLeft').innerText = timeLeft;
-        document.getElementById('timerBadge').style.display = 'inline-block'; // Force show
-        quizData.timerId = setInterval(() => {
-            timeLeft--; document.getElementById('timeLeft').innerText = timeLeft;
-            if (timeLeft <= 0) { clearInterval(quizData.timerId); handleTimeUp(); }
-        }, 1000);
-    }
-
-    function handleTimeUp() {
-        speak("Time's up!");
-        const currentItem = quizData.list[quizData.index];
-        saveMistake(currentItem.word);
-        userStats.totalMistakes++;
-        
-        quizData.results.push({ word: currentItem.word, correct: false, userAns: "(逾時)" });
-
-        if (quizConfig.mode === 'choice') {
-            const btns = document.querySelectorAll('.btn-choice');
-            btns.forEach(b => {
-                if (b.innerText === currentItem.word) b.classList.add('correct');
-                b.disabled = true;
+    function openAchievementScreen(){
+        const grid=document.getElementById('badgeGrid'); grid.innerHTML=""; const cats={ 'learn':'📚 勤學之路','unit':'🏫 Unit 制霸','alpha':'🔡 字母蒐集','quiz':'⚔️ 試煉戰場','milestone':'💎 傳奇里程碑','secret':'✨ 神秘彩蛋' };
+        for(let c in cats){
+            const h=document.createElement('div'); h.className=`category-header cat-${c}`; h.innerText=cats[c]; grid.appendChild(h);
+            achievements.filter(a=>a.category===c).forEach(ach=>{
+                const u=unlockedTitles.has(ach.id); const d=document.createElement('div'); d.className=`badge-card ${u?'unlocked':''} ${ach.tier}`;
+                let i='🔒',t=ach.title,l="🎯 目標：",de=ach.desc; if(u){i=ach.icon||'🏆';}else{if(ach.category==='secret'){t='？？？';l="🕵️ 線索：";de=ach.secretDesc;}}
+                d.innerHTML=`<div class="badge-icon">${i}</div><div class="badge-title">${t}</div>${!u?`<div class="badge-hint-box">${l}${de}</div>`:`<div class="badge-desc">${de}</div>`}`; grid.appendChild(d);
             });
-        } else {
-            document.getElementById('spellingInput').value = currentItem.word;
-            document.getElementById('spellingInput').style.borderColor = "var(--danger)";
+        } showScreen('achievementScreen');
+    }
+
+    function openAnalysisScreen(){
+        const m=JSON.parse(localStorage.getItem('myMistakes'))||{}; const top=document.getElementById('topWeakList'), full=document.getElementById('fullMistakeList');
+        let s=Object.keys(m).map(k=>({w:k,c:m[k]})).sort((a,b)=>b.c-a.c);
+        if(s.length===0){ top.innerHTML="無錯題紀錄"; full.innerHTML=""; }else{
+            top.innerHTML=""; s.slice(0,3).forEach((i,x)=>{ top.innerHTML+=`<div class="weak-item-card"><div style="font-size:1.5rem;">${x===0?'🥇':(x===1?'🥈':'🥉')}</div><span class="weak-word">${i.w}</span><span class="weak-count">錯 ${i.c} 次</span></div>`; });
+            let h=""; s.forEach((i,x)=>{ h+=`<div class="mistake-row"><span class="rank-num">#${x+1}</span><span class="mistake-word">${i.w}</span><span class="mistake-val">錯 ${i.c} 次</span></div>`; }); full.innerHTML=h;
+        } showScreen('analysisScreen');
+    }
+
+    function startTop30WeaknessQuiz(){
+        const m=JSON.parse(localStorage.getItem('myMistakes'))||{}; const s=Object.keys(m).map(k=>({w:k,c:m[k]})).sort((a,b)=>b.c-a.c);
+        if(s.length===0){alert("沒有錯題！");return;} const top=s.slice(0,30).map(i=>i.w);
+        quizConfig.selectedWords=new Set(top); quizConfig.mode='choice'; quizConfig.timer=false; quizConfig.autoNext=true;
+        document.getElementById('ingameTimer').checked=false; document.getElementById('ingameAutoNext').checked=true; startConfiguredQuiz();
+    }
+
+    function openUnitSelector(m){ currentMode=m; const g=document.getElementById('unitGridContainer'); g.innerHTML=""; sessions.forEach(s=>{ const c=masterWordList.filter(w=>w.session===s).length; const b=document.createElement('div'); b.className='unit-card'; b.innerHTML=`<h3>Unit ${s}</h3><span class="action-hint">${c} words ▶</span>`; b.onclick=()=>loadStudyOverview(s); g.appendChild(b); }); showScreen('unitSelectScreen'); }
+    function loadStudyOverview(s){ studyData.sid=s; studyData.list=masterWordList.filter(w=>w.session===s); document.getElementById('overviewTitle').innerText=`Unit ${s}`; renderOverviewGrid(); showScreen('studyOverviewScreen'); }
+    function renderOverviewGrid(){ const g=document.getElementById('overviewGrid'); g.innerHTML=""; studyData.list.forEach((i,x)=>{ const c=document.createElement('div'); c.className='word-overview-card'; if(viewedWords.has(i.word))c.classList.add('read'); c.innerHTML=`<h4>${i.word}</h4>`; c.onclick=()=>openFlashcard(x); g.appendChild(c); }); }
+    function openFlashcard(x){ studyData.currentIndex=x; updateFlashcardUI(); showScreen('studyDetailScreen'); }
+    function updateFlashcardUI(){ const i=studyData.list[studyData.currentIndex]; if(!viewedWords.has(i.word)){ viewedWords.add(i.word); saveUserData(); checkAchievements(); } document.getElementById('detailIdx').innerText=studyData.currentIndex+1; document.getElementById('detailTotal').innerText=studyData.list.length; document.getElementById('cardWord').innerText=i.word; document.getElementById('cardZh').innerText=i.word_zh||''; document.getElementById('cardSentEn').innerText=i.sentence; document.getElementById('cardSentZh').innerText=i.sentence_zh||''; window.speechSynthesis.cancel(); setTimeout(()=>speak(i.word),300); }
+    function prevCard(){ if(studyData.currentIndex>0){ studyData.currentIndex--; updateFlashcardUI(); } }
+    function nextCard(){ if(studyData.currentIndex<studyData.list.length-1){ studyData.currentIndex++; updateFlashcardUI(); } }
+    function backToOverview(){ renderOverviewGrid(); showScreen('studyOverviewScreen'); }
+    function playCurrentCardAudio(){ window.speechSynthesis.cancel(); speak(studyData.list[studyData.currentIndex].word); }
+    function playCurrentCardSent(){ window.speechSynthesis.cancel(); speak(studyData.list[studyData.currentIndex].sentence); }
+    
+    function quickQuizFromStudy(){ openQuickQuizPicker(); }
+    function openQuickQuizPicker(){ isQuickQuizPicker=true; openWordPicker(studyData.sid); }
+    function startQuickQuizDirect(m){ 
+        quizConfig.mode=m; quizConfig.timer=false; quizConfig.autoNext=false; 
+        document.getElementById('ingameTimer').checked=false; document.getElementById('ingameAutoNext').checked=false;
+        closeWordPicker_Confirm(); startConfiguredQuiz(); 
+    }
+
+    function openQuizSetup(){
+        quizConfig.mode='choice'; quizConfig.timer=false; quizConfig.autoNext=true; quizConfig.selectedWords=new Set();
+        updateModeUI(); document.getElementById('setupTimer').checked=false; document.getElementById('setupAutoNext').checked=true;
+        renderQuizRangeGrid(); updateTotalCount(); showScreen('quizSetupScreen');
+    }
+    function renderQuizRangeGrid(){ const g=document.getElementById('quizRangeGrid'); g.innerHTML=""; sessions.forEach(s=>{ const b=document.createElement('div'); b.className='range-btn'; const u=masterWordList.filter(w=>w.session===s); let c=0; u.forEach(w=>{if(quizConfig.selectedWords.has(w.word))c++;}); if(c>0)b.classList.add('has-data'); b.innerHTML=`Unit ${s} ${c>0?`<span class="badge-count">${c}</span>`:''}`; b.onclick=()=>{isQuickQuizPicker=false;openWordPicker(s);}; g.appendChild(b); }); }
+    function setQuizMode(m){ quizConfig.mode=m; updateModeUI(); }
+    function updateModeUI(){ document.getElementById('modeChoice').classList.toggle('active',quizConfig.mode==='choice'); document.getElementById('modeSpelling').classList.toggle('active',quizConfig.mode==='spelling'); }
+    function clearAllSelectedWords(){ if(confirm("清除所有？")){ quizConfig.selectedWords.clear(); renderQuizRangeGrid(); updateTotalCount(); } }
+    function updateTotalCount(){ document.getElementById('totalSelectedCount').innerText=quizConfig.selectedWords.size; }
+
+    function openWordPicker(sid){ currentPickerSid=sid; document.getElementById('pickerTitle').innerText=`挑選 (Unit ${sid})`; tempSelectedWords=new Set(); if(isQuickQuizPicker){ const u=masterWordList.filter(w=>w.session===sid); u.forEach(w=>{if(viewedWords.has(w.word))tempSelectedWords.add(w.word);}); document.getElementById('btnPickerSave').style.display='none'; document.getElementById('btnPickerQuickStart').style.display='flex'; }else{ const u=masterWordList.filter(w=>w.session===sid); u.forEach(w=>{if(quizConfig.selectedWords.has(w.word))tempSelectedWords.add(w.word);}); document.getElementById('btnPickerSave').style.display='flex'; document.getElementById('btnPickerQuickStart').style.display='none'; } document.getElementById('wordPickerModal').style.display='block'; renderPickerGrid(); }
+    function closeWordPicker_Cancel(){ document.getElementById('wordPickerModal').style.display='none'; }
+    function closeWordPicker_Confirm(){ document.getElementById('wordPickerModal').style.display='none'; const u=masterWordList.filter(w=>w.session===currentPickerSid); u.forEach(w=>quizConfig.selectedWords.delete(w.word)); tempSelectedWords.forEach(w=>quizConfig.selectedWords.add(w)); if(!isQuickQuizPicker){renderQuizRangeGrid(); updateTotalCount();} }
+    function renderPickerGrid(){ const c=document.getElementById('pickerGrid'); c.innerHTML=""; const u=masterWordList.filter(w=>w.session===currentPickerSid); u.forEach(i=>{ const d=document.createElement('div'); d.className='picker-item'; if(tempSelectedWords.has(i.word))d.classList.add('picked'); d.innerText=i.word; d.onclick=()=>{ if(tempSelectedWords.has(i.word)){tempSelectedWords.delete(i.word);d.classList.remove('picked');}else{tempSelectedWords.add(i.word);d.classList.add('picked');} }; c.appendChild(d); }); }
+    function pickerSelectAll(){ masterWordList.filter(w=>w.session===currentPickerSid).forEach(w=>tempSelectedWords.add(w.word)); renderPickerGrid(); }
+    function pickerSelectNone(){ masterWordList.filter(w=>w.session===currentPickerSid).forEach(w=>tempSelectedWords.delete(w.word)); renderPickerGrid(); }
+    function pickerSelectViewed(){ masterWordList.filter(w=>w.session===currentPickerSid).forEach(w=>{ if(viewedWords.has(w.word))tempSelectedWords.add(w.word); else tempSelectedWords.delete(w.word); }); renderPickerGrid(); }
+
+    function startConfiguredQuiz(){
+        if(quizConfig.selectedWords.size===0){alert("請至少選1個字！");return;}
+        if(document.getElementById('quizSetupScreen').classList.contains('active')){
+            quizConfig.timer=document.getElementById('setupTimer').checked;
+            quizConfig.autoNext=document.getElementById('setupAutoNext').checked;
+            document.getElementById('ingameTimer').checked=quizConfig.timer;
+            document.getElementById('ingameAutoNext').checked=quizConfig.autoNext;
         }
+        let q=masterWordList.filter(w=>quizConfig.selectedWords.has(w.word));
+        q.sort(()=>0.5-Math.random()); quizData.list=q; quizData.index=0; quizData.score=0; quizData.results=[];
+        document.getElementById('choiceArea').style.display=(quizConfig.mode==='choice')?'grid':'none';
+        document.getElementById('spellingArea').style.display=(quizConfig.mode==='spelling')?'block':'none';
+        document.getElementById('timerBadge').style.display=quizConfig.timer?'inline-block':'none';
+        document.getElementById('btnNextQ').style.display='none';
+        showScreen('quizScreen'); loadQuestion();
+    }
+
+    function loadQuestion(){
+        clearInterval(quizData.timerId); document.getElementById('btnNextQ').style.display='none';
+        document.getElementById('qHint').style.display='none'; document.getElementById('btnShowHint').style.display='inline-block';
+        const i=quizData.list[quizData.index]; document.getElementById('qIdx').innerText=quizData.index+1; document.getElementById('qTotal').innerText=quizData.list.length; document.getElementById('qHint').innerText=i.word_zh||"(無中文)";
+        if(quizConfig.mode==='choice')renderChoices(i); else renderSpelling(); playQuizSequence();
+    }
+    function showHint(){ document.getElementById('qHint').style.display='block'; document.getElementById('btnShowHint').style.display='none'; }
+    function playQuizSequence(){ const i=quizData.list[quizData.index]; window.speechSynthesis.cancel(); const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.9; const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.9; const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.9; u3.onend=function(){if(quizConfig.timer)startTimer();}; window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3); }
+    
+    function startTimer(){ clearInterval(quizData.timerId); let t=8; document.getElementById('timeLeft').innerText=t; document.getElementById('timerBadge').style.display='inline-block'; quizData.timerId=setInterval(()=>{ t--; document.getElementById('timeLeft').innerText=t; if(t<=0){clearInterval(quizData.timerId); handleTimeUp();} },1000); }
+    
+    function handleTimeUp(){
+        speak("Time's up!"); const i=quizData.list[quizData.index]; saveMistake(i.word); userStats.totalMistakes++; quizData.results.push({word:i.word, correct:false, userAns:"(逾時)"});
+        if(quizConfig.mode==='choice'){ const b=document.querySelectorAll('.btn-choice'); b.forEach(btn=>{ if(btn.innerText===i.word)btn.classList.add('correct'); btn.disabled=true; }); }
+        else{ document.getElementById('spellingInput').value=i.word; document.getElementById('spellingInput').style.borderColor="var(--danger)"; }
         handleNextStep();
     }
 
-    function handleNextStep() {
-        if (quizConfig.autoNext) setTimeout(nextQuestion, 1500); else document.getElementById('btnNextQ').style.display = 'block';
-    }
+    function handleNextStep(){ if(quizConfig.autoNext)setTimeout(nextQuestion,1500); else document.getElementById('btnNextQ').style.display='block'; }
+    function nextQuestion(){ quizData.index++; if(quizData.index<quizData.list.length)loadQuestion(); else showResult(); }
 
-    function nextQuestion() {
-        quizData.index++;
-        if (quizData.index < quizData.list.length) loadQuestion(); else showResult();
+    function renderChoices(item){
+        const c=document.getElementById('choiceArea'); c.innerHTML=""; let o=[item]; let p=quizData.list.length>=4?quizData.list:masterWordList;
+        while(o.length<4){ const r=p[Math.floor(Math.random()*p.length)]; if(!o.some(x=>x.word===r.word))o.push(r); }
+        o.sort(()=>0.5-Math.random());
+        o.forEach(opt=>{ const b=document.createElement('button'); b.className='btn-choice'; b.innerText=opt.word; b.onclick=()=>checkChoice(b,opt.word===item.word); c.appendChild(b); });
     }
-
-    function renderChoices(correctItem) {
-        const container = document.getElementById('choiceArea'); container.innerHTML = "";
-        let opts = [correctItem];
-        let pool = quizData.list.length >= 4 ? quizData.list : masterWordList;
-        while(opts.length < 4) { const rand = pool[Math.floor(Math.random() * pool.length)]; if (!opts.some(o => o.word === rand.word)) opts.push(rand); }
-        opts.sort(() => 0.5 - Math.random());
-        opts.forEach(opt => {
-            const btn = document.createElement('button'); btn.className = 'btn-choice'; btn.innerText = opt.word;
-            btn.onclick = () => checkChoice(btn, opt.word === correctItem.word);
-            container.appendChild(btn);
-        });
-    }
-
-    function checkChoice(btn, isCorrect) {
+    function checkChoice(btn,isCorrect){
         clearInterval(quizData.timerId); window.speechSynthesis.cancel();
-        const allBtns = document.querySelectorAll('.btn-choice'); allBtns.forEach(b => b.disabled = true);
-        const currentItem = quizData.list[quizData.index];
-
-        if (isCorrect) { 
-            btn.classList.add('correct'); quizData.score++; speak("Correct"); userStats.totalCorrect++; 
-            quizData.results.push({ word: currentItem.word, correct: true });
-        } else { 
-            btn.classList.add('wrong'); saveMistake(currentItem.word); speak("Wrong"); userStats.totalMistakes++;
-            quizData.results.push({ word: currentItem.word, correct: false, userAns: btn.innerText });
-            allBtns.forEach(b => { if (b.innerText === currentItem.word) b.classList.add('correct'); }); 
-        }
+        const all=document.querySelectorAll('.btn-choice'); all.forEach(b=>b.disabled=true); const cur=quizData.list[quizData.index];
+        if(isCorrect){ btn.classList.add('correct'); quizData.score++; speak("Correct"); userStats.totalCorrect++; quizData.results.push({word:cur.word, correct:true}); }
+        else{ btn.classList.add('wrong'); saveMistake(cur.word); speak("Wrong"); userStats.totalMistakes++; quizData.results.push({word:cur.word, correct:false, userAns:btn.innerText}); all.forEach(b=>{if(b.innerText===cur.word)b.classList.add('correct');}); }
         handleNextStep();
     }
 
-    function renderSpelling() {
-        const input = document.getElementById('spellingInput'); input.value = ""; input.disabled = false; input.style.borderColor = "#000"; document.getElementById('spellingFeedback').innerText = ""; input.focus();
-    }
-
-    function checkSpelling() {
+    function renderSpelling(){ const i=document.getElementById('spellingInput'); i.value=""; i.disabled=false; i.style.borderColor="#000"; document.getElementById('spellingFeedback').innerText=""; i.focus(); }
+    function checkSpelling(){
         clearInterval(quizData.timerId); window.speechSynthesis.cancel();
-        const input = document.getElementById('spellingInput');
-        const currentItem = quizData.list[quizData.index];
-        const correct = currentItem.word.trim().toLowerCase();
-        const userVal = input.value.trim().toLowerCase();
-        input.disabled = true;
-        
-        if (userVal === correct || (correct.includes('(') && correct.startsWith(userVal))) {
-            input.style.borderColor = "var(--success)"; quizData.score++; speak("Correct"); userStats.totalCorrect++;
-            quizData.results.push({ word: currentItem.word, correct: true });
-        } else {
-            input.style.borderColor = "var(--danger)";
-            document.getElementById('spellingFeedback').innerText = `Ans: ${currentItem.word}`;
-            document.getElementById('spellingFeedback').style.color = "var(--danger)";
-            saveMistake(currentItem.word); speak("Wrong"); userStats.totalMistakes++;
-            quizData.results.push({ word: currentItem.word, correct: false, userAns: userVal });
-        }
+        const i=document.getElementById('spellingInput'); const cur=quizData.list[quizData.index]; const cor=cur.word.trim().toLowerCase(); const val=i.value.trim().toLowerCase(); i.disabled=true;
+        if(val===cor||(cor.includes('(')&&cor.startsWith(val))){ i.style.borderColor="var(--success)"; quizData.score++; speak("Correct"); userStats.totalCorrect++; quizData.results.push({word:cur.word, correct:true}); }
+        else{ i.style.borderColor="var(--danger)"; document.getElementById('spellingFeedback').innerText=`Ans: ${cur.word}`; document.getElementById('spellingFeedback').style.color="var(--danger)"; saveMistake(cur.word); speak("Wrong"); userStats.totalMistakes++; quizData.results.push({word:cur.word, correct:false, userAns:val}); }
         handleNextStep();
     }
-    document.getElementById('spellingInput').addEventListener('keyup', function(e) { if (e.key === 'Enter' && !this.disabled) checkSpelling(); });
+    document.getElementById('spellingInput').addEventListener('keyup',function(e){if(e.key==='Enter'&&!this.disabled)checkSpelling();});
 
-    function showResult() {
-        userStats.quizCount++;
-        saveUserData();
-        checkAchievements(); 
-        
-        showScreen('resultScreen');
-        const finalScore = Math.round((quizData.score / quizData.list.length) * 100);
-        document.getElementById('finalScore').innerText = finalScore;
-        
-        // Render Result List
-        const listDiv = document.getElementById('quizReviewList');
-        listDiv.innerHTML = "";
-        quizData.results.forEach(r => {
-            const row = document.createElement('div');
-            row.className = 'result-row';
-            row.innerHTML = `
-                <div class="res-icon">${r.correct ? '<span class="res-correct">⭕</span>' : '<span class="res-wrong">❌</span>'}</div>
-                <div style="flex:1;">
-                    <div>${r.word}</div>
-                    ${!r.correct ? `<div style="font-size:0.8rem; color:#666;">你答: ${r.userAns}</div>` : ''}
-                </div>
-            `;
-            listDiv.appendChild(row);
-        });
+    function showResult(){
+        userStats.quizCount++; saveUserData(); checkAchievements(); showScreen('resultScreen');
+        const s=Math.round((quizData.score/quizData.list.length)*100); document.getElementById('finalScore').innerText=s;
+        const l=document.getElementById('quizReviewList'); l.innerHTML="";
+        quizData.results.forEach(r=>{ const d=document.createElement('div'); d.className='result-row'; d.innerHTML=`<div class="res-icon">${r.correct?'<span class="res-correct">⭕</span>':'<span class="res-wrong">❌</span>'}</div><div style="flex:1;"><div>${r.word}</div>${!r.correct?`<div style="font-size:0.8rem; color:#666;">你答: ${r.userAns}</div>`:''}</div>`; l.appendChild(d); });
     }
 
-    function quitQuiz() { if (confirm("確定放棄？")) goHome(); }
-    function retryQuiz() { startConfiguredQuiz(); }
-
-    function saveMistake(word) { let m = JSON.parse(localStorage.getItem('myMistakes')) || {}; m[word] = (m[word] || 0) + 1; localStorage.setItem('myMistakes', JSON.stringify(m)); }
-    function openMistakes() { openAnalysisScreen(); }
-    function clearMistakes() { if (confirm("確定清空？")) { localStorage.removeItem('myMistakes'); openAnalysisScreen(); } }
-
+    function quitQuiz(){ if(confirm("確定放棄？"))goHome(); }
+    function retryQuiz(){ startConfiguredQuiz(); }
+    function saveMistake(w){ let m=JSON.parse(localStorage.getItem('myMistakes'))||{}; m[w]=(m[w]||0)+1; localStorage.setItem('myMistakes',JSON.stringify(m)); }
 </script>
 </body>
 </html>
