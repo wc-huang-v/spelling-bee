@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v45.1 (Achievement Hints)</title>
+    <title>學生自主學習平板 v45.2 (Time Adjustment)</title>
     <style>
         /* --- 🎨 視覺風格：高對比、明確按鈕 --- */
         :root {
@@ -77,17 +77,15 @@
         .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
         
         .badge-card {
-            /* 鎖定狀態樣式 */
             background: #f0f0f0; 
-            border: 3px dashed #bbb; /* 虛線代表未獲得 */
+            border: 3px dashed #bbb; 
             border-radius: 15px; 
             padding: 15px 10px; 
             text-align: center;
-            opacity: 1; /* 取消透明度，讓字清楚 */
+            opacity: 1; 
             position: relative;
         }
         
-        /* 鎖定時的提示文字 */
         .badge-hint-box {
             background: rgba(0,0,0,0.05);
             border-radius: 8px;
@@ -98,17 +96,15 @@
             font-weight: bold;
         }
         
-        /* 解鎖狀態 */
         .badge-card.unlocked { 
             opacity: 1; 
-            border-style: solid; /* 實線 */
+            border-style: solid; 
             border-width: 3px;
             border-color: var(--gold); 
             background: #fffde7; 
             box-shadow: 0 4px 0 rgba(0,0,0,0.1); 
         }
         
-        /* 稀有度框色 */
         .badge-card.unlocked.common { border-color: var(--tier-common); background: #fff; }
         .badge-card.unlocked.rare { border-color: var(--tier-rare); background: #f8f9fa; }
         .badge-card.unlocked.epic { border-color: var(--tier-epic); background: #fffbe6; }
@@ -413,7 +409,7 @@
     let userStats = { wordsViewedCount: 0, quizCount: 0, totalCorrect: 0, totalMistakes: 0 };
     let unlockedTitles = new Set();
 
-    // 🏆 v43.0 稱號資料庫 (Expanded)
+    // 🏆 v43.0 稱號資料庫 (Expanded + Updated Time)
     const achievements = [
         { id: 'view_5', category: 'learn', tier: 'common', icon: '🪵', title: '單字小萌新', desc: '看過 5 個單字', check: (s) => s.wordsViewedCount >= 5 },
         { id: 'view_20', category: 'learn', tier: 'common', icon: '🕯️', title: '充滿好奇', desc: '看過 20 個單字', check: (s) => s.wordsViewedCount >= 20 },
@@ -423,7 +419,7 @@
         { id: 'view_200', category: 'learn', tier: 'rare', icon: '🎓', title: '博學多聞', desc: '看過 200 個單字', check: (s) => s.wordsViewedCount >= 200 },
         { id: 'view_300', category: 'learn', tier: 'epic', icon: '🔮', title: '單字王者', desc: '看過 300 個單字', check: (s) => s.wordsViewedCount >= 300 },
         { id: 'view_500', category: 'learn', tier: 'epic', icon: '🧙‍♂️', title: '行走字典', desc: '看過 500 個單字', check: (s) => s.wordsViewedCount >= 500 },
-        { id: 'view_all', category: 'learn', tier: 'legendary', icon: '🪐', title: '全知全能', desc: '看過所有單字 (800+)', check: (s) => s.wordsViewedCount >= 800 },
+        { id: 'view_all', category: 'learn', tier: 'legendary', icon: '🪐', title: '全知全能', desc: '看過所有單字', check: (s) => s.wordsViewedCount >= 800 },
         { id: 'unit_1', category: 'unit', tier: 'common', icon: '🚩', title: '初戰告捷', desc: '完成 1 個單元', check: () => checkUnitsCompleted(1) },
         { id: 'unit_3', category: 'unit', tier: 'rare', icon: '⛺', title: '三元及第', desc: '完成 3 個單元', check: () => checkUnitsCompleted(3) },
         { id: 'unit_5', category: 'unit', tier: 'rare', icon: '🛖', title: '五星上將', desc: '完成 5 個單元', check: () => checkUnitsCompleted(5) },
@@ -440,8 +436,8 @@
         { id: 'correct_100', category: 'milestone', tier: 'rare', icon: '💎', title: '智慧之星', desc: '累積答對 100 題', check: (s) => s.totalCorrect >= 100 },
         { id: 'correct_500', category: 'milestone', tier: 'epic', icon: '🏆', title: '神準射手', desc: '累積答對 500 題', check: (s) => s.totalCorrect >= 500 },
         { id: 'correct_1000', category: 'milestone', tier: 'legendary', icon: '🐉', title: '傳說學霸', desc: '累積答對 1000 題', check: (s) => s.totalCorrect >= 1000 },
-        { id: 'secret_night', category: 'secret', tier: 'rare', icon: '🧛', title: '夜貓子', desc: '晚上 10 點後背單字', secretDesc: '深夜出沒...', check: () => new Date().getHours() >= 22 },
-        { id: 'secret_early', category: 'secret', tier: 'rare', icon: '🐔', title: '早起的鳥兒', desc: '早上 7 點前背單字', secretDesc: '早起的鳥兒...', check: () => new Date().getHours() < 7 },
+        { id: 'secret_night', category: 'secret', tier: 'rare', icon: '🧛', title: '夜貓子', desc: '晚上 8 點後背單字', secretDesc: '深夜出沒...', check: () => new Date().getHours() >= 20 },
+        { id: 'secret_early', category: 'secret', tier: 'rare', icon: '🐔', title: '早起的鳥兒', desc: '早上 8 點前背單字', secretDesc: '早起的鳥兒...', check: () => new Date().getHours() < 8 },
         { id: 'secret_fail', category: 'secret', tier: 'epic', icon: '💀', title: '愈挫愈勇', desc: '累積答錯 50 次', secretDesc: '失敗為成功之母...', check: (s) => s.totalMistakes >= 50 }
     ];
 
@@ -507,7 +503,7 @@
 
     function showToast(title, icon) {
         const toast = document.getElementById('toastNotification');
-        toast.querySelector('div').innerText = icon || '🎁';
+        toast.querySelector('div:first-child').innerText = icon || '🎁';
         document.getElementById('toastMsg').innerText = title;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
