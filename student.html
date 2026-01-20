@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v48.1 (Audio Tuned)</title>
+    <title>學生自主學習平板 v48.2 (iOS Patch)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         /* --- 🎨 視覺風格：現代復古像素風 (Pixel Lite) --- */
@@ -142,7 +142,7 @@
         .range-btn.selected { border-color: #000; background: #feca57; color: #000; box-shadow: 3px 3px 0 #000; }
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem; }
         
-        /* Switch */
+        /* Switch (Fixed) */
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; cursor: pointer; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .2s; border-radius: 4px; border: 2px solid #000; }
@@ -197,8 +197,18 @@
         .btn-safe-exit { color: rgba(0,0,0,0.4); text-decoration: none; font-size: 0.8rem; font-weight: bold; border: 1px solid rgba(0,0,0,0.1); padding: 5px 10px; border-radius: 20px; transition: 0.2s; }
         .btn-safe-exit:hover { color: #d63031; border-color: #d63031; opacity: 1; }
 
-        /* Toast */
-        .toast-notification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #fff; padding: 15px 25px; border: 4px solid #000; z-index: 2000; display: flex; align-items: center; gap: 15px; box-shadow: 10px 10px 0 rgba(0,0,0,0.5); transition: top 0.5s; }
+        /* Toast (Fixed: Move way off screen when hidden to avoid "ghost text") */
+        .toast-notification { 
+            position: fixed; 
+            top: -300px; /* Moves far away */
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #fff; padding: 15px 25px; border: 4px solid #000; 
+            z-index: 2000; display: flex; align-items: center; gap: 15px; 
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.5); 
+            transition: top 0.5s; 
+            white-space: nowrap; /* Prevent text wrapping */
+        }
         .toast-notification.show { top: 30px; }
 
     </style>
@@ -216,7 +226,7 @@
     <div id="homeScreen" class="screen active">
         <div class="hero-banner">
             <div class="hero-title">VOCAB HERO</div>
-            <div class="hero-sub">單字大冒險 v48.1</div>
+            <div class="hero-sub">單字大冒險 v48.2</div>
         </div>
 
         <div class="dashboard-grid">
@@ -422,11 +432,16 @@
     let userStats = { wordsViewedCount: 0, quizCount: 0, totalCorrect: 0, totalMistakes: 0 };
     let unlockedTitles = new Set();
     
-    // Voice List (Apple Fix: Prioritize 'Samantha', 'Daniel', 'Karen' and limit rate)
+    // Voice List (Lazy Load & Apple Fix)
     let availableVoices = [];
     function initVoices() {
         availableVoices = window.speechSynthesis.getVoices();
+        // Safari voices load async, sometimes need a retry
+        if (availableVoices.length === 0) {
+            setTimeout(initVoices, 500);
+        }
     }
+    // Apple needs this to trigger loading voices
     if (speechSynthesis.onvoiceschanged !== undefined) {
         speechSynthesis.onvoiceschanged = initVoices;
     }
@@ -513,11 +528,18 @@
     
     function speak(text) {
         window.speechSynthesis.cancel();
+        
+        // Wait for voices if empty (iOS quirk)
+        if (availableVoices.length === 0) {
+            initVoices();
+            setTimeout(() => speak(text), 100);
+            return;
+        }
+
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'en-US';
-        u.rate = 0.8; // Slow down for better clarity
+        u.rate = 0.7; // Slowed down for iOS clarity
         
-        if (availableVoices.length === 0) initVoices();
         const v = getBestVoice();
         if(v) u.voice = v;
         
@@ -614,7 +636,7 @@
         if(quizConfig.mode==='choice')renderChoices(i); else renderSpelling(); playQuizSequence();
     }
     function showHint(){ document.getElementById('qHint').style.display='block'; document.getElementById('btnShowHint').style.display='none'; }
-    function playQuizSequence(){ const i=quizData.list[quizData.index]; window.speechSynthesis.cancel(); const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.8; u1.lang='en-US'; const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.8; u2.lang='en-US'; const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.8; u3.lang='en-US'; 
+    function playQuizSequence(){ const i=quizData.list[quizData.index]; window.speechSynthesis.cancel(); const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.7; u1.lang='en-US'; const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.7; u2.lang='en-US'; const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.7; u3.lang='en-US'; 
     const v=getBestVoice(); if(v){u1.voice=v;u2.voice=v;u3.voice=v;}
     u3.onend=function(){if(quizConfig.timer)startTimer();}; window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3); }
     
