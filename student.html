@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v42.1 (No Hint Default)</title>
+    <title>學生自主學習平板 v43.0 (Max Achievements)</title>
     <style>
         /* --- 🎨 視覺風格 --- */
         :root {
@@ -19,10 +19,10 @@
             --danger: #ef5350;
             
             /* 稀有度顏色 */
-            --tier-common: #cd7f32; 
-            --tier-rare: #95a5a6;   
-            --tier-epic: #ffb300;   
-            --tier-legend: #9b59b6; 
+            --tier-common: #cd7f32; /* 銅 */
+            --tier-rare: #95a5a6;   /* 銀 */
+            --tier-epic: #ffb300;   /* 金 */
+            --tier-legend: #9b59b6; /* 紫/彩虹 */
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Microsoft JhengHei', 'Varela Round', sans-serif; }
@@ -59,38 +59,73 @@
         .dash-btn.achievement-mode { border-bottom: 6px solid var(--gold); grid-column: span 2; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 20px; }
         .dash-btn.analysis-mode { border-bottom: 6px solid var(--danger); grid-column: span 2; display: flex; align-items: center; justify-content: center; gap: 20px; padding: 20px; }
 
-        /* --- 🏆 稱號系統 --- */
+        /* --- 🏆 稱號系統 (Enhanced) --- */
         .achievement-container { padding-bottom: 50px; }
-        .category-header { font-size: 1.2rem; font-weight: 900; margin: 25px 0 15px 0; padding-left: 10px; border-left: 5px solid #ccc; display: flex; align-items: center; gap: 8px; }
-        .cat-learn { border-color: var(--primary); color: var(--primary-dark); }
-        .cat-quiz { border-color: var(--danger); color: #c0392b; }
-        .cat-milestone { border-color: var(--gold); color: #d35400; }
-        .cat-secret { border-color: var(--tier-legend); color: #8e44ad; background: linear-gradient(90deg, #f3e5f5, transparent); padding: 5px 10px; border-radius: 0 10px 10px 0; }
+        
+        .category-header {
+            font-size: 1.1rem; font-weight: 900; margin: 30px 0 15px 0; padding: 8px 15px; 
+            border-radius: 50px; display: inline-flex; align-items: center; gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: white;
+        }
+        /* 分類風格 */
+        .cat-learn { background: var(--primary); }
+        .cat-unit { background: #20bf6b; } /* 綠色 */
+        .cat-alpha { background: #eb3b5a; } /* 紅色 */
+        .cat-quiz { background: #fa8231; }  /* 橘色 */
+        .cat-milestone { background: var(--gold); text-shadow: 1px 1px 0 rgba(0,0,0,0.2); }
+        .cat-secret { background: linear-gradient(135deg, #a55eea, #4b7bec); }
 
         .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .badge-card { background: #f0f0f0; border-radius: 16px; padding: 20px 10px; text-align: center; opacity: 0.6; filter: grayscale(1); transition: 0.3s; position: relative; border: 2px solid transparent; overflow: hidden; }
+        
+        .badge-card {
+            background: #f0f0f0; border-radius: 16px; padding: 15px 10px; text-align: center;
+            opacity: 0.6; filter: grayscale(1); transition: 0.3s; position: relative;
+            border: 2px solid transparent; overflow: hidden;
+        }
+        
+        /* 解鎖狀態 */
         .badge-card.unlocked { background: white; opacity: 1; filter: grayscale(0); box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        
+        /* 稀有度樣式 */
         .badge-card.unlocked.common { border-color: var(--tier-common); }
         .badge-card.unlocked.rare { border-color: var(--tier-rare); background: #fdfdfd; }
         .badge-card.unlocked.epic { border-color: var(--tier-epic); background: #fffbe6; box-shadow: 0 0 10px rgba(255, 179, 0, 0.2); }
-        .badge-card.unlocked.legendary { border-color: var(--tier-legend); background: linear-gradient(135deg, #fff, #f8e1ff); box-shadow: 0 0 15px rgba(155, 89, 182, 0.3); }
-        .badge-icon { font-size: 3rem; margin-bottom: 10px; display: block; transform: scale(0.9); transition: 0.3s; }
-        .badge-card.unlocked:hover .badge-icon { transform: scale(1.1) rotate(5deg); }
-        .badge-title { font-weight: 900; color: var(--text-main); font-size: 1rem; margin-bottom: 5px; line-height: 1.2; }
+        .badge-card.unlocked.legendary { 
+            border-color: var(--tier-legend); 
+            background: linear-gradient(135deg, #fff, #f8e1ff); 
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.3);
+        }
+
+        .badge-icon { font-size: 2.5rem; margin-bottom: 8px; display: block; transform: scale(0.9); transition: 0.3s; }
+        .badge-card.unlocked:hover .badge-icon { transform: scale(1.1) rotate(10deg); }
+        
+        .badge-title { font-weight: 900; color: var(--text-main); font-size: 0.95rem; margin-bottom: 4px; line-height: 1.2; }
         .badge-desc { font-size: 0.75rem; color: #777; line-height: 1.3; }
         
-        .toast-notification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.95); padding: 15px 25px; border-radius: 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 2000; display: flex; align-items: center; gap: 15px; border: 2px solid var(--gold); backdrop-filter: blur(5px); transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        /* 獲得稱號提示 (Toast) */
+        .toast-notification {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.98); padding: 15px 25px; border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25); z-index: 2000;
+            display: flex; align-items: center; gap: 15px; border: 2px solid var(--gold);
+            backdrop-filter: blur(5px);
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
         .toast-icon { font-size: 2rem; animation: bounce 1s infinite; }
         .toast-text h4 { margin: 0; color: var(--text-main); font-weight: 900; }
         .toast-text p { margin: 0; color: var(--primary); font-size: 0.9rem; font-weight: bold; }
         .toast-notification.show { top: 30px; }
+
         @keyframes bounce { 0%, 100% {transform: translateY(0);} 50% {transform: translateY(-5px);} }
 
-        /* --- 弱點分析 --- */
+        /* --- 弱點分析 (Analysis) --- */
         .weak-stats-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .weak-header { font-size: 1.2rem; font-weight: bold; color: var(--danger); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .top-weak-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .weak-item-card { background: #fff5f5; border: 1px solid #ffcdd2; border-radius: 12px; padding: 15px; min-width: 100px; text-align: center; flex-shrink: 0; }
+        .weak-item-card { 
+            background: #fff5f5; border: 1px solid #ffcdd2; border-radius: 12px; 
+            padding: 15px; min-width: 100px; text-align: center; flex-shrink: 0; 
+        }
         .weak-word { font-size: 1.2rem; font-weight: 900; color: var(--danger); display: block; }
         .weak-count { font-size: 0.8rem; color: #888; margin-top: 5px; }
         .full-mistake-list { max-height: 300px; overflow-y: auto; }
@@ -157,7 +192,6 @@
         .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .timer-badge { background: #ffebee; color: var(--danger); padding: 5px 12px; border-radius: 15px; font-weight: bold; display: none; }
         
-        /* Quiz Question Card */
         .question-card { background: white; padding: 40px 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); }
         .q-icon { font-size: 4rem; cursor: pointer; transition: 0.2s; }
         .q-icon:active { transform: scale(0.9); }
@@ -412,6 +446,7 @@
     let currentPickerSid = null;
     let isQuickQuizPicker = false; 
     
+    // --- 🏆 稱號與統計系統 (大幅擴充) ---
     let userStats = {
         wordsViewedCount: 0,
         quizCount: 0,
@@ -421,19 +456,43 @@
     let unlockedTitles = new Set();
 
     const achievements = [
-        { id: 'view_10', category: 'learn', tier: 'common', title: '單字初學者', desc: '看過 10 個單字', check: (s) => s.wordsViewedCount >= 10 },
-        { id: 'view_50', category: 'learn', tier: 'common', title: '單字小學徒', desc: '看過 50 個單字', check: (s) => s.wordsViewedCount >= 50 },
-        { id: 'view_100', category: 'learn', tier: 'rare', title: '單字探索者', desc: '看過 100 個單字', check: (s) => s.wordsViewedCount >= 100 },
-        { id: 'view_300', category: 'learn', tier: 'rare', title: '博學多聞', desc: '看過 300 個單字', check: (s) => s.wordsViewedCount >= 300 },
-        { id: 'view_500', category: 'learn', tier: 'epic', title: '單字大師', desc: '看過 500 個單字', check: (s) => s.wordsViewedCount >= 500 },
+        // 📚 勤學之路 (Words Viewed) - 增加過渡等級
+        { id: 'view_5', category: 'learn', tier: 'common', title: '單字小萌新', desc: '看過 5 個單字', check: (s) => s.wordsViewedCount >= 5 },
+        { id: 'view_20', category: 'learn', tier: 'common', title: '充滿好奇', desc: '看過 20 個單字', check: (s) => s.wordsViewedCount >= 20 },
+        { id: 'view_50', category: 'learn', tier: 'common', title: '累積實力', desc: '看過 50 個單字', check: (s) => s.wordsViewedCount >= 50 },
+        { id: 'view_80', category: 'learn', tier: 'rare', title: '漸入佳境', desc: '看過 80 個單字', check: (s) => s.wordsViewedCount >= 80 },
+        { id: 'view_100', category: 'learn', tier: 'rare', title: '記憶超人', desc: '看過 100 個單字', check: (s) => s.wordsViewedCount >= 100 },
+        { id: 'view_200', category: 'learn', tier: 'rare', title: '博學多聞', desc: '看過 200 個單字', check: (s) => s.wordsViewedCount >= 200 },
+        { id: 'view_300', category: 'learn', tier: 'epic', title: '單字王者', desc: '看過 300 個單字', check: (s) => s.wordsViewedCount >= 300 },
+        { id: 'view_500', category: 'learn', tier: 'epic', title: '行走字典', desc: '看過 500 個單字', check: (s) => s.wordsViewedCount >= 500 },
         { id: 'view_all', category: 'learn', tier: 'legendary', title: '全知全能', desc: '看過所有單字 (800+)', check: (s) => s.wordsViewedCount >= 800 },
+
+        // 🏫 Unit 制霸 (Unit Mastery)
+        { id: 'unit_1', category: 'unit', tier: 'common', title: '初戰告捷', desc: '完成 1 個單元的所有單字', check: () => checkUnitsCompleted(1) },
+        { id: 'unit_3', category: 'unit', tier: 'rare', title: '三元及第', desc: '完成 3 個單元的所有單字', check: () => checkUnitsCompleted(3) },
+        { id: 'unit_5', category: 'unit', tier: 'rare', title: '五星上將', desc: '完成 5 個單元的所有單字', check: () => checkUnitsCompleted(5) },
+        { id: 'unit_10', category: 'unit', tier: 'epic', title: '十全十美', desc: '完成 10 個單元的所有單字', check: () => checkUnitsCompleted(10) },
+        { id: 'unit_all', category: 'unit', tier: 'legendary', title: '制霸全國', desc: '完成所有單元', check: () => checkUnitsCompleted(sessions.length) },
+
+        // 🔡 字母蒐集 (Alphabet Mastery)
+        { id: 'alpha_1', category: 'alpha', tier: 'common', title: '字母搜集家', desc: '完成 1 個字母開頭的所有單字', check: () => checkLettersCompleted(1) },
+        { id: 'alpha_3', category: 'alpha', tier: 'rare', title: '拼字拼圖', desc: '完成 3 個字母開頭的所有單字', check: () => checkLettersCompleted(3) },
+        { id: 'alpha_5', category: 'alpha', tier: 'rare', title: '語彙獵人', desc: '完成 5 個字母開頭的所有單字', check: () => checkLettersCompleted(5) },
+        { id: 'alpha_10', category: 'alpha', tier: 'epic', title: '字母大亨', desc: '完成 10 個字母開頭的所有單字', check: () => checkLettersCompleted(10) },
+        { id: 'alpha_all', category: 'alpha', tier: 'legendary', title: '字典本人', desc: '完成 A-Z 所有字母', check: () => checkLettersCompleted(26) },
+
+        // ⚔️ 試煉戰場 (Quiz)
         { id: 'quiz_1', category: 'quiz', tier: 'common', title: '勇於挑戰', desc: '完成 1 次測驗', check: (s) => s.quizCount >= 1 },
         { id: 'quiz_10', category: 'quiz', tier: 'rare', title: '測驗常客', desc: '完成 10 次測驗', check: (s) => s.quizCount >= 10 },
         { id: 'quiz_50', category: 'quiz', tier: 'epic', title: '身經百戰', desc: '完成 50 次測驗', check: (s) => s.quizCount >= 50 },
+        
+        // 💎 傳奇里程碑 (Milestone)
         { id: 'correct_10', category: 'milestone', tier: 'common', title: '答題新手', desc: '累積答對 10 題', check: (s) => s.totalCorrect >= 10 },
         { id: 'correct_100', category: 'milestone', tier: 'rare', title: '智慧之星', desc: '累積答對 100 題', check: (s) => s.totalCorrect >= 100 },
         { id: 'correct_500', category: 'milestone', tier: 'epic', title: '神準射手', desc: '累積答對 500 題', check: (s) => s.totalCorrect >= 500 },
         { id: 'correct_1000', category: 'milestone', tier: 'legendary', title: '傳說中的學霸', desc: '累積答對 1000 題', check: (s) => s.totalCorrect >= 1000 },
+
+        // ✨ 神秘彩蛋 (Secret)
         { id: 'secret_night', category: 'secret', tier: 'rare', title: '夜貓子', desc: '在晚上 10 點後背單字', secretDesc: '在深夜時刻學習...', check: () => new Date().getHours() >= 22 },
         { id: 'secret_early', category: 'secret', tier: 'rare', title: '早起的鳥兒', desc: '在早上 7 點前背單字', secretDesc: '在清晨時刻學習...', check: () => new Date().getHours() < 7 },
         { id: 'secret_fail', category: 'secret', tier: 'epic', title: '愈挫愈勇', desc: '累積答錯 50 次', secretDesc: '失敗為成功之母...', check: (s) => s.totalMistakes >= 50 }
@@ -467,6 +526,26 @@
         localStorage.setItem('viewedWords', JSON.stringify([...viewedWords]));
         localStorage.setItem('userStats', JSON.stringify(userStats));
         localStorage.setItem('unlockedTitles', JSON.stringify([...unlockedTitles]));
+    }
+
+    // --- Helper for Achievement Calculation ---
+    function checkUnitsCompleted(targetCount) {
+        let completed = 0;
+        sessions.forEach(sid => {
+            const words = masterWordList.filter(w => w.session === sid);
+            if (words.every(w => viewedWords.has(w.word))) completed++;
+        });
+        return completed >= targetCount;
+    }
+
+    function checkLettersCompleted(targetCount) {
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        let completed = 0;
+        letters.forEach(char => {
+            const words = masterWordList.filter(w => w.word.toUpperCase().startsWith(char));
+            if (words.length > 0 && words.every(w => viewedWords.has(w.word))) completed++;
+        });
+        return completed >= targetCount;
     }
 
     function checkAchievements() {
@@ -511,7 +590,14 @@
     function openAchievementScreen() {
         const grid = document.getElementById('badgeGrid');
         grid.innerHTML = "";
-        const categories = { 'learn': '📚 勤學之路', 'quiz': '⚔️ 試煉戰場', 'milestone': '💎 傳奇里程碑', 'secret': '✨ 神秘彩蛋' };
+        const categories = { 
+            'learn': '📚 勤學之路', 
+            'unit': '🏫 Unit 制霸',
+            'alpha': '🔡 字母蒐集',
+            'quiz': '⚔️ 試煉戰場', 
+            'milestone': '💎 傳奇里程碑', 
+            'secret': '✨ 神秘彩蛋' 
+        };
         for (let cat in categories) {
             const header = document.createElement('div');
             header.className = `category-header cat-${cat}`;
@@ -731,8 +817,6 @@
     function loadQuestion() {
         clearInterval(quizData.timerId);
         document.getElementById('btnNextQ').style.display = 'none';
-        
-        // Hide hint initially
         document.getElementById('qHint').style.display = 'none';
         document.getElementById('btnShowHint').style.display = 'inline-block';
 
@@ -740,7 +824,6 @@
         document.getElementById('qIdx').innerText = quizData.index + 1;
         document.getElementById('qTotal').innerText = quizData.list.length;
         document.getElementById('qHint').innerText = item.word_zh || "(無中文)";
-        
         if (quizConfig.mode === 'choice') renderChoices(item); else renderSpelling();
         playQuizSequence();
     }
@@ -773,7 +856,6 @@
         speak("Time's up!");
         saveMistake(quizData.list[quizData.index].word);
         userStats.totalMistakes++;
-        
         if (quizConfig.mode === 'choice') {
             const btns = document.querySelectorAll('.btn-choice');
             btns.forEach(b => {
