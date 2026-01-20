@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v48.0 (Mobile Fix)</title>
+    <title>學生自主學習平板 v48.1 (Audio Tuned)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         /* --- 🎨 視覺風格：現代復古像素風 (Pixel Lite) --- */
@@ -35,42 +35,29 @@
                 linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
             background-size: 20px 20px;
             color: var(--text-main);
-            margin: 0; padding: 15px; /* 稍微減少邊距以適應手機 */
+            margin: 0; padding: 15px;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
         }
 
         /* --- 響應式調整 (Mobile Fixes) --- */
         @media (max-width: 600px) {
-            .hero-title { font-size: 2.8rem !important; } /* 手機標題縮小 */
+            .hero-title { font-size: 2.8rem !important; }
             .hero-sub { font-size: 1rem !important; }
             .dashboard-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
             .dash-btn { min-height: 120px !important; padding: 15px 5px !important; }
             .dash-icon { font-size: 2.5rem !important; }
             .dash-btn h2 { font-size: 1.2rem !important; }
-            
-            /* 測驗區調整 */
             .detail-word { font-size: 3rem !important; }
-            .word-display { font-size: 2.5rem !important; }
-            
-            /* 選字格調整 */
-            .word-picker-container { 
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important; /* 寬度增加，避免擁擠 */
-                gap: 12px !important;
-            }
-            .picker-item { 
-                font-size: 1rem !important; 
-                padding: 12px 5px !important; 
-                min-height: 50px;
-                display: flex; align-items: center; justify-content: center;
-            }
+            .word-picker-container { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important; gap: 12px !important; }
+            .picker-item { font-size: 1rem !important; padding: 12px 5px !important; min-height: 50px; display: flex; align-items: center; justify-content: center; }
         }
 
         /* --- 通用元件 --- */
         .pixel-card {
             background: #fff; border: 3px solid var(--border-black); border-radius: 8px;
             box-shadow: 6px 6px 0px rgba(0,0,0,0.2); padding: 20px; position: relative; margin-bottom: 20px;
-            width: 100%; /* 確保卡片撐滿容器 */
+            width: 100%;
         }
 
         .btn-pixel {
@@ -196,21 +183,12 @@
         .badge-hint-box { background: rgba(0,0,0,0.1); font-size: 0.8rem; margin-top: 5px; padding: 5px; font-weight: bold; color: #555; }
         .category-header { grid-column: 1/-1; font-size: 1.2rem; font-weight: 900; margin: 20px 0 10px; padding: 5px 15px; background: #000; color: #fff; width: fit-content; border-radius: 4px; transform: skew(-5deg); }
 
-        /* --- Word Picker Modal (Mobile Optimized) --- */
+        /* --- Word Picker Modal --- */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; }
         .modal-content { background: #fff; margin: 5% auto; padding: 20px; width: 90%; max-width: 500px; border: 6px solid #000; box-shadow: 15px 15px 0 #222; text-align: center; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
         .close-modal { position: absolute; top: 10px; right: 15px; font-size: 2.5rem; cursor: pointer; color: #000; line-height: 0.8; }
-        
-        .word-picker-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Optimised for mobile visibility */
-            gap: 8px; margin-top: 10px; padding: 5px; overflow-y: auto; flex: 1; 
-        }
-        .picker-item { 
-            background: #f9f9f9; border: 2px solid #ccc; padding: 10px 5px; border-radius: 4px; 
-            text-align: center; cursor: pointer; font-size: 1rem; font-weight: bold; 
-            position: relative; overflow: hidden; word-break: break-all;
-        }
+        .word-picker-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; margin-top: 10px; padding: 5px; overflow-y: auto; flex: 1; }
+        .picker-item { background: #f9f9f9; border: 2px solid #ccc; padding: 8px 4px; border-radius: 4px; text-align: center; cursor: pointer; font-size: 0.9rem; font-weight: bold; position: relative; overflow: hidden; word-break: break-all; }
         .picker-item.picked { background: #fff3cd; border-color: #000; color: #000; box-shadow: 2px 2px 0 #000; transform: translate(-1px, -1px); }
         .picker-actions { display: flex; gap: 8px; margin-top: 15px; padding-top: 10px; border-top: 2px dashed #ccc; flex-shrink: 0; }
 
@@ -238,7 +216,7 @@
     <div id="homeScreen" class="screen active">
         <div class="hero-banner">
             <div class="hero-title">VOCAB HERO</div>
-            <div class="hero-sub">單字大冒險 v48.0</div>
+            <div class="hero-sub">單字大冒險 v48.1</div>
         </div>
 
         <div class="dashboard-grid">
@@ -444,16 +422,11 @@
     let userStats = { wordsViewedCount: 0, quizCount: 0, totalCorrect: 0, totalMistakes: 0 };
     let unlockedTitles = new Set();
     
-    // Voice List (Lazy Load & Apple Fix)
+    // Voice List (Apple Fix: Prioritize 'Samantha', 'Daniel', 'Karen' and limit rate)
     let availableVoices = [];
     function initVoices() {
         availableVoices = window.speechSynthesis.getVoices();
-        // Safari voices load async, sometimes need a retry
-        if (availableVoices.length === 0) {
-            setTimeout(initVoices, 500);
-        }
     }
-    // Apple needs this to trigger loading voices
     if (speechSynthesis.onvoiceschanged !== undefined) {
         speechSynthesis.onvoiceschanged = initVoices;
     }
@@ -527,26 +500,24 @@
     function goHome(){ showScreen('homeScreen'); }
     function showScreen(id){ document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); clearInterval(quizData.timerId); window.speechSynthesis.cancel(); }
     
-    // Enhanced Speak Function (Apple Fix)
+    // --- Enhanced Voice Selection (Apple Fix) ---
     function getBestVoice() {
-         // Priority: Google US -> Samantha (Mac) -> Daniel (iOS) -> Any US English -> Default
-         return availableVoices.find(v => v.name === "Google US English") || 
-                availableVoices.find(v => v.name === "Samantha") || 
-                availableVoices.find(v => v.name === "Daniel") || 
-                availableVoices.find(v => v.lang === 'en-US') ||
-                availableVoices[0];
+         const all = window.speechSynthesis.getVoices();
+         let best = all.find(v => v.name.includes("Google US English"));
+         if (!best) best = all.find(v => v.lang === 'en-US' && v.name.includes("Samantha")); // macOS
+         if (!best) best = all.find(v => v.lang === 'en-US' && v.name.includes("Daniel")); // iOS
+         if (!best) best = all.find(v => v.lang === 'en-US' && v.localService); // Prioritize Local
+         if (!best) best = all.find(v => v.lang.startsWith('en'));
+         return best;
     }
     
     function speak(text) {
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'en-US';
-        // iOS requires rate 1.0 or slightly less to sound natural with Daniel/Samantha
-        u.rate = 1.0; 
+        u.rate = 0.8; // Slow down for better clarity
         
-        // Ensure voice loading
         if (availableVoices.length === 0) initVoices();
-        
         const v = getBestVoice();
         if(v) u.voice = v;
         
@@ -643,9 +614,8 @@
         if(quizConfig.mode==='choice')renderChoices(i); else renderSpelling(); playQuizSequence();
     }
     function showHint(){ document.getElementById('qHint').style.display='block'; document.getElementById('btnShowHint').style.display='none'; }
-    function playQuizSequence(){ const i=quizData.list[quizData.index]; window.speechSynthesis.cancel(); const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.9; const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.9; const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.9; 
-    // Apple Fix
-    const v=getBestVoice(); if(v){u1.voice=v;u2.voice=v;u3.voice=v;u1.rate=1.0;u2.rate=1.0;u3.rate=1.0;}
+    function playQuizSequence(){ const i=quizData.list[quizData.index]; window.speechSynthesis.cancel(); const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.8; u1.lang='en-US'; const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.8; u2.lang='en-US'; const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.8; u3.lang='en-US'; 
+    const v=getBestVoice(); if(v){u1.voice=v;u2.voice=v;u3.voice=v;}
     u3.onend=function(){if(quizConfig.timer)startTimer();}; window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3); }
     
     function startTimer(){ clearInterval(quizData.timerId); let t=8; document.getElementById('timeLeft').innerText=t; document.getElementById('timerBadge').style.display='inline-block'; quizData.timerId=setInterval(()=>{ t--; document.getElementById('timeLeft').innerText=t; if(t<=0){clearInterval(quizData.timerId); handleTimeUp();} },1000); }
