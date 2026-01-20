@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v47.5 (Voice Fix)</title>
+    <title>學生自主學習平板 v48.0 (Mobile Fix)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         /* --- 🎨 視覺風格：現代復古像素風 (Pixel Lite) --- */
@@ -35,15 +35,42 @@
                 linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
             background-size: 20px 20px;
             color: var(--text-main);
-            margin: 0; padding: 0;
+            margin: 0; padding: 15px; /* 稍微減少邊距以適應手機 */
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
+        }
+
+        /* --- 響應式調整 (Mobile Fixes) --- */
+        @media (max-width: 600px) {
+            .hero-title { font-size: 2.8rem !important; } /* 手機標題縮小 */
+            .hero-sub { font-size: 1rem !important; }
+            .dashboard-grid { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+            .dash-btn { min-height: 120px !important; padding: 15px 5px !important; }
+            .dash-icon { font-size: 2.5rem !important; }
+            .dash-btn h2 { font-size: 1.2rem !important; }
+            
+            /* 測驗區調整 */
+            .detail-word { font-size: 3rem !important; }
+            .word-display { font-size: 2.5rem !important; }
+            
+            /* 選字格調整 */
+            .word-picker-container { 
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important; /* 寬度增加，避免擁擠 */
+                gap: 12px !important;
+            }
+            .picker-item { 
+                font-size: 1rem !important; 
+                padding: 12px 5px !important; 
+                min-height: 50px;
+                display: flex; align-items: center; justify-content: center;
+            }
         }
 
         /* --- 通用元件 --- */
         .pixel-card {
             background: #fff; border: 3px solid var(--border-black); border-radius: 8px;
             box-shadow: 6px 6px 0px rgba(0,0,0,0.2); padding: 20px; position: relative; margin-bottom: 20px;
+            width: 100%; /* 確保卡片撐滿容器 */
         }
 
         .btn-pixel {
@@ -62,7 +89,7 @@
         .btn-cancel { background: #eee; color: #666; border-color: #999; box-shadow: 4px 4px 0 #999; }
 
         /* --- 頁面切換 --- */
-        .screen { display: none; width: 100%; max-width: 700px; padding: 20px; animation: fadeIn 0.3s; }
+        .screen { display: none; width: 100%; max-width: 700px; padding-bottom: 20px; animation: fadeIn 0.3s; }
         .screen.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -71,7 +98,7 @@
 
         /* --- 1. 首頁 --- */
         .hero-banner { text-align: center; margin-bottom: 30px; margin-top: 10px; }
-        .hero-title { font-size: 3.5rem; font-weight: 900; color: #feca57; text-shadow: 4px 4px 0 #000; margin-bottom: 5px; line-height: 1; }
+        .hero-title { font-size: 4rem; font-weight: 900; color: #feca57; text-shadow: 4px 4px 0 #000; margin-bottom: 5px; line-height: 1; }
         .hero-sub { background: #fff; padding: 5px 15px; border-radius: 20px; border: 2px solid #000; display: inline-block; font-weight: bold; font-size: 1.1rem; box-shadow: 3px 3px 0 rgba(0,0,0,0.1); }
 
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 40px; }
@@ -98,17 +125,17 @@
         .unit-card .action-hint { font-size: 0.9rem; color: var(--primary); margin-top: 5px; font-weight: bold; display: block;}
 
         /* --- 3. 背單字 (Overview) --- */
-        .word-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding-bottom: 100px; }
-        .word-overview-card { background: white; border: 3px solid #ddd; border-radius: 8px; padding: 15px 10px; text-align: center; cursor: pointer; position: relative; box-shadow: 3px 3px 0 #ddd; }
+        .word-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; padding-bottom: 100px; }
+        .word-overview-card { background: white; border: 3px solid #ddd; border-radius: 8px; padding: 15px 10px; text-align: center; cursor: pointer; position: relative; box-shadow: 3px 3px 0 #ddd; word-wrap: break-word; }
         .word-overview-card:active { transform: translate(3px, 3px); box-shadow: 0 0 0; }
-        .word-overview-card h4 { margin: 0; font-size: 1.4rem; font-weight: 900; }
+        .word-overview-card h4 { margin: 0; font-size: 1.2rem; font-weight: 900; }
         .word-overview-card.read { background: #e8f5e9; border-color: #27ae60; box-shadow: 3px 3px 0 #27ae60; }
         .word-overview-card.read::after { content: "✔"; position: absolute; top: 2px; right: 2px; color: #27ae60; font-weight: bold; font-size: 0.8rem; }
 
         /* --- 4. 詳細卡片 --- */
         .detail-box { text-align: center; padding: 20px 10px; }
         .word-header-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px; }
-        .detail-word { font-size: 4.5rem; font-weight: 900; color: #000; letter-spacing: 1px; line-height: 1; }
+        .detail-word { font-size: 4.5rem; font-weight: 900; color: #000; letter-spacing: 1px; line-height: 1; word-wrap: break-word; }
         .btn-speak-inline { background: var(--primary); color: white; border: 3px solid #000; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 3px 3px 0 #000; flex-shrink: 0; }
         .btn-speak-inline:active { transform: translate(2px, 2px); box-shadow: 0 0 0; }
         .detail-zh { font-size: 1.8rem; color: #555; margin-bottom: 30px; font-weight: bold; }
@@ -128,7 +155,7 @@
         .range-btn.selected { border-color: #000; background: #feca57; color: #000; box-shadow: 3px 3px 0 #000; }
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem; }
         
-        /* Switch (Fixed) */
+        /* Switch */
         .switch { position: relative; display: inline-block; width: 50px; height: 26px; cursor: pointer; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .2s; border-radius: 4px; border: 2px solid #000; }
@@ -142,7 +169,7 @@
         .quiz-status { display: flex; justify-content: space-between; font-weight: bold; color: #fff; margin-bottom: 10px; font-size: 1.4rem; background: #000; padding: 5px 10px; border-radius: 4px; }
         .q-hint { font-size: 1.5rem; font-weight: 900; color: #000; margin: 20px 0; min-height: 1.5em; background: #eee; border: 2px dashed #000; padding: 10px; }
         .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-choice { background: #fff; border: 4px solid #000; padding: 20px; font-size: 1.5rem; font-weight: bold; color: #000; cursor: pointer; box-shadow: 6px 6px 0 #000; transition: 0.1s; }
+        .btn-choice { background: #fff; border: 4px solid #000; padding: 20px; font-size: 1.5rem; font-weight: bold; color: #000; cursor: pointer; box-shadow: 6px 6px 0 #000; transition: 0.1s; word-wrap: break-word; }
         .btn-choice:active { transform: translate(6px, 6px); box-shadow: 0 0 0; }
         .btn-choice.correct { background: #55efc4; }
         .btn-choice.wrong { background: #ff7675; }
@@ -169,12 +196,21 @@
         .badge-hint-box { background: rgba(0,0,0,0.1); font-size: 0.8rem; margin-top: 5px; padding: 5px; font-weight: bold; color: #555; }
         .category-header { grid-column: 1/-1; font-size: 1.2rem; font-weight: 900; margin: 20px 0 10px; padding: 5px 15px; background: #000; color: #fff; width: fit-content; border-radius: 4px; transform: skew(-5deg); }
 
-        /* --- Word Picker Modal --- */
+        /* --- Word Picker Modal (Mobile Optimized) --- */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; }
         .modal-content { background: #fff; margin: 5% auto; padding: 20px; width: 90%; max-width: 500px; border: 6px solid #000; box-shadow: 15px 15px 0 #222; text-align: center; max-height: 85vh; overflow-y: auto; display: flex; flex-direction: column; }
         .close-modal { position: absolute; top: 10px; right: 15px; font-size: 2.5rem; cursor: pointer; color: #000; line-height: 0.8; }
-        .word-picker-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; margin-top: 10px; padding: 5px; overflow-y: auto; flex: 1; }
-        .picker-item { background: #f9f9f9; border: 2px solid #ccc; padding: 8px 4px; border-radius: 4px; text-align: center; cursor: pointer; font-size: 0.9rem; font-weight: bold; position: relative; overflow: hidden; word-break: break-all; }
+        
+        .word-picker-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Optimised for mobile visibility */
+            gap: 8px; margin-top: 10px; padding: 5px; overflow-y: auto; flex: 1; 
+        }
+        .picker-item { 
+            background: #f9f9f9; border: 2px solid #ccc; padding: 10px 5px; border-radius: 4px; 
+            text-align: center; cursor: pointer; font-size: 1rem; font-weight: bold; 
+            position: relative; overflow: hidden; word-break: break-all;
+        }
         .picker-item.picked { background: #fff3cd; border-color: #000; color: #000; box-shadow: 2px 2px 0 #000; transform: translate(-1px, -1px); }
         .picker-actions { display: flex; gap: 8px; margin-top: 15px; padding-top: 10px; border-top: 2px dashed #ccc; flex-shrink: 0; }
 
@@ -202,7 +238,7 @@
     <div id="homeScreen" class="screen active">
         <div class="hero-banner">
             <div class="hero-title">VOCAB HERO</div>
-            <div class="hero-sub">單字大冒險 v47.5</div>
+            <div class="hero-sub">單字大冒險 v48.0</div>
         </div>
 
         <div class="dashboard-grid">
@@ -408,13 +444,19 @@
     let userStats = { wordsViewedCount: 0, quizCount: 0, totalCorrect: 0, totalMistakes: 0 };
     let unlockedTitles = new Set();
     
-    // Voice List (Lazy Load)
+    // Voice List (Lazy Load & Apple Fix)
     let availableVoices = [];
     function initVoices() {
         availableVoices = window.speechSynthesis.getVoices();
+        // Safari voices load async, sometimes need a retry
+        if (availableVoices.length === 0) {
+            setTimeout(initVoices, 500);
+        }
     }
-    window.speechSynthesis.onvoiceschanged = initVoices;
-    // Try init immediately
+    // Apple needs this to trigger loading voices
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = initVoices;
+    }
     initVoices();
 
     const achievements = [
@@ -455,7 +497,7 @@
         goHome();
     };
     
-    // --- In-Game Toggle Functions (Fixed) ---
+    // --- In-Game Toggle Functions ---
     function toggleAutoNext(checked) { quizConfig.autoNext = checked; }
     function toggleTimer(checked) { 
         quizConfig.timer = checked; 
@@ -485,23 +527,29 @@
     function goHome(){ showScreen('homeScreen'); }
     function showScreen(id){ document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); clearInterval(quizData.timerId); window.speechSynthesis.cancel(); }
     
-    // Enhanced Speak Function
+    // Enhanced Speak Function (Apple Fix)
     function getBestVoice() {
-         return availableVoices.find(v => 
-            (v.name.includes("Google US English")) || 
-            (v.name.includes("Samantha")) || 
-            (v.name.includes("Microsoft Zira")) || 
-            (v.lang === 'en-US')
-        );
+         // Priority: Google US -> Samantha (Mac) -> Daniel (iOS) -> Any US English -> Default
+         return availableVoices.find(v => v.name === "Google US English") || 
+                availableVoices.find(v => v.name === "Samantha") || 
+                availableVoices.find(v => v.name === "Daniel") || 
+                availableVoices.find(v => v.lang === 'en-US') ||
+                availableVoices[0];
     }
     
     function speak(text) {
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'en-US';
-        u.rate = 0.9; 
+        // iOS requires rate 1.0 or slightly less to sound natural with Daniel/Samantha
+        u.rate = 1.0; 
+        
+        // Ensure voice loading
+        if (availableVoices.length === 0) initVoices();
+        
         const v = getBestVoice();
         if(v) u.voice = v;
+        
         window.speechSynthesis.speak(u);
     }
     
@@ -595,21 +643,10 @@
         if(quizConfig.mode==='choice')renderChoices(i); else renderSpelling(); playQuizSequence();
     }
     function showHint(){ document.getElementById('qHint').style.display='block'; document.getElementById('btnShowHint').style.display='none'; }
-    
-    function playQuizSequence(){ 
-        const i=quizData.list[quizData.index]; 
-        window.speechSynthesis.cancel(); 
-        const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.9; u1.lang='en-US';
-        const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.9; u2.lang='en-US';
-        const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.9; u3.lang='en-US';
-        
-        // Voice selection
-        const v = getBestVoice();
-        if(v) { u1.voice=v; u2.voice=v; u3.voice=v; }
-
-        u3.onend=function(){if(quizConfig.timer)startTimer();}; 
-        window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3); 
-    }
+    function playQuizSequence(){ const i=quizData.list[quizData.index]; window.speechSynthesis.cancel(); const u1=new SpeechSynthesisUtterance(i.word); u1.rate=0.9; const u2=new SpeechSynthesisUtterance(i.sentence); u2.rate=0.9; const u3=new SpeechSynthesisUtterance(i.word); u3.rate=0.9; 
+    // Apple Fix
+    const v=getBestVoice(); if(v){u1.voice=v;u2.voice=v;u3.voice=v;u1.rate=1.0;u2.rate=1.0;u3.rate=1.0;}
+    u3.onend=function(){if(quizConfig.timer)startTimer();}; window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3); }
     
     function startTimer(){ clearInterval(quizData.timerId); let t=8; document.getElementById('timeLeft').innerText=t; document.getElementById('timerBadge').style.display='inline-block'; quizData.timerId=setInterval(()=>{ t--; document.getElementById('timeLeft').innerText=t; if(t<=0){clearInterval(quizData.timerId); handleTimeUp();} },1000); }
     
