@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v37.0</title>
+    <title>學生自主學習平板 v38.0</title>
     <style>
         /* --- 🎨 視覺風格：平板學習 App --- */
         :root {
@@ -111,7 +111,8 @@
         .range-btn.has-data { border-color: var(--accent); background: #fff8e1; color: #d35400; font-weight: bold; }
         .badge-count { background: var(--accent); color: white; font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; margin-left: 5px; }
 
-        .timer-row { display: flex; justify-content: space-between; align-items: center; }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .setting-row:last-child { margin-bottom: 0; }
         .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
@@ -156,6 +157,8 @@
         .input-spelling { width: 100%; padding: 15px; font-size: 1.8rem; text-align: center; border: 3px solid #ddd; border-radius: 15px; letter-spacing: 2px; outline: none; margin-bottom: 15px; text-transform: lowercase; }
         .input-spelling:focus { border-color: var(--primary); }
         .btn-submit-spelling { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 15px; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
+        
+        .btn-next-manual { display: none; width: 100%; padding: 15px; background: linear-gradient(to right, #4facfe, #00f2fe); color: white; border: none; border-radius: 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
         /* 結果頁 */
         .result-box { background: white; border-radius: 20px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
@@ -276,8 +279,17 @@
         </div>
 
         <div class="setup-section">
-            <div class="timer-row">
-                <span class="setup-title" style="margin:0;">3. 限時挑戰 (每題8秒)</span>
+            <span class="setup-title">3. 進階設定</span>
+            <div class="setting-row">
+                <span>自動換題 (答對後自動跳轉)</span>
+                <label class="switch">
+                    <input type="checkbox" id="autoNextSwitch" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div style="height:10px;"></div>
+            <div class="setting-row">
+                <span>限時挑戰 (每題8秒)</span>
                 <label class="switch">
                     <input type="checkbox" id="timerSwitch">
                     <span class="slider round"></span>
@@ -331,6 +343,8 @@
             <div id="spellingFeedback" style="height: 20px; font-weight:bold; margin-bottom:10px;"></div>
             <button class="btn-submit-spelling" onclick="checkSpelling()">送出</button>
         </div>
+        
+        <button id="btnNextQ" class="btn-next-manual" onclick="nextQuestion()">➡ 下一題</button>
     </div>
 
     <div id="resultScreen" class="screen">
@@ -360,7 +374,7 @@
     let currentMode = ''; 
     let viewedWords = new Set(); 
     let studyData = { sid: null, list: [], currentIndex: 0 };
-    let quizConfig = { mode: 'choice', selectedWords: new Set(), timer: false };
+    let quizConfig = { mode: 'choice', selectedWords: new Set(), timer: false, autoNext: true };
     let quizData = { list: [], index: 0, score: 0, timerId: null };
     let currentPickerSid = null;
     let isQuickQuizPicker = false; 
@@ -370,6 +384,17 @@
             alert("錯誤：找不到資料庫 words.js"); return;
         }
         sessions = [...new Set(masterWordList.map(item => item.session))].sort();
+        
+        // 讀取瀏覽紀錄 (LocalStorage)
+        const savedViewed = localStorage.getItem('viewedWords');
+        if (savedViewed) {
+            try {
+                viewedWords = new Set(JSON.parse(savedViewed));
+            } catch(e) {
+                console.log("Error loading viewed words");
+            }
+        }
+
         goHome();
     };
 
@@ -382,14 +407,20 @@
         document.getElementById(id).classList.add('active');
         window.scrollTo(0,0);
         clearInterval(quizData.timerId); 
-        window.speechSynthesis.cancel(); // 換頁切斷語音
+        window.speechSynthesis.cancel(); 
     }
 
+    // 🔊 語音 (Accent Fix)
     function speak(text) {
-        // window.speechSynthesis.cancel(); // 這裡不Cancel，避免連續播放被切
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'en-US';
-        u.rate = 0.8; 
+        u.rate = 0.9; // 語速調整為 0.9，比較自然
+        
+        // 嘗試選取較好的美式發音
+        const voices = window.speechSynthesis.getVoices();
+        const preferred = voices.find(v => v.name.includes("Google US English") || v.name.includes("Samantha"));
+        if (preferred) u.voice = preferred;
+
         window.speechSynthesis.speak(u);
     }
 
@@ -441,7 +472,11 @@
 
     function updateFlashcardUI() {
         const item = studyData.list[studyData.currentIndex];
+        
+        // 標記為已讀並存檔
         viewedWords.add(item.word);
+        localStorage.setItem('viewedWords', JSON.stringify([...viewedWords]));
+
         document.getElementById('detailIdx').innerText = studyData.currentIndex + 1;
         document.getElementById('detailTotal').innerText = studyData.list.length;
         document.getElementById('cardWord').innerText = item.word;
@@ -485,8 +520,10 @@
     function openQuizSetup() {
         quizConfig.mode = 'choice';
         quizConfig.timer = false;
+        quizConfig.autoNext = true;
         updateModeUI();
         document.getElementById('timerSwitch').checked = false;
+        document.getElementById('autoNextSwitch').checked = true;
         renderQuizRangeGrid();
         updateTotalCount();
         showScreen('quizSetupScreen');
@@ -541,7 +578,6 @@
         document.getElementById('pickerTitle').innerText = `挑選單字 (Unit ${sid})`;
         
         if (isQuickQuizPicker) {
-            // 快速模式：預設選取已讀
             quizConfig.selectedWords.clear();
             const unitWords = masterWordList.filter(w => w.session === sid);
             unitWords.forEach(w => {
@@ -612,13 +648,13 @@
 
     function openQuickQuizPicker() {
         isQuickQuizPicker = true;
-        // 打開時會觸發 openWordPicker 自動預設已讀
         openWordPicker(studyData.sid);
     }
 
     function startQuickQuizDirect(mode) {
         quizConfig.mode = mode;
         quizConfig.timer = false;
+        quizConfig.autoNext = true; // 快速測驗預設開啟自動換題
         closeWordPicker();
         startConfiguredQuiz();
     }
@@ -629,6 +665,7 @@
         
         if (document.getElementById('quizSetupScreen').classList.contains('active')) {
             quizConfig.timer = document.getElementById('timerSwitch').checked;
+            quizConfig.autoNext = document.getElementById('autoNextSwitch').checked;
         }
 
         let questions = masterWordList.filter(w => quizConfig.selectedWords.has(w.word));
@@ -641,19 +678,21 @@
         document.getElementById('choiceArea').style.display = (quizConfig.mode === 'choice') ? 'grid' : 'none';
         document.getElementById('spellingArea').style.display = (quizConfig.mode === 'spelling') ? 'block' : 'none';
         document.getElementById('timerBadge').style.display = quizConfig.timer ? 'inline-block' : 'none';
+        document.getElementById('btnNextQ').style.display = 'none'; // 初始隱藏手動按鈕
 
         showScreen('quizScreen');
         loadQuestion();
     }
 
     function loadQuestion() {
-        clearInterval(quizData.timerId); // 先清 Timer
+        clearInterval(quizData.timerId); 
+        document.getElementById('btnNextQ').style.display = 'none'; // 隱藏手動按鈕
+        
         const item = quizData.list[quizData.index];
         document.getElementById('qIdx').innerText = quizData.index + 1;
         document.getElementById('qTotal').innerText = quizData.list.length;
         document.getElementById('qHint').innerText = item.word_zh || "(聽音辨字)";
         
-        // 準備 UI
         if (quizConfig.mode === 'choice') renderChoices(item);
         else renderSpelling();
 
@@ -665,11 +704,10 @@
         const item = quizData.list[quizData.index];
         window.speechSynthesis.cancel();
 
-        const u1 = new SpeechSynthesisUtterance(item.word); u1.rate = 0.8;
-        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.rate = 0.8;
-        const u3 = new SpeechSynthesisUtterance(item.word); u3.rate = 0.8;
+        const u1 = new SpeechSynthesisUtterance(item.word); u1.rate = 0.9; u1.lang = 'en-US';
+        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.rate = 0.9; u2.lang = 'en-US';
+        const u3 = new SpeechSynthesisUtterance(item.word); u3.rate = 0.9; u3.lang = 'en-US';
 
-        // 聲音播完後才啟動計時器
         u3.onend = function() {
             if (quizConfig.timer) startTimer();
         };
@@ -677,11 +715,6 @@
         window.speechSynthesis.speak(u1);
         window.speechSynthesis.speak(u2);
         window.speechSynthesis.speak(u3);
-    }
-
-    // 重播按鈕
-    function playQuizAudio() {
-        playQuizSequence();
     }
 
     function startTimer() {
@@ -713,7 +746,8 @@
             document.getElementById('spellingInput').value = quizData.list[quizData.index].word;
             document.getElementById('spellingInput').style.borderColor = "var(--danger)";
         }
-        setTimeout(nextQuestion, 2000);
+        
+        handleNextStep();
     }
 
     function renderChoices(correctItem) {
@@ -740,7 +774,7 @@
 
     function checkChoice(btn, isCorrect) {
         clearInterval(quizData.timerId);
-        window.speechSynthesis.cancel(); // 停止題目播放
+        window.speechSynthesis.cancel();
         const allBtns = document.querySelectorAll('.btn-choice');
         allBtns.forEach(b => b.disabled = true);
 
@@ -756,7 +790,7 @@
                 if (b.innerText === quizData.list[quizData.index].word) b.classList.add('correct');
             });
         }
-        setTimeout(nextQuestion, 1500);
+        handleNextStep();
     }
 
     function renderSpelling() {
@@ -788,9 +822,18 @@
             saveMistake(quizData.list[quizData.index].word);
             speak("Wrong");
         }
-        setTimeout(nextQuestion, 2000);
+        handleNextStep();
     }
     
+    // 答題後處理 (自動跳 or 顯示按鈕)
+    function handleNextStep() {
+        if (quizConfig.autoNext) {
+            setTimeout(nextQuestion, 1500);
+        } else {
+            document.getElementById('btnNextQ').style.display = 'block';
+        }
+    }
+
     document.getElementById('spellingInput').addEventListener('keyup', function(e) {
         if (e.key === 'Enter' && !this.disabled) checkSpelling();
     });
