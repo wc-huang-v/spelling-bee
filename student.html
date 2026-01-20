@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v36.1</title>
+    <title>學生自主學習平板 v37.0</title>
     <style>
         /* --- 🎨 視覺風格：平板學習 App --- */
         :root {
@@ -135,7 +135,6 @@
         .btn-picker-action:active { background: #f0f0f0; }
         .btn-picker-action.accent { color: var(--primary); border-color: var(--primary); background: #e3f2fd; }
 
-        /* 快速測驗模式按鈕 */
         .quick-quiz-actions { display: flex; gap: 10px; margin-top: 15px; }
         .btn-quick-start { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: bold; color: white; cursor: pointer; font-size: 1rem; }
         .btn-quick-start.choice { background: linear-gradient(135deg, #4facfe, #00f2fe); }
@@ -321,7 +320,7 @@
         </div>
 
         <div class="question-card">
-            <div class="q-icon" onclick="playQuizAudio()">🔊</div>
+            <div class="q-icon" onclick="playQuizSequence()">🔊</div>
             <div class="q-hint" id="qHint">中文提示</div>
         </div>
 
@@ -357,34 +356,20 @@
 
 <script src="words.js"></script>
 <script>
-    // --- 全域變數 ---
     let sessions = [];
     let currentMode = ''; 
-    let viewedWords = new Set(); // 記錄已讀單字 (Session Storage)
-
-    // 背單字相關
-    let studyData = {
-        sid: null,
-        list: [],
-        currentIndex: 0
-    };
-
-    // 測驗相關
+    let viewedWords = new Set(); 
+    let studyData = { sid: null, list: [], currentIndex: 0 };
     let quizConfig = { mode: 'choice', selectedWords: new Set(), timer: false };
     let quizData = { list: [], index: 0, score: 0, timerId: null };
-    
-    // Word Picker 暫存
     let currentPickerSid = null;
-    let isQuickQuizPicker = false; // 判斷是否為快速測驗模式
+    let isQuickQuizPicker = false; 
 
-    // --- 初始化 ---
     window.onload = function() {
         if (typeof masterWordList === 'undefined') {
             alert("錯誤：找不到資料庫 words.js"); return;
         }
-        // 取得所有 Unit 並排序
         sessions = [...new Set(masterWordList.map(item => item.session))].sort();
-        
         goHome();
     };
 
@@ -397,23 +382,21 @@
         document.getElementById(id).classList.add('active');
         window.scrollTo(0,0);
         clearInterval(quizData.timerId); 
+        window.speechSynthesis.cancel(); // 換頁切斷語音
     }
 
-    // 🔊 語音
     function speak(text) {
-        window.speechSynthesis.cancel();
+        // window.speechSynthesis.cancel(); // 這裡不Cancel，避免連續播放被切
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'en-US';
         u.rate = 0.8; 
         window.speechSynthesis.speak(u);
     }
 
-    // --- 1. 單元選擇器 (背單字用) ---
     function openUnitSelector(targetMode) {
         currentMode = targetMode; 
         const grid = document.getElementById('unitGridContainer');
         grid.innerHTML = "";
-        
         sessions.forEach(sid => {
             const count = masterWordList.filter(w => w.session === sid).length;
             const btn = document.createElement('div');
@@ -425,13 +408,10 @@
         showScreen('unitSelectScreen');
     }
 
-    // --- 2. 背單字邏輯 (總表 Overview) ---
     function loadStudyOverview(sid) {
         studyData.sid = sid;
         studyData.list = masterWordList.filter(w => w.session === sid);
-        
         document.getElementById('overviewTitle').innerText = `Unit ${sid}`;
-        
         renderOverviewGrid();
         showScreen('studyOverviewScreen');
     }
@@ -439,38 +419,20 @@
     function renderOverviewGrid() {
         const grid = document.getElementById('overviewGrid');
         grid.innerHTML = "";
-
         studyData.list.forEach((item, index) => {
             const card = document.createElement('div');
             card.className = 'word-overview-card';
-            
-            if (viewedWords.has(item.word)) {
-                card.classList.add('read');
-            }
-
+            if (viewedWords.has(item.word)) card.classList.add('read');
             card.innerHTML = `<h4>${item.word}</h4>`;
             card.onclick = () => openFlashcard(index);
             grid.appendChild(card);
         });
     }
 
-    // ⚡ 快速測驗入口：打開 Picker
-    function openQuickQuizPicker() {
-        // 設定為快速測驗模式
-        isQuickQuizPicker = true;
-        // 清空之前的選擇
-        quizConfig.selectedWords.clear();
-        
-        // 預設選取：當前單元中「已讀」的字
-        studyData.list.forEach(w => {
-            if (viewedWords.has(w.word)) quizConfig.selectedWords.add(w.word);
-        });
-
-        // 打開 Picker (傳入目前 Unit)
-        openWordPicker(studyData.sid);
+    function quickQuizFromStudy() {
+        openQuickQuizPicker();
     }
 
-    // --- 3. 背單字邏輯 (單卡 Detail) ---
     function openFlashcard(index) {
         studyData.currentIndex = index;
         updateFlashcardUI();
@@ -479,18 +441,15 @@
 
     function updateFlashcardUI() {
         const item = studyData.list[studyData.currentIndex];
-        
-        // 標記為已讀
         viewedWords.add(item.word);
-        
         document.getElementById('detailIdx').innerText = studyData.currentIndex + 1;
         document.getElementById('detailTotal').innerText = studyData.list.length;
-        
         document.getElementById('cardWord').innerText = item.word;
         document.getElementById('cardZh').innerText = item.word_zh || '';
         document.getElementById('cardSentEn').innerText = item.sentence;
         document.getElementById('cardSentZh').innerText = item.sentence_zh || '';
-
+        
+        window.speechSynthesis.cancel();
         setTimeout(() => speak(item.word), 300);
     }
 
@@ -509,13 +468,13 @@
     }
 
     function playCurrentCardAudio() {
-        const item = studyData.list[studyData.currentIndex];
-        speak(item.word);
+        window.speechSynthesis.cancel();
+        speak(studyData.list[studyData.currentIndex].word);
     }
 
     function playCurrentCardSent() {
-        const item = studyData.list[studyData.currentIndex];
-        speak(item.sentence);
+        window.speechSynthesis.cancel();
+        speak(studyData.list[studyData.currentIndex].sentence);
     }
 
     function backToOverview() {
@@ -523,17 +482,13 @@
         showScreen('studyOverviewScreen');
     }
 
-    // --- 4. 測驗設定邏輯 ---
     function openQuizSetup() {
         quizConfig.mode = 'choice';
         quizConfig.timer = false;
-        
         updateModeUI();
         document.getElementById('timerSwitch').checked = false;
-        
         renderQuizRangeGrid();
         updateTotalCount();
-        
         showScreen('quizSetupScreen');
     }
 
@@ -543,19 +498,15 @@
         sessions.forEach(sid => {
             const btn = document.createElement('div');
             btn.className = 'range-btn';
-            
-            // 計算該單元被選了幾個字
             const unitWords = masterWordList.filter(w => w.session === sid);
             let pickedCount = 0;
             unitWords.forEach(w => {
                 if (quizConfig.selectedWords.has(w.word)) pickedCount++;
             });
-
             if (pickedCount > 0) btn.classList.add('has-data');
-
             btn.innerHTML = `Unit ${sid} ${pickedCount > 0 ? `<span class="badge-count">${pickedCount}</span>` : ''}`;
             btn.onclick = () => {
-                isQuickQuizPicker = false; // 一般設定模式
+                isQuickQuizPicker = false; 
                 openWordPicker(sid);
             };
             grid.appendChild(btn);
@@ -584,13 +535,18 @@
         document.getElementById('totalSelectedCount').innerText = quizConfig.selectedWords.size;
     }
 
-    // --- Word Picker Modal Logic ---
+    // --- Picker Logic ---
     function openWordPicker(sid) {
         currentPickerSid = sid;
         document.getElementById('pickerTitle').innerText = `挑選單字 (Unit ${sid})`;
         
-        // 切換按鈕顯示：快速測驗顯示直接開始，一般設定顯示完成選取
         if (isQuickQuizPicker) {
+            // 快速模式：預設選取已讀
+            quizConfig.selectedWords.clear();
+            const unitWords = masterWordList.filter(w => w.session === sid);
+            unitWords.forEach(w => {
+                if (viewedWords.has(w.word)) quizConfig.selectedWords.add(w.word);
+            });
             document.getElementById('btnPickerSave').style.display = 'none';
             document.getElementById('btnPickerQuickStart').style.display = 'flex';
         } else {
@@ -604,7 +560,6 @@
 
     function closeWordPicker() {
         document.getElementById('wordPickerModal').style.display = 'none';
-        // 如果是一般設定模式，關閉時要更新外層 UI
         if (!isQuickQuizPicker) {
             renderQuizRangeGrid();
             updateTotalCount();
@@ -614,14 +569,12 @@
     function renderPickerGrid() {
         const container = document.getElementById('pickerGrid');
         container.innerHTML = "";
-        
         const unitWords = masterWordList.filter(w => w.session === currentPickerSid);
         
         unitWords.forEach(item => {
             const div = document.createElement('div');
             div.className = 'picker-item';
             if (quizConfig.selectedWords.has(item.word)) div.classList.add('picked');
-            
             div.innerText = item.word;
             div.onclick = () => {
                 if (quizConfig.selectedWords.has(item.word)) {
@@ -657,28 +610,29 @@
         renderPickerGrid();
     }
 
-    // --- 5. 測驗引擎 ---
+    function openQuickQuizPicker() {
+        isQuickQuizPicker = true;
+        // 打開時會觸發 openWordPicker 自動預設已讀
+        openWordPicker(studyData.sid);
+    }
+
     function startQuickQuizDirect(mode) {
-        // 從 Picker 直接開始
         quizConfig.mode = mode;
-        quizConfig.timer = false; // 快速測驗預設不計時，降低壓力
+        quizConfig.timer = false;
         closeWordPicker();
         startConfiguredQuiz();
     }
 
+    // --- Quiz Engine ---
     function startConfiguredQuiz() {
-        // 檢查數量
         if (quizConfig.selectedWords.size === 0) { alert("請至少選擇 1 個單字！"); return; }
         
         if (document.getElementById('quizSetupScreen').classList.contains('active')) {
             quizConfig.timer = document.getElementById('timerSwitch').checked;
         }
 
-        // 從 selectedWords Set 轉回 Object Array
         let questions = masterWordList.filter(w => quizConfig.selectedWords.has(w.word));
-        
         questions.sort(() => 0.5 - Math.random());
-        // 自主測驗不限題數，全測
 
         quizData.list = questions;
         quizData.index = 0;
@@ -693,27 +647,43 @@
     }
 
     function loadQuestion() {
+        clearInterval(quizData.timerId); // 先清 Timer
         const item = quizData.list[quizData.index];
         document.getElementById('qIdx').innerText = quizData.index + 1;
         document.getElementById('qTotal').innerText = quizData.list.length;
         document.getElementById('qHint').innerText = item.word_zh || "(聽音辨字)";
         
-        setTimeout(() => speak(item.word), 500);
+        // 準備 UI
+        if (quizConfig.mode === 'choice') renderChoices(item);
+        else renderSpelling();
 
-        if (quizConfig.timer) startTimer();
-
-        if (quizConfig.mode === 'choice') {
-            renderChoices(item);
-        } else {
-            renderSpelling();
-        }
+        // 啟動音檔流程 (Word -> Sentence -> Word)
+        playQuizSequence();
     }
 
+    function playQuizSequence() {
+        const item = quizData.list[quizData.index];
+        window.speechSynthesis.cancel();
+
+        const u1 = new SpeechSynthesisUtterance(item.word); u1.rate = 0.8;
+        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.rate = 0.8;
+        const u3 = new SpeechSynthesisUtterance(item.word); u3.rate = 0.8;
+
+        // 聲音播完後才啟動計時器
+        u3.onend = function() {
+            if (quizConfig.timer) startTimer();
+        };
+
+        window.speechSynthesis.speak(u1);
+        window.speechSynthesis.speak(u2);
+        window.speechSynthesis.speak(u3);
+    }
+
+    // 重播按鈕
     function playQuizAudio() {
-        speak(quizData.list[quizData.index].word);
+        playQuizSequence();
     }
 
-    // Timer: 8 秒
     function startTimer() {
         clearInterval(quizData.timerId);
         let timeLeft = 8;
@@ -751,7 +721,6 @@
         container.innerHTML = "";
         
         let opts = [correctItem];
-        // 產生干擾項：優先從本次測驗範圍找，不夠則從全域找
         let pool = quizData.list.length >= 4 ? quizData.list : masterWordList;
         
         while(opts.length < 4) {
@@ -771,6 +740,7 @@
 
     function checkChoice(btn, isCorrect) {
         clearInterval(quizData.timerId);
+        window.speechSynthesis.cancel(); // 停止題目播放
         const allBtns = document.querySelectorAll('.btn-choice');
         allBtns.forEach(b => b.disabled = true);
 
@@ -800,6 +770,7 @@
 
     function checkSpelling() {
         clearInterval(quizData.timerId);
+        window.speechSynthesis.cancel();
         const input = document.getElementById('spellingInput');
         const correct = quizData.list[quizData.index].word.trim().toLowerCase();
         const userVal = input.value.trim().toLowerCase();
