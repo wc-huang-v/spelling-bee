@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生練習區 v31.0</title>
+    <title>學生練習區 v32.1 (雙語版)</title>
     <style>
         /* --- 🎨 學生版配色：森林探險風格 --- */
         :root {
@@ -16,6 +16,7 @@
             --wrong-bg: #fadbd8;
             --text-main: #2c3e50; 
             --text-light: #7f8c8d;
+            --text-trans: #666; /* 翻譯文字顏色 */
             --radius-card: 24px;
             --radius-btn: 50px;
         }
@@ -31,496 +32,383 @@
             min-height: 100vh;
         }
 
-        .app-container {
-            width: 100%; max-width: 600px;
-            background: #ffffff; 
-            border-radius: var(--radius-card);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            overflow: hidden;
-            border: 4px solid #fff; 
-            min-height: 85vh; position: relative;
-            display: flex; flex-direction: column;
-        }
-
-        /* Header */
+        /* --- 導覽列 --- */
         header {
-            background: var(--primary); color: white; padding: 15px 20px;
-            font-size: 1.3rem; font-weight: 900;
+            width: 100%; max-width: 600px;
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 5px solid rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
-
-        .header-right { display: flex; gap: 10px; }
-
-        .nav-btn {
-            background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); 
-            color: white; padding: 6px 14px; border-radius: 20px; cursor: pointer; 
-            font-size: 0.9rem; font-weight:bold; transition: 0.2s;
-            display: flex; align-items: center; gap: 5px;
+        .app-logo { font-size: 1.4rem; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .btn-mistake {
+            background: white; border: 2px solid var(--wrong); color: var(--wrong);
+            padding: 6px 14px; border-radius: 20px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 0 #fadbd8; transition: 0.1s;
         }
-        .nav-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.4); }
+        .btn-mistake:active { transform: translateY(2px); box-shadow: 0 2px 0 #fadbd8; }
 
-        .screen { padding: 25px; display: none; flex: 1; overflow-y: auto; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* --- 畫面切換 --- */
+        .screen { display: none; width: 100%; max-width: 600px; animation: fadeIn 0.4s; }
         .screen.active { display: block; }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 1. 首頁 */
-        .welcome-area { text-align: center; margin-bottom: 25px; margin-top: 15px; }
-        .welcome-emoji { font-size: 4rem; margin-bottom: 10px; display: block; filter: drop-shadow(0 4px 0 #ddd); animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-        
-        .session-select-area { 
-            background: var(--primary-light); padding: 20px; border-radius: 20px; 
-            border: 2px dashed var(--primary); margin-bottom: 25px; text-align: center;
+        /* --- 1. 首頁 (選單) --- */
+        .welcome-card {
+            background: white; padding: 25px; border-radius: var(--radius-card);
+            text-align: center; box-shadow: 0 8px 20px rgba(39, 174, 96, 0.15);
+            margin-bottom: 25px;
         }
-        select {
-            width: 100%; padding: 15px; border-radius: 12px;
-            border: 2px solid var(--primary); font-size: 1.2rem; 
-            background: white; color: var(--text-main); font-weight: bold;
-            outline: none; cursor: pointer; appearance: none;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.05); text-align: center;
-        }
+        .welcome-title { font-size: 1.6rem; font-weight: 900; color: var(--text-main); margin: 0 0 10px 0; }
+        .welcome-sub { color: var(--text-light); font-size: 1rem; }
 
-        .menu-grid { display: grid; gap: 20px; }
-        
-        .mode-card {
-            background: white; border: 2px solid #eee; border-radius: 24px;
-            padding: 20px; display: flex; align-items: center; gap: 20px;
-            cursor: pointer; transition: 0.1s; box-shadow: 0 6px 0 #eee;
+        .session-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .session-btn {
+            background: white; border: 2px solid #e0e0e0; border-radius: 16px;
+            padding: 20px 10px; text-align: center; cursor: pointer; transition: 0.2s;
             position: relative; overflow: hidden;
         }
-        .mode-card:active { transform: translateY(4px); box-shadow: 0 2px 0 #eee; }
+        .session-btn:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .session-btn h3 { margin: 0; font-size: 1.4rem; color: var(--primary); }
+        .session-btn p { margin: 5px 0 0; font-size: 0.85rem; color: #aaa; }
+        .session-btn.completed { border-color: #f1c40f; background: #fef9e7; }
+        .session-btn.completed::after { content: "★"; position: absolute; top: 5px; right: 5px; color: #f1c40f; font-size: 1.2rem; }
+
+        /* --- 2. 學習模式 (Flashcards) --- */
+        .study-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+        .btn-back { background: #f0f0f0; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; color: #777; }
         
-        .mode-review:hover { border-color: var(--primary); }
-        .mode-review .icon-box { background: var(--primary); color: white; }
-        .mode-quiz:hover { border-color: var(--action); }
-        .mode-quiz .icon-box { background: var(--action); color: white; }
-
-        .icon-box {
-            width: 65px; height: 65px; border-radius: 18px; display: flex; 
-            justify-content: center; align-items: center; font-size: 2.2rem; flex-shrink: 0;
-            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.1);
+        .flashcard-list { display: flex; flex-direction: column; gap: 15px; padding-bottom: 80px; }
+        .flashcard {
+            background: white; padding: 20px; border-radius: 20px;
+            border-left: 6px solid var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex; justify-content: space-between; align-items: flex-start;
         }
-        .mode-info h3 { margin: 0; font-size: 1.4rem; color: var(--text-main); font-weight: 900; }
-        .mode-info p { margin: 5px 0 0; color: var(--text-light); font-size: 0.95rem; font-weight: bold; }
-
-        .btn-mistake {
-            background: #fff; border: 2px solid var(--wrong); color: var(--wrong);
-            width: 100%; padding: 15px; border-radius: 20px; margin-top: 25px;
-            font-weight: bold; cursor: pointer; box-shadow: 0 4px 0 #fadbd8; font-size: 1rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .btn-mistake:active { transform: translateY(2px); box-shadow: none; }
-
-        .safe-exit-area { margin-top: 40px; text-align: center; border-top: 2px dashed #eee; padding-top: 20px; }
-        .btn-safe-exit {
-            background: transparent; border: 1px solid #ccc; color: #999;
-            padding: 10px 20px; border-radius: 30px; font-size: 0.9rem; cursor: pointer;
-            display: inline-flex; align-items: center; gap: 5px; transition: 0.2s;
-        }
-        .btn-safe-exit:hover { border-color: var(--wrong); color: var(--wrong); background: #fff5f5; }
-
-        /* 2. Grid */
-        .grid-header { text-align: center; margin-bottom: 20px; }
-        .word-grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .grid-item {
-            background: #fff; border: 2px solid #eee; border-radius: 16px;
-            padding: 25px 5px; text-align: center; font-size: 1.3rem; font-weight: 800;
-            color: #bdc3c7; cursor: pointer; transition: 0.1s; box-shadow: 0 5px 0 #eee;
-            position: relative;
-        }
-        .grid-item:active { transform: translateY(4px); box-shadow: 0 1px 0 #eee; }
-        .grid-item.viewed {
-            background-color: #fff; border-color: var(--primary); color: var(--primary);
-            box-shadow: 0 5px 0 var(--primary-light);
-        }
-        .grid-item.viewed::after { content: "✔"; position: absolute; top: 5px; right: 8px; font-size: 0.9rem; color: var(--primary); }
-
-        /* 3. Flashcard */
-        .word-card {
-            background: #fff; border: 3px solid var(--primary); border-radius: 30px;
-            padding: 40px 20px; text-align: center; margin-bottom: 25px; 
-            box-shadow: 0 10px 0 var(--primary-light); position: relative;
-        }
-        .wc-word { font-size: 3.5rem; font-weight: 900; color: var(--text-main); margin-bottom: 20px; word-break: break-word; line-height: 1.1; }
-        .wc-sentence { 
-            font-size: 1.4rem; color: #555; background: #f8f9fa; 
-            padding: 20px; border-radius: 16px; text-align: left; 
-            border-left: 6px solid var(--action); line-height: 1.5;
-        }
-        .btn-audio-small {
-            width: 50px; height: 50px; border-radius: 50%; background: var(--action);
-            border: none; font-size: 1.5rem; cursor: pointer; color: #fff;
-            box-shadow: 0 4px 0 var(--action-shadow); margin: 0 auto 20px; display: block;
-        }
-        .btn-audio-small:active { transform: translateY(3px); box-shadow: none; }
-
-        /* 4. Quiz */
-        .quiz-status { 
-            display: flex; justify-content: space-between; font-weight: bold; color: var(--primary); 
-            background: var(--primary-light); padding: 12px 20px; border-radius: 30px; margin-bottom: 25px; font-size: 1.1rem;
-        }
-        .quiz-control-row { display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 25px; }
+        .fc-content { flex: 1; }
+        .fc-word { font-size: 1.6rem; font-weight: 800; color: var(--text-main); line-height: 1.2; }
+        .fc-trans { font-size: 1rem; color: var(--text-trans); font-weight: bold; margin-bottom: 8px; } /* 單字翻譯樣式 */
+        .fc-sentence { font-size: 0.95rem; color: #444; line-height: 1.4; background: #f8f9fa; padding: 8px 8px 4px 8px; border-radius: 8px 8px 0 0; margin-top: 5px; }
+        .fc-sentence-trans { font-size: 0.9rem; color: #888; background: #f8f9fa; padding: 0 8px 8px 8px; border-radius: 0 0 8px 8px; margin-bottom: 5px; } /* 例句翻譯樣式 */
         
-        .btn-audio-big {
-            width: 90px; height: 90px; border-radius: 50%; background: var(--action);
-            border: 5px solid #fff; font-size: 2.8rem; cursor: pointer; color: #fff;
-            box-shadow: 0 8px 0 var(--action-shadow), 0 0 0 5px var(--action); 
-            transition: 0.1s; animation: pulse 2s infinite; position: relative; z-index: 10;
+        .btn-speak-row {
+            background: var(--primary-light); color: var(--primary); border: none;
+            width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+            margin-left: 15px; flex-shrink: 0; font-size: 1.2rem; transition: 0.2s;
+            margin-top: 5px;
         }
-        .btn-audio-big:active { transform: translateY(4px); box-shadow: 0 4px 0 var(--action-shadow), 0 0 0 5px var(--action); }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .btn-speak-row:active { transform: scale(0.9); background: var(--primary); color: white; }
 
-        .timer-container { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .timer-btn { width: 70px; height: 70px; background: white; border: 4px solid #ccc; border-radius: 50%; color: #999; display: flex; justify-content: center; align-items: center; font-size: 2rem; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #bbb; transition: 0.2s; }
-        .timer-btn.active { border-color: var(--wrong); color: var(--wrong); box-shadow: 0 4px 0 #c0392b; }
-        .timer-btn.ticking { animation: pulse 1s infinite; }
+        /* 底部學習後測驗區塊 */
+        .post-study-actions {
+            margin-top: 30px; padding: 25px; background: #fff8e1;
+            border: 2px dashed #f39c12; border-radius: 20px; text-align: center;
+        }
+        .post-study-title { font-weight: bold; color: #d35400; margin-bottom: 15px; font-size: 1.1rem; }
+        .post-study-btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .btn-post-quiz {
+            padding: 12px 24px; border-radius: 30px; border: none;
+            font-weight: bold; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1); transition: 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-quiz-all { background: var(--primary); color: white; box-shadow: 0 4px 0 #1e8449; }
+        .btn-quiz-all:active { transform: translateY(2px); box-shadow: 0 2px 0 #1e8449; }
+        .btn-quiz-random { background: var(--action); color: white; box-shadow: 0 4px 0 var(--action-shadow); }
+        .btn-quiz-random:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--action-shadow); }
+
+        /* --- 3. 測驗模式 --- */
+        .quiz-container { 
+            background: white; border-radius: var(--radius-card); padding: 30px 20px;
+            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative; overflow: hidden;
+        }
+        .quiz-progress { position: absolute; top: 0; left: 0; height: 6px; background: var(--primary); transition: width 0.3s; }
+        .quiz-question-num { font-size: 0.9rem; color: #aaa; margin-bottom: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         
-        .switch-wrapper { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-light); font-weight: bold;}
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(18px); }
-
-        .quiz-input {
-            width: 100%; padding: 18px; font-size: 2rem; text-align: center; font-weight: bold;
-            border: 3px solid #e0e0e0; border-radius: 20px; outline: none;
-            margin-bottom: 15px; color: var(--text-main); background: #fff; transition: 0.3s;
-        }
-        .quiz-input:focus { border-color: var(--action); box-shadow: 0 0 0 5px rgba(243, 156, 18, 0.2); }
+        .quiz-word-card { margin: 20px 0 30px 0; min-height: 120px; }
+        .quiz-icon { font-size: 3rem; margin-bottom: 10px; }
+        .quiz-word-display { font-size: 2.5rem; font-weight: 900; color: var(--text-main); margin-bottom: 5px; opacity: 0; transition: 0.3s; }
+        .quiz-word-display.revealed { opacity: 1; }
         
-        .feedback-area {
-            min-height: 50px; text-align: center; font-weight: 800; margin-bottom: 15px; font-size: 1.4rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .correct { color: var(--primary); background: var(--primary-light); padding: 15px; border-radius: 15px; width: 100%; border: 2px solid var(--primary); }
-        .wrong { color: var(--wrong); background: var(--wrong-bg); padding: 15px; border-radius: 15px; width: 100%; border: 2px solid var(--wrong); }
+        /* 測驗模式下的翻譯顯示 (預設隱藏) */
+        .quiz-info-hidden { opacity: 0; transition: 0.3s; height: 0; overflow: hidden; }
+        .quiz-info-hidden.revealed { opacity: 1; height: auto; margin-top: 10px; }
+        .quiz-trans { color: var(--text-trans); font-size: 1.1rem; font-weight: bold; margin-bottom: 10px; }
+        .quiz-sentence-box { background: #f8f9fa; padding: 10px; border-radius: 8px; text-align: left; font-size: 0.95rem; color: #555; border-left: 4px solid var(--primary); }
+        .quiz-sentence-trans { color: #888; font-size: 0.9rem; margin-top: 4px; display: block; }
 
-        /* 按鈕 */
-        .btn-main {
-            width: 100%; padding: 18px; background: var(--primary); color: white;
-            border: none; border-radius: 50px; font-size: 1.4rem; font-weight: 900;
-            cursor: pointer; box-shadow: 0 6px 0 #1e8449; transition: 0.1s; margin-bottom: 15px;
+        .quiz-btn-group { display: grid; gap: 15px; }
+        .btn-quiz-action { 
+            padding: 18px; border: none; border-radius: 16px; 
+            font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.05);
         }
-        .btn-main:active { transform: translateY(4px); box-shadow: 0 2px 0 #1e8449; }
+        .btn-listen { background: var(--primary); color: white; box-shadow: 0 5px 0 #1e8449; }
+        .btn-listen:active { transform: translateY(3px); box-shadow: 0 2px 0 #1e8449; }
         
-        .btn-small {
-            padding: 12px 20px; background: #fff; border: 2px solid #eee; border-radius: 30px;
-            color: var(--text-light); cursor: pointer; font-weight: bold; font-size: 1rem;
-            box-shadow: 0 4px 0 #eee; flex: 1; transition: 0.1s;
-        }
-        .btn-small:active { transform: translateY(4px); box-shadow: none; }
+        .btn-reveal { background: #ecf0f1; color: var(--text-main); box-shadow: 0 5px 0 #bdc3c7; }
+        .btn-reveal:active { transform: translateY(3px); box-shadow: 0 2px 0 #bdc3c7; }
 
-        /* 總結區 */
-        .summary-container { max-height: 50vh; overflow-y: auto; margin: 20px 0; border: 2px solid #eee; border-radius: 15px; }
-        .summary-item { display: flex; align-items: center; justify-content: space-between; padding: 15px; border-bottom: 1px solid #f0f0f0; background: #fff; }
-        .summary-item:last-child { border-bottom: none; }
-        .s-word { font-size: 1.3rem; font-weight: bold; color: #555; }
-        .s-status { font-size: 1.3rem; margin-right: 10px; }
-        .s-btn-audio { width: 40px; height: 40px; border-radius: 50%; background: #eafaf1; border: none; color: var(--primary); cursor: pointer; font-size: 1.1rem; }
+        .btn-answer-group { display: flex; gap: 15px; display: none; }
+        .btn-correct { flex: 1; background: #2ecc71; color: white; box-shadow: 0 5px 0 #27ae60; }
+        .btn-wrong { flex: 1; background: #e74c3c; color: white; box-shadow: 0 5px 0 #c0392b; }
 
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
-        .modal-content { background-color: #fff; margin: 15% auto; padding: 25px; width: 90%; max-width: 500px; border-radius: 20px; max-height: 70vh; overflow-y: auto; position: relative; border: 4px solid var(--primary); }
-        #mistakeModal .modal-content { border-color: var(--wrong); }
-        .close-btn { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
-        .mistake-list { list-style: none; padding: 0; }
-        .mistake-item { border-bottom: 1px dashed #eee; padding: 12px 0; display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: bold; color: #555; }
-        .mistake-count { background: var(--wrong); color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.9rem; }
-        .help-h3 { color: var(--primary); font-size: 1.2rem; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; margin-top: 20px; }
-        .help-p { color: #555; line-height: 1.6; font-size: 1rem; margin: 0; }
+        /* Modal & Result (保持不變) */
+        .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); animation: fadeIn 0.2s; }
+        .modal-content { background: white; margin: 20% auto; padding: 25px; width: 90%; max-width: 400px; border-radius: 20px; position: relative; text-align: center; }
+        .close-btn { position: absolute; right: 20px; top: 15px; font-size: 1.5rem; cursor: pointer; color: #aaa; }
+        .mistake-list { list-style: none; padding: 0; text-align: left; max-height: 300px; overflow-y: auto; }
+        .mistake-item { padding: 12px; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; font-weight: bold; color: var(--text-main); }
+        .mistake-count { color: var(--wrong); background: var(--wrong-bg); padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; }
+        .result-score { font-size: 4rem; font-weight: 900; color: var(--primary); margin: 10px 0; }
+        .result-msg { font-size: 1.2rem; color: #555; margin-bottom: 30px; }
 
     </style>
 </head>
 <body>
 
-<div class="app-container">
     <header>
-        <span>🌱 學生練習區</span>
-        <div class="header-right">
-            <button class="nav-btn" onclick="openHelp()">❓ 說明</button>
-            <button class="nav-btn" onclick="goHome()">🏠 選單</button>
-        </div>
+        <div class="app-logo"><span>🎒</span> 學生練習區</div>
+        <button class="btn-mistake" onclick="openMistakes()">📕 錯題本</button>
     </header>
 
     <div id="homeScreen" class="screen active">
-        <div class="welcome-area">
-            <span class="welcome-emoji">🎒</span>
-            <h2 style="color:var(--text-main); margin:0;">Happy Learning!</h2>
-            <p style="color:#aaa; margin-top:5px; font-weight:bold;">今天想挑戰哪一關？</p>
+        <div class="welcome-card">
+            <h1 class="welcome-title">準備好學習了嗎？</h1>
+            <div class="welcome-sub">選擇一個單元開始背單字！</div>
         </div>
-
-        <div class="session-select-area">
-            <label style="display:block; margin-bottom:10px; color:var(--text-main); font-weight:bold; font-size:1.1rem;">📍 選擇單元</label>
-            <select id="sessionSelect"></select>
+        <div id="sessionGrid" class="session-grid"></div>
+        <div style="margin-top:30px; text-align:center;">
+             <button class="session-btn" style="width:100%; background:#fff3e0; border-color:#ffe0b2;" onclick="enterSmartReview()">
+                <h3>🤖 智能複習</h3><p>隨機抽考 20 題</p>
+             </button>
         </div>
-
-        <div class="menu-grid">
-            <div class="mode-card mode-review" onclick="startReviewGrid()">
-                <div class="icon-box">📖</div>
-                <div class="mode-info"><h3>單字預習</h3><p>瀏覽單字卡</p></div>
-            </div>
-            <div class="mode-card mode-quiz" onclick="startQuiz()">
-                <div class="icon-box">✍️</div>
-                <div class="mode-info"><h3>聽寫挑戰</h3><p>隨機 5 題測驗</p></div>
-            </div>
-        </div>
-
-        <button class="btn-mistake" onclick="openMistakes()">
-            <span style="font-size:1.5rem;">📊</span> 我的錯題本 (Top 5)
-        </button>
-        
-        <div class="safe-exit-area">
-            <button class="btn-safe-exit" onclick="confirmExit()">🚪 結束練習 (回到總入口)</button>
-        </div>
-
-        <div id="loadStatus" style="text-align:center; margin-top:20px; color:#ccc; font-size:0.8rem;"></div>
     </div>
 
-    <div id="gridScreen" class="screen">
-        <div class="grid-header">
-            <h3 style="color:var(--text-main); margin:0;">單元單字表</h3>
-            <p style="color:#999; font-size:0.9rem; margin-top:5px; font-weight:bold;">點擊變色代表看過囉！</p>
+    <div id="studyScreen" class="screen">
+        <div class="study-header">
+            <button class="btn-back" onclick="goHome()">⬅ 回選單</button>
+            <h2 style="margin:0; font-size:1.2rem;" id="studyTitle">Unit 1</h2>
+            <div style="width:60px;"></div>
         </div>
-        <div id="wordGrid" class="word-grid-container"></div>
-        <button class="btn-small" onclick="goHome()" style="width:100%; margin-top:30px;">⬅ 回選單</button>
-    </div>
-
-    <div id="flashcardScreen" class="screen">
-        <div class="word-card">
-            <div class="wc-word" id="revWord">...</div>
-            <button class="btn-audio-small" onclick="playWord()">🔊</button>
-            <div class="wc-sentence" id="revSentence">...</div>
-        </div>
-
-        <button class="btn-main" onclick="backToGrid()" style="background:var(--text-main); box-shadow:0 6px 0 #17202a;">🆗 看完了</button>
-        <div style="display:flex; justify-content:space-between; margin-top:10px; gap:10px;">
-            <button class="btn-small" onclick="prevReview()">⬅ 上一個</button>
-            <button class="btn-small" onclick="nextReview()">下一個 ➡</button>
+        <div id="flashcardList" class="flashcard-list"></div>
+        <div class="post-study-actions">
+            <div class="post-study-title">🎉 背完了嗎？立刻來測驗看看！</div>
+            <div class="post-study-btn-group">
+                <button class="btn-post-quiz btn-quiz-random" onclick="startInstantQuiz('random')">🎲 隨機抽 10 題</button>
+                <button class="btn-post-quiz btn-quiz-all" onclick="startInstantQuiz('all')">📝 測驗全部</button>
+            </div>
         </div>
     </div>
 
     <div id="quizScreen" class="screen">
-        <div class="quiz-status">
-            <span>🚀 挑戰中</span>
-            <span><span id="quizIndex">1</span> / <span id="quizTotal">5</span></span>
-        </div>
-        
-        <div class="quiz-control-row">
-            <div style="text-align:center;">
-                <button class="btn-audio-big" onclick="playQuestionSequence()">🔊</button>
-                <div style="font-size:0.8rem; color:#aaa; font-weight:bold; margin-top:5px;">聽題目</div>
+        <div class="quiz-container">
+            <div class="quiz-progress" id="quizProgress"></div>
+            <div class="quiz-question-num">Question <span id="qCurrent">1</span> / <span id="qTotal">10</span></div>
+            
+            <div class="quiz-word-card">
+                <div class="quiz-icon">🔊</div>
+                <div class="quiz-word-display" id="quizWord">APPLE</div>
+                
+                <div id="quizInfo" class="quiz-info-hidden">
+                    <div class="quiz-trans" id="quizTrans">蘋果</div>
+                    <div class="quiz-sentence-box">
+                        <span id="quizSentence">...</span>
+                        <span class="quiz-sentence-trans" id="quizSentenceTrans">...</span>
+                    </div>
+                </div>
             </div>
-            <div class="timer-container">
-                <button class="timer-btn" id="studentTimerBtn" onclick="manualStartTimer()">8</button>
-                <div class="switch-wrapper">
-                    <label class="switch">
-                        <input type="checkbox" id="autoTimerSwitch">
-                        <span class="slider round"></span>
-                    </label>
-                    <span>自動倒數</span>
+
+            <div class="quiz-btn-group">
+                <button class="btn-quiz-action btn-listen" onclick="playCurrentQuizAudio()">🔊 播放發音</button>
+                <button class="btn-quiz-action btn-reveal" id="btnReveal" onclick="revealAnswer()">👀 看答案</button>
+                
+                <div class="btn-answer-group" id="answerGroup">
+                    <button class="btn-quiz-action btn-wrong" onclick="submitAnswer(false)">❌ 忘了</button>
+                    <button class="btn-quiz-action btn-correct" onclick="submitAnswer(true)">⭕ 記得</button>
                 </div>
             </div>
         </div>
-
-        <input type="text" id="userSpelling" class="quiz-input" placeholder="輸入單字..." autocomplete="off" autocapitalize="off">
-        <div id="quizFeedback" class="feedback-area"></div>
-
-        <button class="btn-main" onclick="checkAnswer()" style="background:var(--action); box-shadow:0 6px 0 var(--action-shadow);">✨ 送出檢查</button>
-    </div>
-
-    <div id="finishScreen" class="screen">
-        <div style="text-align:center;">
-            <div style="font-size:5rem; margin-top:20px; filter:drop-shadow(0 10px 0 rgba(0,0,0,0.1));">🎉</div>
-            <h2 style="color:var(--primary); margin:10px 0;">測驗結束！</h2>
-            <p style="color:#7f8c8d; font-weight:bold;">來看看你的成績單吧：</p>
-        </div>
-        <div id="summaryContainer" class="summary-container"></div>
-        <button class="btn-main" onclick="goHome()" style="margin-top:20px;">🏠 回選單</button>
-    </div>
-
-</div>
-
-<div id="mistakeModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('mistakeModal')">&times;</span>
-        <h2 style="color:var(--wrong); text-align:center; margin-top:0;">📊 我的常錯字</h2>
-        <div id="mistakeListContainer"></div>
         <div style="text-align:center; margin-top:20px;">
-            <button class="btn-small" onclick="clearMyMistakes()" style="color:var(--wrong); border-color:var(--wrong);">🗑️ 清空紀錄</button>
+            <button class="btn-back" onclick="goHome()">放棄測驗</button>
         </div>
     </div>
-</div>
 
-<div id="helpModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal('helpModal')">&times;</span>
-        <h2 style="color:var(--primary); text-align:center; margin-top:0;">📖 小朋友操作指南</h2>
-        <h3 class="help-h3">📖 怎麼預習？</h3><p class="help-p">點擊格子看單字卡。看過的字，格子會變成綠色打勾勾喔 ✅！</p>
-        <h3 class="help-h3">✍️ 怎麼考試？</h3><p class="help-p">按下大喇叭 🔊，聽題目（字-句-字），然後把單字打出來。</p>
-        <h3 class="help-h3">📊 錯題本</h3><p class="help-p">電腦會自動幫你記住常寫錯的字，點擊「錯題本」就可以複習。</p>
-        <div style="text-align:center; margin-top:25px;"><button class="btn-main" style="width:auto; padding:10px 40px;" onclick="closeModal('helpModal')">我知道了</button></div>
+    <div id="resultScreen" class="screen" style="text-align:center;">
+        <div style="font-size:4rem;">🏆</div>
+        <h2 style="color:var(--text-main);">測驗完成！</h2>
+        <div class="result-score" id="finalScore">100</div>
+        <div class="result-msg" id="finalMsg">太厲害了！</div>
+        <button class="session-btn" style="width:100%; margin-bottom:15px; background:var(--primary); color:white; border:none;" onclick="goHome()">🏠 回首頁</button>
+        <button class="btn-back" onclick="retryQuiz()">🔄 再測一次</button>
     </div>
-</div>
+
+    <div id="mistakeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('mistakeModal').style.display='none'">&times;</span>
+            <h2 style="margin-top:0; color:var(--wrong);">📕 我的錯題本</h2>
+            <div id="mistakeListContainer"></div>
+            <button class="btn-back" style="margin-top:20px; background:var(--wrong-bg); color:var(--wrong);" onclick="clearMistakes()">🗑️ 清空紀錄</button>
+        </div>
+    </div>
 
 <script src="words.js"></script>
 <script>
-    let db = [], currentList = [], currentIndex = 0;
-    // ✅ 關鍵優化：從 LocalStorage 讀取已讀紀錄
-    let viewedIndices = new Set(JSON.parse(localStorage.getItem('viewedWords') || '[]'));
-    let quizResults = [], timerValue = 8, timerInterval = null, isTimerRunning = false;
-
+    // --- 全域變數 ---
+    let sessions = [];
+    let currentStudyList = []; 
+    let quizList = [];         
+    let currentQIndex = 0;
+    let score = 0;
+    
+    // --- 初始化 ---
     window.onload = function() {
-        if (typeof masterWordList !== 'undefined') {
-            db = masterWordList;
-            initSessions();
-            document.getElementById('loadStatus').innerText = "v31.0 Ready";
-        } else {
-            document.getElementById('loadStatus').innerHTML = "<span style='color:red'>⚠️ 找不到 words.js</span>";
+        if (typeof masterWordList === 'undefined') {
+            alert("找不到資料庫 (words.js)，請確認檔案是否存在。");
+            return;
         }
+        sessions = [...new Set(masterWordList.map(item => item.session))].sort((a,b)=>a-b);
+        renderHome();
     };
 
-    function initSessions() {
-        const sessions = [...new Set(db.map(x => x.session))].sort((a,b)=>a-b);
-        const sel = document.getElementById('sessionSelect');
-        sessions.forEach(s => { const opt = document.createElement('option'); opt.value = s; opt.innerText = `第 ${s} 單元`; sel.appendChild(opt); });
-    }
-
     function goHome() { showScreen('homeScreen'); }
-    function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-    function confirmExit() { if(confirm("確定要離開練習區回到入口嗎？")) window.location.href = "index.html"; }
-
-    function prepareList(mode) {
-        const session = parseInt(document.getElementById('sessionSelect').value);
-        let list = db.filter(x => x.session === session);
-        if (mode === 'quiz') { list.sort(() => Math.random() - 0.5); if (list.length > 5) list = list.slice(0, 5); }
-        currentList = list; currentIndex = 0;
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
     }
 
-    // Grid
-    function startReviewGrid() {
-        prepareList('review');
-        if(currentList.length === 0) { alert("無單字"); return; }
-        renderGrid(); showScreen('gridScreen');
-    }
-    function renderGrid() {
-        const container = document.getElementById('wordGrid'); container.innerHTML = "";
-        currentList.forEach((item, index) => {
-            const div = document.createElement('div'); div.className = 'grid-item'; div.innerText = item.word;
-            if (viewedIndices.has(item.word)) div.classList.add('viewed');
-            div.onclick = () => jumpToCard(index);
-            container.appendChild(div);
+    // --- 1. 首頁 ---
+    function renderHome() {
+        const grid = document.getElementById('sessionGrid');
+        grid.innerHTML = "";
+        sessions.forEach(sessId => {
+            const btn = document.createElement('div');
+            btn.className = 'session-btn';
+            btn.innerHTML = `<h3>Unit ${sessId}</h3><p>${countWordsInSession(sessId)} Words</p>`;
+            btn.onclick = () => startStudy(sessId);
+            grid.appendChild(btn);
         });
     }
-    function jumpToCard(index) { currentIndex = index; showScreen('flashcardScreen'); updateReviewCard(); }
-    function backToGrid() { renderGrid(); showScreen('gridScreen'); }
+    function countWordsInSession(sid) { return masterWordList.filter(w => w.session === sid).length; }
 
-    function updateReviewCard() {
-        const item = currentList[currentIndex];
-        document.getElementById('revWord').innerText = item.word;
-        document.getElementById('revSentence').innerText = item.sentence;
-        markAsViewed(item.word);
+    // --- 2. 學習模式 ---
+    function startStudy(sid) {
+        document.getElementById('studyTitle').innerText = `Unit ${sid}`;
+        currentStudyList = masterWordList.filter(w => w.session === sid);
+        
+        const listContainer = document.getElementById('flashcardList');
+        listContainer.innerHTML = "";
+        
+        currentStudyList.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'flashcard';
+            // 處理翻譯欄位，如果沒有翻譯則顯示空字串
+            const trans = item.translation || "";
+            const sentTrans = item.sentence_trans || "";
+
+            card.innerHTML = `
+                <div class="fc-content">
+                    <div class="fc-word">${item.word}</div>
+                    ${trans ? `<div class="fc-trans">${trans}</div>` : ''} 
+                    <div class="fc-sentence">${item.sentence}</div>
+                    ${sentTrans ? `<div class="fc-sentence-trans">${sentTrans}</div>` : ''}
+                </div>
+                <button class="btn-speak-row" onclick="speak('${item.word}')">🔊</button>
+            `;
+            listContainer.appendChild(card);
+        });
+        showScreen('studyScreen');
     }
-    // ✅ 關鍵優化：存檔已讀紀錄
-    function markAsViewed(word) {
-        viewedIndices.add(word);
-        localStorage.setItem('viewedWords', JSON.stringify([...viewedIndices]));
+    function speak(text) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US'; u.rate = 0.8;
+        window.speechSynthesis.speak(u);
     }
 
-    function playWord() { speak(currentList[currentIndex].word); }
-    function speakText(type) { const item = currentList[currentIndex]; speak(type === 'word' ? item.word : item.sentence); }
-    function prevReview() { if(currentIndex > 0) { currentIndex--; updateReviewCard(); } }
-    function nextReview() { if(currentIndex < currentList.length - 1) { currentIndex++; updateReviewCard(); } else { if(confirm("回總表？")) backToGrid(); } }
+    // --- 立即測驗 ---
+    function startInstantQuiz(mode) {
+        if(currentStudyList.length === 0) return;
+        let listToTest = [...currentStudyList];
+        if (mode === 'random') { listToTest.sort(() => 0.5 - Math.random()); listToTest = listToTest.slice(0, 10); } 
+        else { listToTest.sort(() => 0.5 - Math.random()); }
+        initQuiz(listToTest);
+    }
+    function enterSmartReview() {
+        let all = [...masterWordList];
+        all.sort(() => 0.5 - Math.random());
+        initQuiz(all.slice(0, 20));
+    }
 
-    // Quiz
-    function startQuiz() {
-        prepareList('quiz'); if(currentList.length === 0) { alert("無單字"); return; }
-        quizResults = []; showScreen('quizScreen'); loadQuizQuestion();
+    // --- 3. 測驗引擎 ---
+    function initQuiz(list) {
+        quizList = list; currentQIndex = 0; score = 0;
+        showScreen('quizScreen'); loadQuestion();
     }
-    function loadQuizQuestion() {
-        resetTimer();
-        document.getElementById('quizIndex').innerText = currentIndex + 1;
-        document.getElementById('quizTotal').innerText = currentList.length;
-        document.getElementById('userSpelling').value = "";
-        document.getElementById('userSpelling').disabled = false;
-        document.getElementById('quizFeedback').innerText = "";
-        document.getElementById('quizFeedback').className = "feedback-area";
-        setTimeout(() => { document.getElementById('userSpelling').focus(); playQuestionSequence(); }, 500);
+    function loadQuestion() {
+        const item = quizList[currentQIndex];
+        document.getElementById('qCurrent').innerText = currentQIndex + 1;
+        document.getElementById('qTotal').innerText = quizList.length;
+        document.getElementById('quizProgress').style.width = `${((currentQIndex) / quizList.length) * 100}%`;
+        
+        const wordEl = document.getElementById('quizWord');
+        wordEl.innerText = item.word;
+        wordEl.classList.remove('revealed');
+        
+        // 隱藏翻譯區
+        document.getElementById('quizInfo').classList.remove('revealed');
+        
+        // 填入翻譯內容
+        document.getElementById('quizTrans').innerText = item.translation || "";
+        document.getElementById('quizSentence').innerText = item.sentence;
+        document.getElementById('quizSentenceTrans').innerText = item.sentence_trans || "";
+
+        document.getElementById('btnReveal').style.display = 'block';
+        document.getElementById('answerGroup').style.display = 'none';
+
+        setTimeout(() => playCurrentQuizAudio(), 500);
     }
-    function playQuestionSequence() {
-        resetTimer(); const item = currentList[currentIndex]; window.speechSynthesis.cancel();
-        const u1 = new SpeechSynthesisUtterance(item.word); u1.lang = 'en-US'; u1.rate = 0.8;
-        const u2 = new SpeechSynthesisUtterance(item.sentence); u2.lang = 'en-US'; u2.rate = 0.8;
-        const u3 = new SpeechSynthesisUtterance(item.word); u3.lang = 'en-US'; u3.rate = 0.8;
-        u3.onend = function() { if(document.getElementById('autoTimerSwitch').checked) startTimer(); };
-        window.speechSynthesis.speak(u1); window.speechSynthesis.speak(u2); window.speechSynthesis.speak(u3);
-    }
-    function checkAnswer() {
-        const userAns = document.getElementById('userSpelling').value.trim().toLowerCase();
-        const item = currentList[currentIndex]; const correctAns = item.word.trim().toLowerCase();
-        const feedback = document.getElementById('quizFeedback');
-        document.getElementById('userSpelling').disabled = true; resetTimer();
-        let isCorrect = false;
-        if (userAns === correctAns) {
-            feedback.innerHTML = "✅ 答對了！"; feedback.className = "feedback-area correct"; playDing(); isCorrect = true;
-        } else {
-            feedback.innerHTML = `❌ 答案是：${item.word}`; feedback.className = "feedback-area wrong"; speak(item.word); saveMyMistake(item.word); isCorrect = false;
-        }
-        quizResults.push({ word: item.word, correct: isCorrect });
-        setTimeout(() => { nextQuiz(); }, 1500);
-    }
-    function nextQuiz() { currentIndex++; if (currentIndex < currentList.length) loadQuizQuestion(); else { renderSummary(); showScreen('finishScreen'); } }
+    function playCurrentQuizAudio() { speak(quizList[currentQIndex].word); }
     
-    function renderSummary() {
-        const container = document.getElementById('summaryContainer'); let html = "";
-        quizResults.forEach(r => {
-            const statusIcon = r.correct ? "✅" : "❌"; const color = r.correct ? "green" : "red";
-            html += `<div class="summary-item"><div style="display:flex; align-items:center;"><span class="s-status">${statusIcon}</span><span class="s-word" style="color:${color}">${r.word}</span></div><button class="s-btn-audio" onclick="speak('${r.word}')">🔊</button></div>`;
-        });
-        container.innerHTML = html;
+    function revealAnswer() {
+        document.getElementById('quizWord').classList.add('revealed');
+        document.getElementById('quizInfo').classList.add('revealed'); // 顯示翻譯區
+        document.getElementById('btnReveal').style.display = 'none';
+        document.getElementById('answerGroup').style.display = 'flex';
+        speak(quizList[currentQIndex].sentence);
     }
 
-    // Timer & Audio
-    function manualStartTimer() { if(isTimerRunning) resetTimer(); else startTimer(); }
-    function startTimer() {
-        if(isTimerRunning) return; isTimerRunning = true; timerValue = 8; updateTimerDisplay();
-        const btn = document.getElementById('studentTimerBtn'); btn.classList.add('active', 'ticking');
-        timerInterval = setInterval(() => {
-            timerValue--; updateTimerDisplay();
-            if(timerValue <= 0) { clearInterval(timerInterval); playDing(); isTimerRunning = false; btn.classList.remove('ticking'); }
-        }, 1000);
-    }
-    function resetTimer() { clearInterval(timerInterval); isTimerRunning = false; timerValue = 8; const btn = document.getElementById('studentTimerBtn'); btn.innerText = "8"; btn.classList.remove('active', 'ticking'); }
-    function updateTimerDisplay() { document.getElementById('studentTimerBtn').innerText = timerValue; }
-    function speak(text) { const u = new SpeechSynthesisUtterance(text); u.lang = 'en-US'; u.rate = 0.8; window.speechSynthesis.speak(u); }
-    function playDing() {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)(); const t = ctx.currentTime;
-        const osc1 = ctx.createOscillator(); const osc2 = ctx.createOscillator(); const gain = ctx.createGain();
-        osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
-        osc1.type = "sine"; osc1.frequency.setValueAtTime(880, t); osc2.type = "sine"; osc2.frequency.setValueAtTime(1760, t);
-        gain.gain.setValueAtTime(0, t); gain.gain.linearRampToValueAtTime(0.5, t + 0.01); gain.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
-        osc1.start(t); osc2.start(t); osc1.stop(t + 1.5); osc2.stop(t + 1.5);
+    function submitAnswer(isCorrect) {
+        if (isCorrect) score++; else saveMyMistake(quizList[currentQIndex].word);
+        currentQIndex++;
+        if (currentQIndex < quizList.length) loadQuestion(); else showResult();
     }
 
-    // Mistakes Modal
+    // --- 4. 結算與錯題 ---
+    function showResult() {
+        showScreen('resultScreen');
+        document.getElementById('finalScore').innerText = Math.round((score / quizList.length) * 100);
+        const msg = document.getElementById('finalMsg');
+        const p = score / quizList.length;
+        if(p === 1) msg.innerText = "太神啦！全對！🎉";
+        else if(p >= 0.8) msg.innerText = "很棒喔！繼續保持！💪";
+        else if(p >= 0.6) msg.innerText = "及格了，再多練習一下！📚";
+        else msg.innerText = "加油！多背幾次就會了！🔥";
+    }
+    function retryQuiz() { quizList.sort(() => 0.5 - Math.random()); initQuiz(quizList); }
     function saveMyMistake(word) { let m = JSON.parse(localStorage.getItem('myMistakes')) || {}; m[word] = (m[word] || 0) + 1; localStorage.setItem('myMistakes', JSON.stringify(m)); }
     function openMistakes() {
         document.getElementById('mistakeModal').style.display = 'block';
         const m = JSON.parse(localStorage.getItem('myMistakes')) || {};
         const c = document.getElementById('mistakeListContainer');
-        if (Object.keys(m).length === 0) { c.innerHTML = "<p style='text-align:center; padding:20px;'>好棒！目前沒有錯題紀錄！👏</p>"; return; }
-        let s = Object.keys(m).map(k => ({ word: k, count: m[k] })).sort((a,b) => b.count - a.count).slice(0, 5);
+        if (Object.keys(m).length === 0) { c.innerHTML = "<p style='text-align:center; padding:20px; color:#999;'>好棒！目前沒有錯題紀錄！👏</p>"; return; }
+        let s = Object.keys(m).map(k => ({ word: k, count: m[k] })).sort((a,b) => b.count - a.count);
         let html = "<ul class='mistake-list'>";
         s.forEach(i => { html += `<li class='mistake-item'><span>${i.word}</span><span class='mistake-count'>錯 ${i.count} 次</span></li>`; });
         c.innerHTML = html + "</ul>";
     }
-    function openHelp() { document.getElementById('helpModal').style.display = 'block'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function clearMyMistakes() { if(confirm("確定清空？")) { localStorage.removeItem('myMistakes'); openMistakes(); } }
-    window.onclick = function(e) { if(e.target.classList.contains('modal')) e.target.style.display = 'none'; }
-
+    function clearMistakes() { if(confirm("確定要清空錯題紀錄嗎？")) { localStorage.removeItem('myMistakes'); openMistakes(); } }
+    window.onclick = function(e) { const m = document.getElementById('mistakeModal'); if (e.target == m) m.style.display = "none"; }
 </script>
 </body>
 </html>
