@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v31.1 (Mobile UX Fixed)</title>
+    <title>智慧單字小考官 v33.0 (Student First)</title>
     <style>
         /* --- 🎨 色彩系統 --- */
         :root {
@@ -13,18 +13,13 @@
             --primary-dark: #2980b9;
             --primary-light: #ebf5fb;
             --student: #2ecc71;
+            --student-dark: #27ae60;
             --accent: #f39c12;
             --danger: #e74c3c;
             --text-main: #2c3e50;
             --text-sub: #7f8c8d;
-            --radius-card: 16px;
-            --radius-btn: 8px;
             
             /* 視覺化熱點 */
-            --heat-critical: #c0392b;
-            --heat-high: #e67e22;
-            --heat-med: #f1c40f;
-            /* 修正熱點顏色定義 */
             --heat-yellow-bg: #fef9e7; --heat-yellow-bd: #f1c40f;
             --heat-orange-bg: #fdf2e9; --heat-orange-bd: #e67e22;
             --heat-red-bg: #fadbd8;    --heat-red-bd: #e74c3c;
@@ -36,44 +31,96 @@
             font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0; padding: 20px;
+            margin: 0; padding: 0; /* 首頁滿版設計，移除 padding */
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh;
         }
 
-        /* --- 🚪 入口大廳 --- */
+        /* --- 🚪 入口大廳 (全新學生優先設計) --- */
         #landing-page {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 100%; max-width: 800px; margin-top: 5vh; animation: fadeIn 0.6s ease-out;
-        }
-        .app-header-area { margin-bottom: 40px; text-align: center; }
-        .app-title { font-size: 2.2rem; font-weight: 900; color: var(--text-main); margin-bottom: 5px; }
-        .app-subtitle { color: var(--text-sub); font-size: 1.1rem; }
-        .role-container { display: flex; gap: 30px; width: 100%; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
-        
-        .landing-card {
-            background: white; flex: 1; min-width: 280px; max-width: 350px;
-            padding: 40px 30px; border-radius: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); text-align: center; cursor: pointer; 
-            transition: all 0.3s ease; border: 2px solid transparent;
-        }
-        .card-teacher:hover { transform: translateY(-8px); border-color: var(--primary); }
-        .card-teacher .icon { font-size: 4.5rem; margin-bottom: 15px; display: block; }
-        .card-student:hover { transform: translateY(-8px); border-color: var(--student); }
-        .card-student .icon { font-size: 4.5rem; margin-bottom: 15px; display: block; }
-        .btn-landing-help {
-            background: #fff; border: 2px solid #ddd; color: var(--text-sub);
-            padding: 12px 30px; border-radius: 30px; font-weight: bold; cursor: pointer;
-            font-size: 1rem; display: flex; align-items: center; gap: 8px; transition: 0.2s;
+            width: 100%; min-height: 100vh;
+            background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%); /* 活潑漸層背景 */
+            padding: 20px;
+            animation: fadeIn 0.6s ease-out;
+            position: relative;
         }
 
-        /* --- 👩‍🏫 老師版容器 --- */
+        .landing-content {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            padding-bottom: 60px; /* 留給底部按鈕空間 */
+        }
+
+        .app-logo-big { font-size: 5rem; margin-bottom: 10px; display: block; animation: bounce 2s infinite; }
+        .app-title { font-size: 2.5rem; font-weight: 900; color: var(--text-main); margin-bottom: 5px; text-shadow: 2px 2px 0px white; }
+        .app-subtitle { color: #555; font-size: 1.2rem; margin-bottom: 40px; font-weight: bold; }
+
+        /* 🎒 學生專屬巨大按鈕 */
+        .btn-student-hero {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 25px;
+            border-radius: 30px;
+            font-size: 1.8rem;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 10px 0 #1e8449, 0 15px 20px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            position: relative;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .btn-student-hero:active {
+            top: 10px;
+            box-shadow: 0 0 0 #1e8449, 0 0 0 rgba(0,0,0,0);
+        }
+        .btn-student-hero .icon { font-size: 2.2rem; }
+
+        /* 👨‍🏫 老師與說明 (次要入口) */
+        .landing-footer {
+            position: absolute;
+            bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .btn-secondary-link {
+            background: rgba(255,255,255,0.6);
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+        .btn-secondary-link:hover { background: white; color: var(--primary); border-color: var(--primary); }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-15px);}
+            60% {transform: translateY(-7px);}
+        }
+
+        /* --- 👩‍🏫 老師版容器 (保持原樣，僅調整 margin) --- */
         #teacher-app {
             display: none; width: 100%; max-width: 1000px;
             background: var(--bg-color);
             min-height: 80vh; flex-direction: column;
             animation: slideUp 0.4s ease-out;
-            padding-bottom: 20px;
+            padding: 20px; /* 加回 padding */
             overflow: visible;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -94,47 +141,30 @@
         .header-brand { font-size: 1.3rem; font-weight: 900; color: var(--text-main); display: flex; align-items: center; gap: 8px; letter-spacing: 1px; }
         .nav-group { display: flex; gap: 15px; align-items: center; }
 
+        /* 漢堡選單相關 */
+        .nav-dropdown-wrapper { position: relative; display: inline-block; }
+        .hamburger-btn {
+            font-size: 1.2rem; padding: 8px 14px;
+            background: var(--primary); color: white; border: 1px solid var(--primary);
+            border-radius: 8px; cursor: pointer;
+        }
+        .hamburger-btn:active { transform: scale(0.95); }
         .nav-btn {
             background: white; color: var(--text-sub); padding: 8px 16px; border-radius: 20px; 
             cursor: pointer; border: 1px solid #e0e0e0; font-size: 0.95rem; font-weight: bold; 
             display: flex; align-items: center; gap: 6px; transition: 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .nav-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
-        .nav-btn.active-tab { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* 🛠️ 漢堡選單樣式修正 (Mobile Menu Fix) */
-        .nav-dropdown-wrapper { position: relative; display: inline-block; }
-        
-        .hamburger-btn {
-            font-size: 1.2rem; padding: 8px 14px;
-            background: var(--primary); color: white; border-color: var(--primary);
-        }
-        .hamburger-btn:active { transform: scale(0.95); }
-
         .nav-dropdown-menu {
-            display: none; /* 預設隱藏，不使用 hover */
-            position: absolute; 
-            top: 100%; right: 0; /* 改為靠右對齊，避免跑版 */
-            transform: none; /* 移除原本的置中偏移 */
-            margin-top: 10px; 
+            display: none; position: absolute; 
+            top: 100%; right: 0; margin-top: 10px; 
             background: white; min-width: 200px; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.2);
             border-radius: 12px; padding: 8px 0; border: 1px solid #eee;
             z-index: 2000;
         }
-        /* JS 控制的 class */
         .nav-dropdown-menu.show { display: block; animation: fadeIn 0.2s; }
-
-        .nav-dropdown-menu::before {
-            content: ""; position: absolute; bottom: 100%; right: 15px; /* 箭頭也靠右 */
-            border-width: 8px; border-style: solid; border-color: transparent transparent white transparent;
-        }
-        
-        .nav-dropdown-item {
-            padding: 12px 20px; color: var(--text-main); cursor: pointer; font-size: 0.95rem; font-weight: bold;
-            transition: 0.1s; display: block; text-align: left;
-        }
+        .nav-dropdown-item { padding: 12px 20px; color: var(--text-main); cursor: pointer; font-size: 0.95rem; font-weight: bold; display: block; text-align: left; }
         .nav-dropdown-item:hover { background: var(--primary-light); color: var(--primary); }
         .nav-dropdown-divider { height: 1px; background: #eee; margin: 5px 0; }
 
@@ -164,11 +194,6 @@
         .dash-card.danger { border-top: 5px solid var(--danger); }
         .dash-card.success { border-top: 5px solid #2ecc71; }
 
-        /* 底部安全離開 */
-        .safe-exit-area { margin-top: 50px; text-align: center; padding-top: 20px; border-top: 2px dashed #eee; }
-        .btn-safe-exit { background: transparent; border: 1px solid #ccc; color: #aaa; padding: 10px 20px; border-radius: 30px; cursor: pointer; transition: 0.2s; }
-        .btn-safe-exit:hover { background: #ffebeb; color: var(--danger); border-color: var(--danger); }
-
         /* 通用元件 */
         .section-header { margin-bottom: 15px; display:flex; align-items:center; justify-content: space-between; flex-wrap: wrap; gap:10px; }
         .section-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); }
@@ -189,7 +214,6 @@
         .btn-big:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(52, 152, 219, 0.5); }
         .btn-big:disabled { background: #bdc3c7; cursor: not-allowed; }
 
-        /* 🔥 小巧的急救按鈕 */
         .btn-compact-action { 
             background: white; border: 1px solid var(--accent); color: var(--accent);
             padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold;
@@ -203,13 +227,9 @@
         .custom-word-label { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; color: var(--text-main); }
         .custom-word-label:has(input:checked) { border-color: #9b59b6; background: #fdfaff; color: #8e44ad; box-shadow: 0 2px 5px rgba(155, 89, 182, 0.2); }
         
-        /* 🆕 已考過的單字樣式 */
-        .custom-word-label.tested-item { 
-            background: #f1f3f5; border-color: #ced4da; color: #636e72; 
-        }
+        .custom-word-label.tested-item { background: #f1f3f5; border-color: #ced4da; color: #636e72; }
         .custom-word-label.tested-item span::after { content: " (已考)"; font-size: 0.75rem; color: #adb5bd; margin-left: 4px; }
         
-        /* 🆕 每日進度選取器 */
         .daily-picker-area { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 15px; background: #f3e5f5; padding: 12px; border-radius: 12px; border: 1px solid #e1bee7; }
         .daily-picker-group { display: flex; align-items: center; gap: 5px; }
         .daily-input { width: 50px; padding: 6px; border-radius: 6px; border: 1px solid #9b59b6; text-align: center; font-weight: bold; color: #8e44ad; }
@@ -267,7 +287,7 @@
         /* 紀錄 & 總表 */
         .data-toolbar { background: white; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 25px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
         .btn-tool { padding: 8px 16px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; color: white; font-size: 0.9rem; }
-        .btn-download { background: var(--student); } /* Used student var for success green */
+        .btn-download { background: var(--student); } 
         .btn-backup { background: #8e44ad; }
         .btn-import { background: #34495e; }
         .btn-clear { background: transparent; color: var(--danger); border: 1px solid var(--danger); margin-left: auto; }
@@ -347,19 +367,20 @@
 <body>
 
     <div id="landing-page">
-        <div class="app-header-area">
-            <div class="app-title">🐝 智慧單字小考官</div>
-            <div class="app-subtitle">Smart Spelling Bee Assistant</div>
+        <div class="landing-content">
+            <span class="app-logo-big">🐝</span>
+            <div class="app-title">智慧單字小考官</div>
+            <div class="app-subtitle">Smart Spelling Bee</div>
+            
+            <button class="btn-student-hero" onclick="enterStudentMode()">
+                <span class="icon">🎒</span> 我是學生 (開始練習)
+            </button>
         </div>
-        <div class="role-container">
-            <div class="landing-card card-teacher" onclick="enterTeacherMode()">
-                <span class="icon">🎓</span><h2>我是老師</h2><p>Teacher Mode</p>
-            </div>
-            <div class="landing-card card-student" onclick="enterStudentMode()">
-                <span class="icon">✏️</span><h2>我是學生</h2><p>Student Mode</p>
-            </div>
+
+        <div class="landing-footer">
+            <button class="btn-secondary-link" onclick="openHelp('general')"><span>📖</span> 使用說明</button>
+            <button class="btn-secondary-link" onclick="enterTeacherMode()"><span>👨‍🏫</span> 老師專區</button>
         </div>
-        <button class="btn-landing-help" onclick="openHelp('general')"><span>📖</span> 使用教學 & 安裝指南</button>
     </div>
 
     <div id="teacher-app">
@@ -657,7 +678,7 @@
 
     function initApp() {
         document.getElementById('startBtn').disabled = false;
-        const sessions = [...new Set(db.map(x => x.session))].sort((a,b)=>a-b);
+        const sessions = [...new Set(db.map(x => x.session))].sort();
         
         const grid = document.getElementById('sessionGrid'); grid.innerHTML = '';
         sessions.forEach(s => { 
@@ -702,20 +723,20 @@
 
     // --- Custom Quiz Logic ---
     function renderCustomWordSelection() {
-        const sid = parseInt(document.getElementById('customSessionSelect').value);
+        const sid = document.getElementById('customSessionSelect').value;
         const container = document.getElementById('customWordGrid');
         const countSpan = document.getElementById('customSelectionCount');
         
         container.innerHTML = "";
         countSpan.innerText = "已選 0 題";
         
-        if(isNaN(sid)) return;
+        if(!sid) return;
 
         // Get logs to find tested words
         const logs = getTestLogs();
         const testedSet = new Set(logs.map(l => l.word));
 
-        const words = db.filter(x => x.session === sid);
+        const words = db.filter(x => x.session == sid);
         words.forEach(w => {
             const isTested = testedSet.has(w.word);
             const label = document.createElement('label');
@@ -876,7 +897,7 @@
 
     function startRandomTest() {
         const cbs = document.querySelectorAll('.sess-cb:checked');
-        const sids = Array.from(cbs).map(cb => parseInt(cb.value));
+        const sids = Array.from(cbs).map(cb => cb.value);
         if(sids.length === 0) { alert("請勾選單元"); return; }
         const pool = db.filter(i => sids.includes(i.session));
         if(pool.length === 0) { alert("無單字"); return; }
@@ -1030,7 +1051,7 @@
         rankContainer.innerHTML = rankHtml;
         const breakdownContainer = document.getElementById('sessionBreakdownGrid');
         let breakdownHtml = "";
-        Object.keys(sessions).sort((a,b)=>a-b).forEach(sid => {
+        Object.keys(sessions).sort().forEach(sid => {
             const wordCounts = sessions[sid].words;
             const topWords = Object.keys(wordCounts).map(w => ({ word: w, count: wordCounts[w] })).sort((a,b) => b.count - a.count).slice(0, 10);
             let listHtml = ""; topWords.forEach(w => { listHtml += `<li><span>${w.word}</span><span class="err-count">${w.count}</span></li>`; });
@@ -1040,7 +1061,7 @@
     }
     
     function renderWordListTabs() {
-        const sessions = [...new Set(db.map(x => x.session))].sort((a,b)=>a-b);
+        const sessions = [...new Set(db.map(x => x.session))].sort();
         const tabsContainer = document.getElementById('wordListTabs');
         tabsContainer.innerHTML = "";
         const allTab = document.createElement('div');
