@@ -3,257 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>學生自主學習平板 v44.0 (Retro RPG)</title>
+    <title>學生自主學習平板 v45.1 (Achievement Hints)</title>
     <style>
-        /* --- 🎨 視覺風格：復古 8-bit RPG --- */
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap'); /* 嘗試引入像素字體，若無則退回 Monospace */
-
+        /* --- 🎨 視覺風格：高對比、明確按鈕 --- */
         :root {
-            --bg-color: #5c94fc; /* 經典馬力歐藍天 */
-            --panel-bg: #fceabb;
-            --primary: #3b82f6;
-            --primary-dark: #1d4ed8;
-            --accent: #f59e0b;
+            --bg-color: #a8dadc;
+            --panel-bg: #ffffff;
+            --primary: #457b9d;
+            --accent: #e63946;
+            --text-main: #1d3557;
+            --border-color: #1d3557;
             
-            /* 稀有度顏色 (RPG 等級) */
-            --tier-common: #cd7f32;  /* 銅 (Bronze) */
-            --tier-rare: #c0c0c0;    /* 銀 (Silver) */
-            --tier-epic: #ffd700;    /* 金 (Gold) */
-            --tier-legend: #e0b0ff;  /* 傳說 (Purple) */
-            
-            /* 復古邊框色 */
-            --border-light: #ffffff;
-            --border-dark: #000000;
+            /* 稀有度顏色 */
+            --tier-common: #cd7f32;
+            --tier-rare: #95a5a6;
+            --tier-epic: #ffb300;
+            --tier-legend: #9b59b6;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'VT323', 'Courier New', monospace; /* 復古字體 */ }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Microsoft JhengHei', sans-serif; }
         
         body { 
             background-color: var(--bg-color); 
-            /* 點陣圖背景紋理 */
-            background-image: radial-gradient(#ffffff 20%, transparent 20%), radial-gradient(#ffffff 20%, transparent 20%);
-            background-position: 0 0, 10px 10px;
-            background-size: 20px 20px;
-            color: #333; margin: 0; padding: 20px; 
+            color: var(--text-main); margin: 0; padding: 20px; 
             display: flex; flex-direction: column; align-items: center; min-height: 100vh; 
         }
 
         /* --- 頁面切換特效 --- */
-        .screen { display: none; width: 100%; max-width: 700px; animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+        .screen { display: none; width: 100%; max-width: 700px; animation: fadeIn 0.3s; }
         .screen.active { display: block; }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 復古按鈕與框 --- */
-        .pixel-box {
-            background: #fff;
-            border: 4px solid var(--border-dark);
-            box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
-            border-radius: 4px; /* 微圓角，保持像素感 */
-            padding: 20px;
-            position: relative;
+        /* --- 按鈕設計 --- */
+        .btn-solid {
+            background: #fff; border: 3px solid var(--border-color); border-radius: 12px;
+            padding: 12px 20px; font-size: 1.1rem; font-weight: 900; color: var(--text-main);
+            cursor: pointer; box-shadow: 0 4px 0 var(--border-color); transition: all 0.1s;
+            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
         }
+        .btn-solid:active { transform: translateY(4px); box-shadow: 0 0 0 var(--border-color); }
+        
+        .btn-green { background: #d4edda; border-color: #155724; color: #155724; box-shadow: 0 4px 0 #155724; }
+        .btn-green:active { box-shadow: 0 0 0 #155724; }
+        .btn-yellow { background: #fff3cd; border-color: #856404; color: #856404; box-shadow: 0 4px 0 #856404; }
+        .btn-yellow:active { box-shadow: 0 0 0 #856404; }
+        .btn-red { background: #f8d7da; border-color: #721c24; color: #721c24; box-shadow: 0 4px 0 #721c24; }
+        .btn-red:active { box-shadow: 0 0 0 #721c24; }
 
-        .btn-pixel {
-            background: #fff; border: 4px solid var(--border-dark);
-            padding: 10px 20px; font-size: 1.2rem; font-weight: bold; cursor: pointer;
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
-            text-transform: uppercase; transition: transform 0.1s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .btn-pixel:active { transform: translate(4px, 4px); box-shadow: 0px 0px 0px; }
-        
-        .btn-back { background: #f0f0f0; color: #333; }
-        .btn-action { background: #ffcc00; color: #000; }
-        
+        .white-panel { background: white; border: 3px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: 0 6px 0 rgba(0,0,0,0.1); margin-bottom: 20px; }
         .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-        .page-title { font-size: 2rem; font-weight: 900; color: #fff; text-shadow: 4px 4px 0 #000; -webkit-text-stroke: 1.5px #000; margin: 0; }
+        .page-title { font-size: 1.8rem; font-weight: 900; color: var(--text-main); margin: 0; text-shadow: 1px 1px 0 #fff; }
 
-        /* --- 1. 首頁 (Dashboard) --- */
-        .hero-banner { text-align: center; margin-bottom: 30px; margin-top: 20px; }
-        .hero-title { 
-            font-size: 3rem; color: #f1c40f; 
-            text-shadow: 4px 4px 0 #d35400, -2px -2px 0 #000; 
-            line-height: 1.1; margin-bottom: 10px;
-        }
-        .hero-sub { color: #fff; text-shadow: 2px 2px 0 #000; font-size: 1.2rem; background: rgba(0,0,0,0.5); display: inline-block; padding: 5px 10px; }
-
+        /* --- 1. 首頁 --- */
+        .hero-banner { text-align: center; margin-bottom: 30px; margin-top: 10px; }
+        .hero-title { font-size: 2.5rem; font-weight: 900; color: #1d3557; margin-bottom: 5px; }
+        .hero-sub { background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid var(--border-color); display: inline-block; font-weight: bold; }
         .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .dash-btn {
-            background: #fff; border: 4px solid #000;
+            background: white; border: 3px solid var(--border-color); border-radius: 20px;
             padding: 20px 10px; text-align: center; cursor: pointer;
-            box-shadow: 6px 6px 0px rgba(0,0,0,0.4);
-            transition: 0.1s; display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 6px 0 var(--border-color); transition: 0.1s; display: flex; flex-direction: column; align-items: center;
         }
-        .dash-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0; }
-        .dash-icon { font-size: 3rem; margin-bottom: 5px; }
-        .dash-btn h2 { font-size: 1.5rem; margin: 5px 0; color: #000; }
-        .dash-btn p { font-size: 0.9rem; color: #555; margin: 0; }
+        .dash-btn:active { transform: translateY(6px); box-shadow: 0 0 0; }
+        .dash-icon { font-size: 3.5rem; margin-bottom: 10px; }
+        .dash-btn h2 { font-size: 1.4rem; margin: 0; color: var(--text-main); font-weight: 900; }
+        .dash-btn p { font-size: 0.9rem; color: #666; margin: 5px 0 0; font-weight: bold; }
+        .dash-btn.study { border-color: #2e7d32; box-shadow: 0 6px 0 #2e7d32; }
+        .dash-btn.study h2 { color: #2e7d32; }
+        .dash-btn.quiz { border-color: #d84315; box-shadow: 0 6px 0 #d84315; }
+        .dash-btn.quiz h2 { color: #d84315; }
 
-        .dash-btn.study-mode { background: #dff9fb; }
-        .dash-btn.quiz-mode { background: #ffeaa7; }
-        .dash-btn.achievement-mode { background: #a29bfe; grid-column: span 2; flex-direction: row; justify-content: center; gap: 20px; color: #fff; }
-        .dash-btn.achievement-mode h2, .dash-btn.achievement-mode p { color: #000; text-align: left; }
-        .dash-btn.analysis-mode { background: #ff7675; grid-column: span 2; flex-direction: row; justify-content: center; gap: 20px; }
-        .dash-btn.analysis-mode h2, .dash-btn.analysis-mode p { color: #000; text-align: left; }
+        /* --- 稱號系統 (Updated) --- */
+        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        
+        .badge-card {
+            /* 鎖定狀態樣式 */
+            background: #f0f0f0; 
+            border: 3px dashed #bbb; /* 虛線代表未獲得 */
+            border-radius: 15px; 
+            padding: 15px 10px; 
+            text-align: center;
+            opacity: 1; /* 取消透明度，讓字清楚 */
+            position: relative;
+        }
+        
+        /* 鎖定時的提示文字 */
+        .badge-hint-box {
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            padding: 5px;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        /* 解鎖狀態 */
+        .badge-card.unlocked { 
+            opacity: 1; 
+            border-style: solid; /* 實線 */
+            border-width: 3px;
+            border-color: var(--gold); 
+            background: #fffde7; 
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1); 
+        }
+        
+        /* 稀有度框色 */
+        .badge-card.unlocked.common { border-color: var(--tier-common); background: #fff; }
+        .badge-card.unlocked.rare { border-color: var(--tier-rare); background: #f8f9fa; }
+        .badge-card.unlocked.epic { border-color: var(--tier-epic); background: #fffbe6; }
+        .badge-card.unlocked.legendary { border-color: var(--tier-legend); background: #f3e5f5; }
 
-        /* --- 🏆 稱號系統 (Retro Style) --- */
-        .achievement-container { padding-bottom: 50px; }
+        .badge-icon { font-size: 3rem; margin-bottom: 5px; display: block; }
+        .badge-title { font-weight: 900; font-size: 1rem; margin-bottom: 5px; color: var(--text-main); }
+        .badge-desc { font-size: 0.8rem; color: #555; line-height: 1.2; }
         
         .category-header {
-            font-size: 1.5rem; color: #fff; text-shadow: 3px 3px 0 #000;
-            margin: 30px 0 15px 0; padding: 5px 10px; 
-            background: #000; display: inline-block; transform: skew(-10deg);
-        }
-        
-        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
-        
-        /* 道具卡片設計 */
-        .badge-card {
-            background: #2d3436; /* 道具欄深色底 */
-            border: 4px solid #b2bec3; /* 銀色邊框 (預設) */
-            padding: 10px; text-align: center;
-            opacity: 0.7; filter: grayscale(1); 
-            transition: 0.3s; position: relative;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
-        }
-        
-        /* 解鎖後 */
-        .badge-card.unlocked { opacity: 1; filter: grayscale(0); background: #fff; color: #000; box-shadow: 4px 4px 0 rgba(0,0,0,0.4); }
-        
-        /* 稀有度邊框 */
-        .badge-card.unlocked.common { border-color: var(--tier-common); background: #fdf5e6; }
-        .badge-card.unlocked.rare { border-color: var(--tier-rare); background: #f0f0f0; }
-        .badge-card.unlocked.epic { border-color: var(--tier-epic); background: #fffbe6; }
-        .badge-card.unlocked.legendary { border-color: var(--tier-legend); background: #f3e5f5; border-width: 6px; }
-
-        .badge-icon-box {
-            width: 60px; height: 60px; margin: 0 auto 10px;
-            background: rgba(0,0,0,0.1); border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem; border: 2px inset rgba(255,255,255,0.5);
-        }
-        .badge-card.unlocked .badge-icon-box { background: rgba(255,255,255,0.5); border: 2px solid rgba(0,0,0,0.1); }
-
-        .badge-title { font-weight: 900; font-size: 1rem; margin-bottom: 4px; line-height: 1.2; }
-        .badge-desc { font-size: 0.75rem; color: #555; line-height: 1.2; }
-        
-        /* 獲得稱號提示 (Toast) - 升級版提示框 */
-        .toast-notification {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: #fff; padding: 10px; width: 90%; max-width: 350px;
-            border: 4px solid #000; box-shadow: 8px 8px 0 rgba(0,0,0,0.5);
-            z-index: 2000; display: flex; align-items: center; gap: 15px;
-            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        .toast-icon { font-size: 2.5rem; animation: bounce 1s infinite; }
-        .toast-text h4 { margin: 0; color: var(--accent); font-size: 1.2rem; text-transform: uppercase; }
-        .toast-text p { margin: 0; color: #000; font-weight: bold; }
-        .toast-notification.show { top: 20px; }
-
-        /* --- 其他介面優化 --- */
-        /* 背單字卡片 */
-        .word-overview-card {
-            background: #fff; border: 3px solid #000; box-shadow: 4px 4px 0 #ccc;
-            padding: 15px; text-align: center; cursor: pointer; transition: 0.1s;
-        }
-        .word-overview-card:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #ccc; }
-        .word-overview-card.read { background: #e0f7fa; border-color: #00bcd4; }
-        .word-overview-card.read::after { content: "✔"; position: absolute; top: 0; right: 2px; color: #00bcd4; font-weight: bold; }
-
-        /* 測驗區 */
-        .question-card { background: #fff; border: 4px solid #000; box-shadow: 6px 6px 0 rgba(0,0,0,0.2); padding: 30px; text-align: center; margin-bottom: 20px; }
-        .choice-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-choice {
-            background: #fff; border: 3px solid #000; padding: 15px; font-size: 1.1rem;
-            box-shadow: 3px 3px 0 #999; cursor: pointer; transition: 0.1s;
-        }
-        .btn-choice:active { transform: translate(3px, 3px); box-shadow: 0 0 0; }
-        .btn-choice.correct { background: #2ecc71; color: white; border-color: #27ae60; }
-        .btn-choice.wrong { background: #e74c3c; color: white; border-color: #c0392b; }
-
-        /* 輸入框 */
-        .input-spelling {
-            border: 4px solid #000; box-shadow: 4px 4px 0 #ccc;
-            font-family: 'Courier New', monospace; font-weight: bold;
-            width: 100%; padding: 15px; font-size: 1.5rem; text-align: center; margin-bottom: 10px;
+            grid-column: 1 / -1;
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin: 20px 0 10px 0;
+            padding: 5px 10px;
+            background: var(--text-main);
+            color: white;
+            border-radius: 20px;
+            width: fit-content;
         }
 
-        /* 弱點分析 */
-        .weak-item-card {
-            background: #fff; border: 3px solid #e74c3c; box-shadow: 4px 4px 0 #ffcdd2;
-            padding: 10px; min-width: 100px; text-align: center; margin-right: 10px;
-        }
-
-        /* 範圍選擇按鈕 */
-        .range-btn {
-            background: #fff; border: 2px solid #aaa; padding: 8px 12px; cursor: pointer;
-            box-shadow: 2px 2px 0 #aaa; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
-        .range-btn.has-data { border-color: #000; background: #ffeaa7; color: #000; box-shadow: 2px 2px 0 #000; }
-        .badge-count { background: #000; color: #fff; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; }
-
-        /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 999; animation: popIn 0.2s; }
-        .modal-content { 
-            background: #fff; margin: 10% auto; padding: 20px; width: 90%; max-width: 500px; 
-            border: 6px solid #000; box-shadow: 10px 10px 0 rgba(0,0,0,0.5); 
-            position: relative; max-height: 80vh; overflow-y: auto; 
-        }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 2rem; cursor: pointer; color: #000; font-family: monospace; }
-
-        .rank-num { font-family: 'Courier New', monospace; font-weight: bold; }
+        /* --- 其他樣式保留 --- */
+        .unit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
+        .unit-card { background: white; border: 2px solid #ccc; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .unit-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .unit-card h3 { margin: 0; font-size: 1.3rem; color: var(--text-main); }
+        .unit-card .action-hint { font-size: 0.8rem; color: var(--primary); margin-top: 5px; font-weight: bold; }
+        .word-overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; padding-bottom: 100px; }
+        .word-overview-card { background: white; border: 2px solid #ddd; border-radius: 12px; padding: 20px 10px; text-align: center; cursor: pointer; position: relative; }
+        .word-overview-card:hover { border-color: var(--primary); background: #f0f9ff; }
+        .word-overview-card h4 { margin: 0; font-size: 1.2rem; font-weight: bold; }
+        .word-overview-card.read { background: #e8f5e9; border-color: #66bb6a; }
+        .word-overview-card.read::after { content: "✔ 已讀"; position: absolute; top: 5px; right: 5px; color: #2e7d32; font-size: 0.7rem; font-weight: bold; }
+        .detail-container { text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .detail-word { font-size: 3.5rem; font-weight: 900; color: var(--text-main); margin: 10px 0; }
+        .detail-zh { font-size: 1.6rem; color: #555; margin-bottom: 30px; font-weight: bold; }
+        .audio-btn-big { width: 70px; height: 70px; border-radius: 50%; background: var(--primary); color: white; border: 4px solid #1d3557; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; box-shadow: 0 4px 0 #1d3557; margin-bottom: 30px; }
+        .audio-btn-big:active { transform: translateY(4px); box-shadow: 0 0 0; }
+        .detail-sent-box { background: #f1f1f1; padding: 20px; border-radius: 15px; width: 100%; text-align: left; border-left: 6px solid var(--primary); }
+        .detail-sent-en { font-size: 1.3rem; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .detail-sent-zh { font-size: 1.1rem; color: #666; }
+        .nav-controls { display: flex; justify-content: space-between; width: 100%; margin-top: 30px; gap: 20px; }
+        .nav-controls button { flex: 1; }
+        .setup-row { margin-bottom: 20px; }
+        .setup-label { font-weight: 900; font-size: 1.1rem; margin-bottom: 8px; display: block; }
+        .toggle-group { display: flex; gap: 10px; }
+        .toggle-btn { flex: 1; padding: 15px; border: 2px solid #ccc; background: white; border-radius: 12px; font-weight: bold; color: #777; cursor: pointer; font-size: 1rem; }
+        .toggle-btn.active { border-color: var(--primary); background: #e3f2fd; color: var(--primary); box-shadow: 0 0 0 2px var(--primary) inset; }
+        .range-selector { display: flex; flex-wrap: wrap; gap: 10px; max-height: 200px; overflow-y: auto; margin-top: 10px; }
+        .range-btn { padding: 10px 15px; border-radius: 20px; border: 2px solid #ddd; background: white; cursor: pointer; font-weight: bold; color: #555; }
+        .range-btn.selected { border-color: var(--accent); background: #fff3e0; color: #e65100; }
+        .quiz-status { display: flex; justify-content: space-between; font-weight: bold; color: #666; margin-bottom: 10px; }
+        .q-hint { font-size: 1.4rem; font-weight: 900; color: var(--text-main); margin: 20px 0; min-height: 1.5em; }
+        .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-choice { background: white; border: 3px solid #ccc; border-radius: 15px; padding: 20px; font-size: 1.2rem; font-weight: bold; color: var(--text-main); cursor: pointer; box-shadow: 0 4px 0 #ccc; transition: 0.1s; }
+        .btn-choice:active { transform: translateY(4px); box-shadow: 0 0 0; }
+        .btn-choice.correct { background: #d4edda; border-color: #155724; color: #155724; box-shadow: 0 4px 0 #155724; }
+        .btn-choice.wrong { background: #f8d7da; border-color: #721c24; color: #721c24; box-shadow: 0 4px 0 #721c24; }
+        .input-spelling { width: 100%; padding: 15px; font-size: 1.8rem; text-align: center; border: 3px solid var(--text-main); border-radius: 12px; margin-bottom: 15px; }
+        .weak-stats-card { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .weak-header { font-size: 1.2rem; font-weight: bold; color: var(--danger); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .top-weak-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .weak-item-card { background: #fff5f5; border: 1px solid #ffcdd2; border-radius: 12px; padding: 15px; min-width: 100px; text-align: center; flex-shrink: 0; }
+        .weak-word { font-size: 1.2rem; font-weight: 900; color: var(--danger); display: block; }
+        .weak-count { font-size: 0.8rem; color: #888; margin-top: 5px; }
+        .full-mistake-list { max-height: 300px; overflow-y: auto; }
+        .mistake-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px dashed #eee; }
+        .rank-num { font-weight: 900; color: #ccc; width: 30px; font-style: italic; }
+        .rank-num.top1 { color: #f1c40f; font-size: 1.2rem; }
+        .rank-num.top2 { color: #95a5a6; font-size: 1.1rem; }
+        .rank-num.top3 { color: #d35400; font-size: 1.1rem; }
+        .mistake-word { font-weight: bold; font-size: 1.1rem; flex: 1; text-align: left; }
+        .mistake-val { color: var(--danger); font-weight: bold; background: #ffebee; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; }
+        .toast-notification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: white; padding: 15px 25px; border-radius: 50px; border: 3px solid var(--gold); z-index: 2000; display: flex; align-items: center; gap: 15px; transition: top 0.5s; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .toast-notification.show { top: 30px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; width: 90%; max-width: 500px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto; }
 
     </style>
 </head>
 <body>
 
     <div id="toastNotification" class="toast-notification">
-        <div class="toast-icon">🎁</div>
-        <div class="toast-text">
-            <h4>LEVEL UP!</h4>
-            <p id="toastMsg">獲得新稱號</p>
+        <div style="font-size:2rem;">🏆</div>
+        <div>
+            <h4 style="margin:0; color:var(--text-main);">恭喜獲得稱號！</h4>
+            <p id="toastMsg" style="margin:0; color:var(--accent); font-weight:bold;">單字小學徒</p>
         </div>
     </div>
 
     <div id="homeScreen" class="screen active">
         <div class="hero-banner">
-            <div class="hero-title">單字大冒險</div>
-            <div class="hero-sub">READY PLAYER ONE?</div>
+            <div class="hero-title">智慧單字小考官</div>
+            <div class="hero-sub">今天想做什麼呢？</div>
         </div>
 
         <div class="dashboard-grid">
-            <button class="dash-btn study-mode" onclick="openUnitSelector('study')">
+            <button class="dash-btn study" onclick="openUnitSelector('study')">
                 <span class="dash-icon">📖</span>
-                <h2>修練場 (背單字)</h2>
-                <p>LEVEL UP YOUR VOCAB</p>
+                <h2>我要背單字</h2>
+                <p>瀏覽單字卡、聽發音</p>
             </button>
-            <button class="dash-btn quiz-mode" onclick="openQuizSetup()">
-                <span class="dash-icon">⚔️</span>
-                <h2>競技場 (測驗)</h2>
-                <p>FIGHT THE BOSS</p>
+            <button class="dash-btn quiz" onclick="openQuizSetup()">
+                <span class="dash-icon">✍️</span>
+                <h2>我要測驗</h2>
+                <p>挑戰題目、拚速度</p>
             </button>
-            <button class="dash-btn achievement-mode" onclick="openAchievementScreen()">
-                <span class="dash-icon">🏰</span>
-                <div>
-                    <h2>榮譽殿堂 (成就)</h2>
-                    <p>VIEW YOUR TROPHIES</p>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn-solid" onclick="openAchievementScreen()">🏆 稱號蒐集</button>
+            <button class="btn-solid" onclick="openAnalysisScreen()">📊 弱點分析</button>
+        </div>
+    </div>
+
+    <div id="unitSelectScreen" class="screen">
+        <div class="page-header">
+            <button class="btn-solid" style="width:auto;" onclick="goHome()">⬅ 回首頁</button>
+            <h2 class="page-title">選擇單元</h2>
+            <div style="width: 80px;"></div>
+        </div>
+        <div id="unitGridContainer" class="unit-grid"></div>
+    </div>
+
+    <div id="studyOverviewScreen" class="screen">
+        <div class="page-header">
+            <button class="btn-solid" style="width:auto;" onclick="openUnitSelector('study')">⬅ 回選單</button>
+            <h2 class="page-title" id="overviewTitle">Unit A</h2>
+            <div style="width:60px;"></div>
+        </div>
+        <div style="text-align:center; color:#666; margin-bottom:15px; font-weight:bold;">👇 點擊單字卡開始學習</div>
+        <div id="overviewGrid" class="word-overview-grid"></div>
+        <div style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:90%; max-width:600px;">
+            <button class="btn-solid btn-green" onclick="quickQuizFromStudy()">⚡ 背完了！馬上測驗此單元</button>
+        </div>
+    </div>
+
+    <div id="studyDetailScreen" class="screen">
+        <div class="page-header">
+            <button class="btn-solid" style="width:auto;" onclick="backToOverview()">⬅ 回列表</button>
+            <div style="font-weight:bold; color:#777;">Word <span id="detailIdx">1</span> / <span id="detailTotal">20</span></div>
+            <div style="width:80px;"></div>
+        </div>
+
+        <div class="white-panel detail-container">
+            <div class="detail-word" id="cardWord">Apple</div>
+            <div class="detail-zh" id="cardZh">蘋果</div>
+            
+            <button class="audio-btn-big" onclick="playCurrentCardAudio()">🔊</button>
+
+            <div class="detail-sent-box">
+                <div class="detail-sent-en" id="cardSentEn">I eat an apple.</div>
+                <div class="detail-sent-zh" id="cardSentZh">我吃一顆蘋果。</div>
+                <button class="btn-icon" style="float:right; margin-top:-30px; color:var(--primary);" onclick="playCurrentCardSent()">🔊</button>
+            </div>
+
+            <div class="nav-controls">
+                <button class="btn-solid" onclick="prevCard()">◀ 上一個</button>
+                <button class="btn-solid" onclick="nextCard()">下一個 ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizSetupScreen" class="screen">
+        <div class="page-header">
+            <button class="btn-solid" style="width:auto;" onclick="goHome()">⬅ 回首頁</button>
+            <h2 class="page-title">測驗設定</h2>
+            <div style="width:80px;"></div>
+        </div>
+
+        <div class="white-panel">
+            <div class="setup-row">
+                <span class="setup-label">1. 選擇題型</span>
+                <div class="toggle-group">
+                    <button class="toggle-btn active" id="modeChoice" onclick="setQuizMode('choice')">👆 選擇題</button>
+                    <button class="toggle-btn" id="modeSpelling" onclick="setQuizMode('spelling')">⌨️ 拼字題</button>
                 </div>
-            </button>
-            <button class="dash-btn analysis-mode" onclick="openAnalysisScreen()">
-                <span class="dash-icon">🩹</span>
-                <div>
-                    <h2>醫療中心 (弱點)</h2>
-                    <p>HEAL YOUR WEAKNESS</p>
-                </div>
-            </button>
+            </div>
+        </div>
+
+        <div class="white-panel">
+            <div class="setup-row" style="display:flex; justify-content:space-between;">
+                <span class="setup-label">2. 選擇範圍 (可複選)</span>
+                <button class="btn-icon" style="color:var(--danger); font-size:1rem; font-weight:bold;" onclick="clearAllSelectedWords()">[清空]</button>
+            </div>
+            <div style="margin-bottom:10px;">目前已選：<b id="totalSelectedCount" style="color:var(--primary); font-size:1.2rem;">0</b> 個字</div>
+            <div id="quizRangeGrid" class="range-selector"></div>
+        </div>
+
+        <div class="white-panel">
+            <span class="setup-label">3. 進階設定</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
+                <span>自動換題 (答對後自動下一題)</span>
+                <input type="checkbox" id="autoNextSwitch" checked style="transform:scale(1.5);">
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+                <span>限時挑戰 (每題8秒)</span>
+                <input type="checkbox" id="timerSwitch" style="transform:scale(1.5);">
+            </div>
+        </div>
+
+        <button class="btn-solid btn-red" onclick="startConfiguredQuiz()">🚀 開始測驗</button>
+    </div>
+
+    <div id="wordPickerModal" class="modal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 id="pickerTitle" style="margin:0;">挑選單字</h3>
+                <span style="font-size:1.5rem; cursor:pointer;" onclick="closeWordPicker()">×</span>
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="btn-solid" style="padding:5px 10px; font-size:0.9rem;" onclick="pickerSelectViewed()">僅選已讀</button>
+                <button class="btn-solid" style="padding:5px 10px; font-size:0.9rem;" onclick="pickerSelectAll()">全選</button>
+                <button class="btn-solid" style="padding:5px 10px; font-size:0.9rem;" onclick="pickerSelectNone()">全取消</button>
+            </div>
+            <div id="pickerGrid" class="word-picker-container"></div>
+            
+            <div id="btnPickerSave" style="margin-top:20px;">
+                <button class="btn-solid btn-green" onclick="closeWordPicker()">完成選取</button>
+            </div>
+            <div id="btnPickerQuickStart" style="display:none; gap:10px; margin-top:20px;">
+                <button class="btn-solid btn-green" onclick="startQuickQuizDirect('choice')">開始選擇題</button>
+                <button class="btn-solid btn-yellow" onclick="startQuickQuizDirect('spelling')">開始拼字題</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quizScreen" class="screen">
+        <div class="quiz-status">
+            <span>第 <span id="qIdx">1</span> / <span id="qTotal">10</span> 題</span>
+            <span id="timerBadge" style="color:var(--danger); display:none;">⏱️ <span id="timeLeft">8</span></span>
+            <button style="border:none; background:none; font-weight:bold; color:#888;" onclick="quitQuiz()">離開</button>
+        </div>
+
+        <div class="white-panel" style="text-align:center; padding:40px 20px;">
+            <div style="font-size:4rem; cursor:pointer;" onclick="playQuizSequence()">🔊</div>
+            <div id="qHint" class="q-hint" style="display:none; margin-top:20px; font-size:1.5rem; font-weight:bold; color:var(--text-main);"></div>
+            <button id="btnShowHint" class="btn-solid" style="margin-top:20px; width:auto; display:inline-block;" onclick="showHint()">💡 顯示中文提示</button>
+        </div>
+
+        <div id="choiceArea" class="choice-grid" style="display:none;"></div>
+
+        <div id="spellingArea" style="display:none; text-align:center;">
+            <input type="text" id="spellingInput" class="input-spelling" placeholder="請輸入單字..." autocomplete="off" style="width:100%; padding:15px; font-size:1.5rem; text-align:center; border:3px solid #ccc; border-radius:12px; margin-bottom:15px;">
+            <div id="spellingFeedback" style="height:25px; font-weight:bold; margin-bottom:10px; font-size:1.2rem;"></div>
+            <button class="btn-solid btn-green" onclick="checkSpelling()">送出答案</button>
+        </div>
+
+        <button id="btnNextQ" class="btn-solid" style="margin-top:20px; display:none;" onclick="nextQuestion()">➡ 下一題</button>
+    </div>
+
+    <div id="resultScreen" class="screen">
+        <div class="white-panel" style="text-align:center; padding:40px;">
+            <div style="font-size:5rem;">🏆</div>
+            <h2 style="font-size:2rem; margin:10px 0;">測驗完成！</h2>
+            <div id="finalScore" style="font-size:4rem; font-weight:900; color:var(--primary); margin:20px 0;">100</div>
+            <p id="finalMsg" style="font-size:1.2rem; color:#666; margin-bottom:40px;">太厲害了！</p>
+            
+            <button class="btn-solid btn-green" style="margin-bottom:15px;" onclick="goHome()">🏠 回首頁</button>
+            <button class="btn-solid" onclick="retryQuiz()">🔄 再測一次</button>
         </div>
     </div>
 
     <div id="achievementScreen" class="screen">
         <div class="page-header">
-            <button class="btn-pixel btn-back" onclick="goHome()">⬅ MENU</button>
-            <h2 class="page-title">榮譽殿堂</h2>
-            <div style="width: 80px;"></div>
+            <button class="btn-solid" style="width:auto;" onclick="goHome()">⬅ 回首頁</button>
+            <h2 class="page-title">稱號蒐集</h2>
+            <div style="width:80px;"></div>
         </div>
         <div class="achievement-container">
             <div id="badgeGrid" class="achievement-grid"></div>
@@ -262,168 +385,19 @@
 
     <div id="analysisScreen" class="screen">
         <div class="page-header">
-            <button class="btn-pixel btn-back" onclick="goHome()">⬅ MENU</button>
-            <h2 class="page-title">醫療中心</h2>
-            <div style="width: 80px;"></div>
+            <button class="btn-solid" style="width:auto;" onclick="goHome()">⬅ 回首頁</button>
+            <h2 class="page-title">弱點分析</h2>
+            <div style="width:80px;"></div>
         </div>
-
-        <div class="pixel-box" style="margin-bottom:20px;">
-            <div style="font-weight:bold; color:var(--danger); margin-bottom:10px;">⚠️ 你的大魔王 (Top 3)</div>
-            <div id="topWeakList" style="display:flex; overflow-x:auto; padding-bottom:5px;">
-                <div style="color:#999;">目前非常健康！</div>
-            </div>
+        <div class="white-panel">
+            <div style="font-weight:bold; color:var(--danger); margin-bottom:10px;">⚠️ 最常錯 Top 3</div>
+            <div id="topWeakList" style="display:flex; gap:10px; overflow-x:auto;"></div>
         </div>
-
-        <div class="pixel-box">
-            <div style="font-weight:bold; margin-bottom:10px;">📝 病歷表 (錯題列表)</div>
+        <div class="white-panel">
+            <div style="font-weight:bold; margin-bottom:10px;">📝 錯題列表</div>
             <div id="fullMistakeList" class="full-mistake-list" style="max-height:250px; overflow-y:auto;"></div>
         </div>
-
-        <button class="btn-pixel btn-action" style="width:100%; margin-top:20px; background:#e74c3c; color:white; border-color:#c0392b;" onclick="startTop30WeaknessQuiz()">🔥 討伐魔王 (Top 30)</button>
-    </div>
-
-    <div id="unitSelectScreen" class="screen">
-        <div class="page-header">
-            <button class="btn-pixel btn-back" onclick="goHome()">⬅ MENU</button>
-            <h2 class="page-title">選擇地圖</h2>
-            <div style="width: 80px;"></div>
-        </div>
-        <div id="unitGridContainer" class="unit-grid"></div>
-    </div>
-
-    <div id="studyOverviewScreen" class="screen">
-        <div class="page-header">
-            <button class="btn-pixel btn-back" onclick="openUnitSelector('study')">⬅ MAP</button>
-            <h2 class="page-title" id="overviewTitle">Unit A</h2>
-            <div style="width: 60px;"></div>
-        </div>
-        
-        <div id="overviewGrid" class="word-overview-grid"></div>
-
-        <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px;">
-            <button class="btn-pixel btn-action" style="width:100%; background:#2ecc71; color:white; border-color:#27ae60;" onclick="openQuickQuizPicker()">
-                ⚡ 立即戰鬥 (測驗)
-            </button>
-        </div>
-    </div>
-
-    <div id="studyDetailScreen" class="screen">
-        <div class="page-header">
-            <button class="btn-pixel btn-back" onclick="backToOverview()">⬅ LIST</button>
-            <div style="font-weight:bold; color:#fff;">Word <span id="detailIdx">1</span> / <span id="detailTotal">20</span></div>
-            <div style="width: 80px;"></div>
-        </div>
-
-        <div class="pixel-box" style="text-align:center; padding:40px 20px;">
-            <div class="detail-word" id="cardWord" style="font-size:3rem; margin-bottom:10px;">Apple</div>
-            <div class="detail-zh" id="cardZh" style="font-size:1.5rem; color:#666; margin-bottom:30px;">蘋果</div>
-            
-            <button class="btn-pixel" style="border-radius:50%; width:60px; height:60px; margin:0 auto 20px; padding:0;" onclick="playCurrentCardAudio()">🔊</button>
-
-            <div style="background:#eee; padding:15px; border:2px solid #ccc; text-align:left;">
-                <div class="detail-sent-en" id="cardSentEn" style="font-size:1.2rem; margin-bottom:5px;">I eat an apple.</div>
-                <div class="detail-sent-zh" id="cardSentZh" style="color:#666;">我吃一顆蘋果。</div>
-                <button style="float:right; margin-top:-20px; background:none; border:none; cursor:pointer;" onclick="playCurrentCardSent()">🔊</button>
-            </div>
-        </div>
-
-        <div class="nav-controls" style="margin-top:20px;">
-            <button class="btn-pixel btn-back" onclick="prevCard()">◀ PREV</button>
-            <button class="btn-pixel btn-back" onclick="nextCard()">NEXT ▶</button>
-        </div>
-    </div>
-
-    <div id="quizSetupScreen" class="screen">
-        <div class="page-header">
-            <button class="btn-pixel btn-back" onclick="goHome()">⬅ MENU</button>
-            <h2 class="page-title">戰鬥準備</h2>
-            <div style="width: 80px;"></div>
-        </div>
-
-        <div class="pixel-box" style="margin-bottom:20px;">
-            <span style="font-weight:bold; display:block; margin-bottom:10px;">1. 選擇武器 (題型)</span>
-            <div class="toggle-group" style="display:flex; gap:10px;">
-                <button class="btn-pixel" style="flex:1;" id="modeChoice" onclick="setQuizMode('choice')">👆 選擇題</button>
-                <button class="btn-pixel" style="flex:1;" id="modeSpelling" onclick="setQuizMode('spelling')">⌨️ 拼字題</button>
-            </div>
-        </div>
-
-        <div class="pixel-box" style="margin-bottom:20px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <span style="font-weight:bold;">2. 選擇戰場 (單元)</span>
-                <button style="border:none; background:none; color:red; cursor:pointer;" onclick="clearAllSelectedWords()">[清空]</button>
-            </div>
-            <div style="margin-bottom:10px;">已選：<b id="totalSelectedCount" style="color:var(--primary);">0</b></div>
-            <div id="quizRangeGrid" class="range-selector"></div>
-        </div>
-
-        <div class="pixel-box" style="margin-bottom:20px;">
-            <span style="font-weight:bold; display:block; margin-bottom:10px;">3. 難度設定</span>
-            <div class="setting-row">
-                <span>自動下一關</span>
-                <input type="checkbox" id="autoNextSwitch" checked style="transform:scale(1.5);">
-            </div>
-            <div class="setting-row">
-                <span>8秒限時</span>
-                <input type="checkbox" id="timerSwitch" style="transform:scale(1.5);">
-            </div>
-        </div>
-
-        <button class="btn-pixel btn-action" style="width:100%;" onclick="startConfiguredQuiz()">⚔️ 開始戰鬥</button>
-    </div>
-
-    <div id="wordPickerModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeWordPicker()">×</span>
-            <h3 id="pickerTitle" style="margin-top:0;">挑選敵人</h3>
-            <div class="picker-actions">
-                <button class="btn-pixel" style="font-size:0.8rem; padding:5px;" onclick="pickerSelectViewed()">僅已讀</button>
-                <button class="btn-pixel" style="font-size:0.8rem; padding:5px;" onclick="pickerSelectAll()">全選</button>
-                <button class="btn-pixel" style="font-size:0.8rem; padding:5px;" onclick="pickerSelectNone()">全消</button>
-            </div>
-            <div id="pickerGrid" class="word-picker-container"></div>
-            <div id="btnPickerSave" style="display:block; margin-top:15px;">
-                <button class="btn-pixel btn-action" style="width:100%;" onclick="closeWordPicker()">確定</button>
-            </div>
-            <div id="btnPickerQuickStart" style="display:none; gap:10px; margin-top:15px;">
-                <button class="btn-pixel btn-action" style="flex:1;" onclick="startQuickQuizDirect('choice')">選</button>
-                <button class="btn-pixel btn-action" style="flex:1;" onclick="startQuickQuizDirect('spelling')">拼</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="quizScreen" class="screen">
-        <div class="quiz-header">
-            <span>Q: <span id="qIdx">1</span>/<span id="qTotal">10</span></span>
-            <span id="timerBadge" style="display:none; color:red;">⏱️ <span id="timeLeft">8</span></span>
-            <button style="background:none; border:none; font-size:1.5rem;" onclick="quitQuiz()">🏳️</button>
-        </div>
-
-        <div class="question-card">
-            <div class="q-icon" onclick="playQuizSequence()">🔊</div>
-            <div class="q-hint" id="qHint" style="display:none; margin-top:15px;"></div>
-            <button id="btnShowHint" style="margin-top:15px; background:#ddd; border:none; padding:5px 10px; cursor:pointer;" onclick="showHint()">💡 提示</button>
-        </div>
-
-        <div id="choiceArea" class="choice-container" style="display:none;"></div>
-
-        <div id="spellingArea" class="spelling-container" style="display:none;">
-            <input type="text" id="spellingInput" class="input-spelling" placeholder="輸入單字..." autocomplete="off">
-            <div id="spellingFeedback" style="height: 20px; font-weight:bold; margin-bottom:10px;"></div>
-            <button class="btn-pixel btn-action" style="width:100%;" onclick="checkSpelling()">攻擊 (送出)</button>
-        </div>
-        <button id="btnNextQ" class="btn-pixel" style="width:100%; margin-top:20px; display:none;" onclick="nextQuestion()">➡ NEXT</button>
-    </div>
-
-    <div id="resultScreen" class="screen">
-        <div class="result-box">
-            <div style="font-size:4rem;">🏆</div>
-            <h2>戰鬥結束！</h2>
-            <div class="score-display" id="finalScore">100</div>
-            <p id="finalMsg">太厲害了！</p>
-            <button class="btn-pixel btn-action" style="width:100%; margin-bottom:15px;" onclick="goHome()">🏠 回大廳</button>
-            <button class="btn-pixel btn-back" style="width:100%;" onclick="retryQuiz()">🔄 再戰一次</button>
-        </div>
+        <button class="btn-solid btn-red" onclick="startTop30WeaknessQuiz()">🔥 挑戰 Top 30 常錯字</button>
     </div>
 
 <script src="words.js"></script>
@@ -436,62 +410,43 @@
     let currentPickerSid = null;
     let isQuickQuizPicker = false; 
     
-    let userStats = {
-        wordsViewedCount: 0,
-        quizCount: 0,
-        totalCorrect: 0,
-        totalMistakes: 0 
-    };
+    let userStats = { wordsViewedCount: 0, quizCount: 0, totalCorrect: 0, totalMistakes: 0 };
     let unlockedTitles = new Set();
 
-    // 🏆 v44.0 稱號資料庫 (RPG Icons)
+    // 🏆 v43.0 稱號資料庫 (Expanded)
     const achievements = [
-        // 📚 勤學之路 (Learning)
-        { id: 'view_5', category: 'learn', tier: 'common', icon: '🪵', title: '撿木柴', desc: '看過 5 個單字', check: (s) => s.wordsViewedCount >= 5 },
-        { id: 'view_20', category: 'learn', tier: 'common', icon: '🕯️', title: '點亮燭光', desc: '看過 20 個單字', check: (s) => s.wordsViewedCount >= 20 },
-        { id: 'view_50', category: 'learn', tier: 'common', icon: '📜', title: '新手卷軸', desc: '看過 50 個單字', check: (s) => s.wordsViewedCount >= 50 },
-        { id: 'view_80', category: 'learn', tier: 'rare', icon: '📓', title: '冒險筆記', desc: '看過 80 個單字', check: (s) => s.wordsViewedCount >= 80 },
-        { id: 'view_100', category: 'learn', tier: 'rare', icon: '📘', title: '初級魔法書', desc: '看過 100 個單字', check: (s) => s.wordsViewedCount >= 100 },
-        { id: 'view_200', category: 'learn', tier: 'rare', icon: '🎓', title: '學者帽', desc: '看過 200 個單字', check: (s) => s.wordsViewedCount >= 200 },
-        { id: 'view_300', category: 'learn', tier: 'epic', icon: '🔮', title: '先知水晶', desc: '看過 300 個單字', check: (s) => s.wordsViewedCount >= 300 },
-        { id: 'view_500', category: 'learn', tier: 'epic', icon: '🧙‍♂️', title: '大賢者', desc: '看過 500 個單字', check: (s) => s.wordsViewedCount >= 500 },
-        { id: 'view_all', category: 'learn', tier: 'legendary', icon: '🪐', title: '全知之眼', desc: '看過所有單字 (800+)', check: (s) => s.wordsViewedCount >= 800 },
-
-        // 🏫 Unit 制霸
-        { id: 'unit_1', category: 'unit', tier: 'common', icon: '🚩', title: '佔領據點', desc: '完成 1 個單元', check: () => checkUnitsCompleted(1) },
-        { id: 'unit_3', category: 'unit', tier: 'rare', icon: '⛺', title: '建立營地', desc: '完成 3 個單元', check: () => checkUnitsCompleted(3) },
-        { id: 'unit_5', category: 'unit', tier: 'rare', icon: '🛖', title: '擴張領土', desc: '完成 5 個單元', check: () => checkUnitsCompleted(5) },
-        { id: 'unit_10', category: 'unit', tier: 'epic', icon: '🏰', title: '建立王國', desc: '完成 10 個單元', check: () => checkUnitsCompleted(10) },
-        { id: 'unit_all', category: 'unit', tier: 'legendary', icon: '👑', title: '統治世界', desc: '完成所有單元', check: () => checkUnitsCompleted(sessions.length) },
-
-        // 🔡 字母蒐集
-        { id: 'alpha_1', category: 'alpha', tier: 'common', icon: '🧩', title: '拼圖碎片', desc: '完成 1 個字母', check: () => checkLettersCompleted(1) },
-        { id: 'alpha_3', category: 'alpha', tier: 'rare', icon: '🧱', title: '奠基石', desc: '完成 3 個字母', check: () => checkLettersCompleted(3) },
-        { id: 'alpha_5', category: 'alpha', tier: 'rare', icon: '🏗️', title: '建築師', desc: '完成 5 個字母', check: () => checkLettersCompleted(5) },
-        { id: 'alpha_10', category: 'alpha', tier: 'epic', icon: '🏛️', title: '神殿守護', desc: '完成 10 個字母', check: () => checkLettersCompleted(10) },
-        { id: 'alpha_all', category: 'alpha', tier: 'legendary', icon: '🗿', title: '古文明', desc: '完成 A-Z 所有字母', check: () => checkLettersCompleted(26) },
-
-        // ⚔️ 試煉戰場
-        { id: 'quiz_1', category: 'quiz', tier: 'common', icon: '🗡️', title: '木劍', desc: '完成 1 次測驗', check: (s) => s.quizCount >= 1 },
-        { id: 'quiz_10', category: 'quiz', tier: 'rare', icon: '⚔️', title: '騎士劍', desc: '完成 10 次測驗', check: (s) => s.quizCount >= 10 },
-        { id: 'quiz_50', category: 'quiz', tier: 'epic', icon: '🛡️', title: '英雄之盾', desc: '完成 50 次測驗', check: (s) => s.quizCount >= 50 },
-        
-        // 💎 傳奇里程碑 (Correct)
-        { id: 'correct_10', category: 'milestone', tier: 'common', icon: '💰', title: '第一桶金', desc: '累積答對 10 題', check: (s) => s.totalCorrect >= 10 },
-        { id: 'correct_100', category: 'milestone', tier: 'rare', icon: '💎', title: '寶石獵人', desc: '累積答對 100 題', check: (s) => s.totalCorrect >= 100 },
-        { id: 'correct_500', category: 'milestone', tier: 'epic', icon: '🏆', title: '冠軍獎盃', desc: '累積答對 500 題', check: (s) => s.totalCorrect >= 500 },
-        { id: 'correct_1000', category: 'milestone', tier: 'legendary', icon: '🐉', title: '屠龍者', desc: '累積答對 1000 題', check: (s) => s.totalCorrect >= 1000 },
-
-        // ✨ 神秘彩蛋
-        { id: 'secret_night', category: 'secret', tier: 'rare', icon: '🧛', title: '吸血鬼', desc: '晚上 10 點後背單字', secretDesc: '深夜出沒...', check: () => new Date().getHours() >= 22 },
-        { id: 'secret_early', category: 'secret', tier: 'rare', icon: '🐔', title: '公雞', desc: '早上 7 點前背單字', secretDesc: '早起的鳥兒...', check: () => new Date().getHours() < 7 },
-        { id: 'secret_fail', category: 'secret', tier: 'epic', icon: '💀', title: '不屈不撓', desc: '累積答錯 50 次', secretDesc: '失敗為成功之母...', check: (s) => s.totalMistakes >= 50 }
+        { id: 'view_5', category: 'learn', tier: 'common', icon: '🪵', title: '單字小萌新', desc: '看過 5 個單字', check: (s) => s.wordsViewedCount >= 5 },
+        { id: 'view_20', category: 'learn', tier: 'common', icon: '🕯️', title: '充滿好奇', desc: '看過 20 個單字', check: (s) => s.wordsViewedCount >= 20 },
+        { id: 'view_50', category: 'learn', tier: 'common', icon: '📜', title: '累積實力', desc: '看過 50 個單字', check: (s) => s.wordsViewedCount >= 50 },
+        { id: 'view_80', category: 'learn', tier: 'rare', icon: '📓', title: '漸入佳境', desc: '看過 80 個單字', check: (s) => s.wordsViewedCount >= 80 },
+        { id: 'view_100', category: 'learn', tier: 'rare', icon: '📘', title: '記憶超人', desc: '看過 100 個單字', check: (s) => s.wordsViewedCount >= 100 },
+        { id: 'view_200', category: 'learn', tier: 'rare', icon: '🎓', title: '博學多聞', desc: '看過 200 個單字', check: (s) => s.wordsViewedCount >= 200 },
+        { id: 'view_300', category: 'learn', tier: 'epic', icon: '🔮', title: '單字王者', desc: '看過 300 個單字', check: (s) => s.wordsViewedCount >= 300 },
+        { id: 'view_500', category: 'learn', tier: 'epic', icon: '🧙‍♂️', title: '行走字典', desc: '看過 500 個單字', check: (s) => s.wordsViewedCount >= 500 },
+        { id: 'view_all', category: 'learn', tier: 'legendary', icon: '🪐', title: '全知全能', desc: '看過所有單字 (800+)', check: (s) => s.wordsViewedCount >= 800 },
+        { id: 'unit_1', category: 'unit', tier: 'common', icon: '🚩', title: '初戰告捷', desc: '完成 1 個單元', check: () => checkUnitsCompleted(1) },
+        { id: 'unit_3', category: 'unit', tier: 'rare', icon: '⛺', title: '三元及第', desc: '完成 3 個單元', check: () => checkUnitsCompleted(3) },
+        { id: 'unit_5', category: 'unit', tier: 'rare', icon: '🛖', title: '五星上將', desc: '完成 5 個單元', check: () => checkUnitsCompleted(5) },
+        { id: 'unit_10', category: 'unit', tier: 'epic', icon: '🏰', title: '十全十美', desc: '完成 10 個單元', check: () => checkUnitsCompleted(10) },
+        { id: 'unit_all', category: 'unit', tier: 'legendary', icon: '👑', title: '制霸全國', desc: '完成所有單元', check: () => checkUnitsCompleted(sessions.length) },
+        { id: 'alpha_1', category: 'alpha', tier: 'common', icon: '🧩', title: '字母搜集', desc: '完成 1 個字母', check: () => checkLettersCompleted(1) },
+        { id: 'alpha_3', category: 'alpha', tier: 'rare', icon: '🧱', title: '拼字拼圖', desc: '完成 3 個字母', check: () => checkLettersCompleted(3) },
+        { id: 'alpha_5', category: 'alpha', tier: 'rare', icon: '🏗️', title: '語彙獵人', desc: '完成 5 個字母', check: () => checkLettersCompleted(5) },
+        { id: 'alpha_10', category: 'alpha', tier: 'epic', icon: '🏛️', title: '字母大亨', desc: '完成 10 個字母', check: () => checkLettersCompleted(10) },
+        { id: 'quiz_1', category: 'quiz', tier: 'common', icon: '🗡️', title: '勇於挑戰', desc: '完成 1 次測驗', check: (s) => s.quizCount >= 1 },
+        { id: 'quiz_10', category: 'quiz', tier: 'rare', icon: '⚔️', title: '測驗常客', desc: '完成 10 次測驗', check: (s) => s.quizCount >= 10 },
+        { id: 'quiz_50', category: 'quiz', tier: 'epic', icon: '🛡️', title: '身經百戰', desc: '完成 50 次測驗', check: (s) => s.quizCount >= 50 },
+        { id: 'correct_10', category: 'milestone', tier: 'common', icon: '💰', title: '答題新手', desc: '累積答對 10 題', check: (s) => s.totalCorrect >= 10 },
+        { id: 'correct_100', category: 'milestone', tier: 'rare', icon: '💎', title: '智慧之星', desc: '累積答對 100 題', check: (s) => s.totalCorrect >= 100 },
+        { id: 'correct_500', category: 'milestone', tier: 'epic', icon: '🏆', title: '神準射手', desc: '累積答對 500 題', check: (s) => s.totalCorrect >= 500 },
+        { id: 'correct_1000', category: 'milestone', tier: 'legendary', icon: '🐉', title: '傳說學霸', desc: '累積答對 1000 題', check: (s) => s.totalCorrect >= 1000 },
+        { id: 'secret_night', category: 'secret', tier: 'rare', icon: '🧛', title: '夜貓子', desc: '晚上 10 點後背單字', secretDesc: '深夜出沒...', check: () => new Date().getHours() >= 22 },
+        { id: 'secret_early', category: 'secret', tier: 'rare', icon: '🐔', title: '早起的鳥兒', desc: '早上 7 點前背單字', secretDesc: '早起的鳥兒...', check: () => new Date().getHours() < 7 },
+        { id: 'secret_fail', category: 'secret', tier: 'epic', icon: '💀', title: '愈挫愈勇', desc: '累積答錯 50 次', secretDesc: '失敗為成功之母...', check: (s) => s.totalMistakes >= 50 }
     ];
 
     window.onload = function() {
-        if (typeof masterWordList === 'undefined') {
-            alert("錯誤：找不到資料庫 words.js"); return;
-        }
+        if (typeof masterWordList === 'undefined') { alert("錯誤：找不到資料庫 words.js"); return; }
         sessions = [...new Set(masterWordList.map(item => item.session))].sort();
         loadUserData();
         goHome();
@@ -518,7 +473,6 @@
         localStorage.setItem('unlockedTitles', JSON.stringify([...unlockedTitles]));
     }
 
-    // Helper
     function checkUnitsCompleted(targetCount) {
         let completed = 0;
         sessions.forEach(sid => {
@@ -553,13 +507,12 @@
 
     function showToast(title, icon) {
         const toast = document.getElementById('toastNotification');
-        toast.querySelector('.toast-icon').innerText = icon || '🎁';
+        toast.querySelector('div').innerText = icon || '🎁';
         document.getElementById('toastMsg').innerText = title;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Navigation
     function goHome() { showScreen('homeScreen'); }
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
@@ -579,43 +532,55 @@
         window.speechSynthesis.speak(u);
     }
 
-    // 🏆 Achievement UI (Retro)
     function openAchievementScreen() {
         const grid = document.getElementById('badgeGrid');
         grid.innerHTML = "";
         const categories = { 'learn': '📚 勤學之路', 'unit': '🏫 Unit 制霸', 'alpha': '🔡 字母蒐集', 'quiz': '⚔️ 試煉戰場', 'milestone': '💎 傳奇里程碑', 'secret': '✨ 神秘彩蛋' };
+        
         for (let cat in categories) {
             const header = document.createElement('div');
             header.className = `category-header cat-${cat}`;
             header.style.gridColumn = "1 / -1";
             header.innerText = categories[cat];
             grid.appendChild(header);
+
             achievements.filter(a => a.category === cat).forEach(ach => {
                 const isUnlocked = unlockedTitles.has(ach.id);
                 const div = document.createElement('div');
                 div.className = `badge-card ${isUnlocked ? 'unlocked' : ''} ${ach.tier}`;
-                let icon = '🔒'; let title = '？？？'; let desc = ach.secretDesc || '達成條件解鎖';
                 
+                let icon = '🔒'; let title = ach.title; let hintLabel = "🎯 目標："; let desc = ach.desc;
+
                 if (isUnlocked) {
-                    icon = ach.icon || '🏆'; // Use custom icon
-                    title = ach.title; desc = ach.desc;
-                } else if (!ach.secretDesc) { title = ach.title; desc = ach.desc; }
+                    icon = ach.icon || '🏆';
+                } else {
+                    if (ach.category === 'secret') {
+                        title = '？？？';
+                        hintLabel = "🕵️ 線索：";
+                        desc = ach.secretDesc;
+                    }
+                }
                 
-                div.innerHTML = `<div class="badge-icon-box">${icon}</div><div class="badge-title">${title}</div><div class="badge-desc">${desc}</div>`;
+                div.innerHTML = `
+                    <div class="badge-icon">${icon}</div>
+                    <div class="badge-title">${title}</div>
+                    ${!isUnlocked ? `<div class="badge-hint-box">${hintLabel}${desc}</div>` : `<div class="badge-desc">${desc}</div>`}
+                `;
                 grid.appendChild(div);
             });
         }
         showScreen('achievementScreen');
     }
 
-    // --- Core Logic (Copied from previous stable version) ---
     function openAnalysisScreen() {
         const m = JSON.parse(localStorage.getItem('myMistakes')) || {};
         const topList = document.getElementById('topWeakList');
         const fullList = document.getElementById('fullMistakeList');
         let sorted = Object.keys(m).map(k => ({ word: k, count: m[k] })).sort((a,b) => b.count - a.count);
-        if (sorted.length === 0) { topList.innerHTML = "無錯題紀錄"; fullList.innerHTML = ""; } 
-        else {
+        if (sorted.length === 0) {
+            topList.innerHTML = "<div style='color:#999;'>無錯題紀錄</div>";
+            fullList.innerHTML = "";
+        } else {
             topList.innerHTML = "";
             sorted.slice(0, 3).forEach((item, idx) => {
                 let medal = idx===0?'🥇':(idx===1?'🥈':'🥉');
@@ -649,7 +614,7 @@
             const count = masterWordList.filter(w => w.session === sid).length;
             const btn = document.createElement('div');
             btn.className = 'unit-card';
-            btn.innerHTML = `<h3>Unit ${sid}</h3><span>${count} words</span>`;
+            btn.innerHTML = `<h3>Unit ${sid}</h3><span class="action-hint">${count} words ▶</span>`;
             btn.onclick = () => loadStudyOverview(sid);
             grid.appendChild(btn);
         });
@@ -746,7 +711,7 @@
 
     function openWordPicker(sid) {
         currentPickerSid = sid;
-        document.getElementById('pickerTitle').innerText = `挑選單字 (Unit ${sid})`;
+        document.getElementById('pickerTitle').innerText = `挑選 (Unit ${sid})`;
         if (isQuickQuizPicker) {
             quizConfig.selectedWords.clear();
             const unitWords = masterWordList.filter(w => w.session === sid);
@@ -844,7 +809,10 @@
         userStats.totalMistakes++;
         if (quizConfig.mode === 'choice') {
             const btns = document.querySelectorAll('.btn-choice');
-            btns.forEach(b => { if (b.innerText === quizData.list[quizData.index].word) b.classList.add('correct'); b.disabled = true; });
+            btns.forEach(b => {
+                if (b.innerText === quizData.list[quizData.index].word) b.classList.add('correct');
+                b.disabled = true;
+            });
         } else {
             document.getElementById('spellingInput').value = quizData.list[quizData.index].word;
             document.getElementById('spellingInput').style.borderColor = "var(--danger)";
@@ -884,7 +852,7 @@
     }
 
     function renderSpelling() {
-        const input = document.getElementById('spellingInput'); input.value = ""; input.disabled = false; input.style.borderColor = "#000"; document.getElementById('spellingFeedback').innerText = ""; input.focus();
+        const input = document.getElementById('spellingInput'); input.value = ""; input.disabled = false; input.style.borderColor = "#ccc"; document.getElementById('spellingFeedback').innerText = ""; input.focus();
     }
 
     function checkSpelling() {
