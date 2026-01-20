@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>智慧單字小考官 v49.0 (Teacher Pro)</title>
+    <title>智慧單字小考官 v50.0 (Mini Card)</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
         /* --- 🎨 視覺風格：現代復古像素風 (Pixel Lite) --- */
@@ -91,7 +91,7 @@
             border-radius: 12px; font-size: 2rem; font-weight: 900;
             cursor: pointer; box-shadow: 8px 8px 0 #000;
             transition: all 0.1s; display: flex; align-items: center; justify-content: center; gap: 15px;
-            margin: 0 auto; /* Center fix */
+            margin: 0 auto;
         }
         .btn-student-hero:active { transform: translate(6px, 6px); box-shadow: 2px 2px 0 #000; }
 
@@ -247,57 +247,43 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(16px); }
 
-        /* Stats & Charts */
-        .student-analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .student-card-view { 
-            background: #fff; border: 3px solid #000; border-radius: 8px; padding: 15px; 
-            display: flex; flex-direction: column; height: 100%; box-shadow: 6px 6px 0 #000; 
-        }
+        /* Stats High Contrast */
+        .student-analysis-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .student-card-view { background: #fff; border: 3px solid #000; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; height: 100%; box-shadow: 6px 6px 0 #000; }
         .student-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 3px solid #000; padding-bottom: 8px; }
-        .weak-word-tag { display: inline-block; background: #ffcccc; color: #c0392b; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold; margin: 3px 0; width: 100%; border: 1px solid #000; }
         
-        .rank-card { 
-            background: #fff; border: 3px solid #000; border-radius: 8px; padding: 15px; 
-            display: flex; align-items: center; justify-content: space-between; 
-            position: relative; box-shadow: 4px 4px 0 #000;
-        }
+        .weak-word-row { display: flex; justify-content: space-between; align-items: center; background: #fff; border: 2px solid var(--danger); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; box-shadow: 3px 3px 0 #ffcdd2; }
+        .stat-word { font-size: 1.2rem; font-weight: 900; color: #000; }
+        .stat-badge { background: var(--danger-dark); color: #fff; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-family: 'VT323'; font-size: 1.1rem; border: 2px solid #000; }
+
+        .session-rank-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .session-col-card { background: #fff; border: 3px solid #000; border-radius: 8px; padding: 15px; height: 350px; display: flex; flex-direction: column; box-shadow: 4px 4px 0 #ccc; }
+        
+        .rank-card { background: #fff; border: 3px solid #000; border-radius: 8px; padding: 15px; display: flex; align-items: center; justify-content: space-between; position: relative; box-shadow: 4px 4px 0 #000; }
         .rank-card.rank-1 { background: #ffeaa7; }
         .rank-card.rank-2 { background: #dfe6e9; }
         .rank-card.rank-3 { background: #fab1a0; }
-        
-        .session-rank-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .session-col-card { background: #fff; border: 3px solid #000; border-radius: 8px; padding: 15px; height: 300px; display: flex; flex-direction: column; box-shadow: 4px 4px 0 #ccc; }
-        
-        .table-container { max-height: 400px; overflow-y: auto; border: 2px solid #000; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; font-size: 1rem; }
-        th { text-align: left; padding: 10px; background: #000; color: #fff; position: sticky; top: 0; }
-        td { padding: 10px; border-bottom: 1px solid #ccc; background: #fff; font-weight: bold; }
-        .rank-bar-bg { width: 100px; height: 10px; background: #eee; border: 1px solid #000; display: inline-block; margin-right: 8px; }
-        .rank-bar-fill { height: 100%; background: var(--danger); }
+
+        .table-container { max-height: 400px; overflow-y: auto; border: 3px solid #000; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 1.1rem; }
+        th { text-align: left; padding: 12px; background: #000; color: #fff; position: sticky; top: 0; font-family: 'VT323'; letter-spacing: 1px; font-size: 1.2rem; }
+        td { padding: 12px; border-bottom: 2px dashed #ccc; background: #fff; font-weight: bold; color: #333; }
+        .big-rank-num { font-size: 1.5rem; font-weight: 900; color: var(--danger); font-family: 'VT323'; margin-left: 10px; text-shadow: 1px 1px 0 #000;}
 
         .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 5px 2px; margin-bottom: 15px; }
-        .filter-tab { 
-            flex: 0 0 auto; padding: 6px 14px; border-radius: 6px; border: 2px solid #000; 
-            background: #fff; cursor: pointer; font-weight: bold; color: #000; transition: 0.2s; 
-        }
+        .filter-tab { flex: 0 0 auto; padding: 6px 14px; border-radius: 6px; border: 2px solid #000; background: #fff; cursor: pointer; font-weight: bold; color: #000; transition: 0.2s; }
         .filter-tab.active { background: #000; color: #fff; }
         
         .full-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top:20px;}
-        .word-item-card { 
-            background: #fff; border: 3px solid #000; border-radius: 8px; padding: 10px; 
-            transition: 0.1s; position: relative; text-align: center; box-shadow: 4px 4px 0 #ccc; 
-        }
+        .word-item-card { background: #fff; border: 3px solid #000; border-radius: 8px; padding: 10px; transition: 0.1s; position: relative; text-align: center; box-shadow: 4px 4px 0 #ccc; cursor: pointer; }
         .word-item-card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 #000; z-index: 10; }
         .heatmap-yellow { background-color: var(--heat-yellow-bg); border-color: var(--heat-yellow-bd); }
         .heatmap-orange { background-color: var(--heat-orange-bg); border-color: var(--heat-orange-bd); }
         .heatmap-red { background-color: var(--heat-red-bg); border-color: var(--heat-red-bd); }
         
-        /* 1. 單字卡標籤修復 */
-        .wi-word { font-size: 1.3rem; font-weight: 800; color: var(--text-main); display: block; margin-bottom: 8px; }
-        .badge-unit {
-            display: inline-block; background: #eee; border: 1px solid #aaa; color: #555;
-            padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; font-family: monospace;
-        }
+        .wi-word { font-size: 1.4rem; font-weight: 900; color: var(--text-main); display: block; margin-bottom: 5px; }
+        /* UA Style Fix */
+        .badge-unit { display: inline-block; background: #eee; border: 1px solid #aaa; color: #555; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold; font-family: monospace; margin-top: 5px; }
 
         .page-bottom-actions { margin-top: 40px; padding-top: 20px; border-top: 2px dashed #000; text-align: center; }
         .btn-safe-exit { background: transparent; border: none; color: #555; padding: 8px 15px; cursor: pointer; font-size: 0.9rem; margin-top: 10px; text-decoration: underline; font-weight: bold; }
@@ -311,12 +297,53 @@
 
         /* Report Screen Styles */
         .report-grid { display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto; border: 3px solid #000; padding: 10px; background: #f9f9f9; }
-        .report-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: white; border-bottom: 1px dashed #ccc; }
-        .report-item.error { background: #ffebee; }
-        .report-word { font-size: 1.5rem; font-weight: bold; }
+        .report-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: white; border-bottom: 2px solid #eee; }
+        .report-item.error { background: #ffebee; border-left: 5px solid var(--danger); }
+        .report-word { font-size: 1.5rem; font-weight: 900; }
         .report-stat { display: flex; align-items: center; gap: 10px; }
-        .badge-err-list { display: flex; gap: 5px; }
-        .badge-student { background: #ff7675; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; border: 1px solid #d63031; }
+        .badge-err-list { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+        .badge-student { background: #ff7675; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.9rem; font-weight: bold; border: 2px solid #000; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); }
+
+        /* --- Mini Flashcard (Right Panel / Top Panel) --- */
+        .mini-flashcard {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            background: #fff;
+            border: 4px solid #000;
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.5);
+            padding: 20px;
+            text-align: center;
+            /* Desktop Default: Right Side */
+            right: 20px; 
+            top: 80px; 
+            width: 320px;
+            max-width: 90%;
+        }
+        /* Mobile: Top Panel */
+        @media (max-width: 768px) {
+            .mini-flashcard {
+                right: 5%;
+                top: 60px;
+                width: 90%;
+            }
+        }
+        .mini-close-btn {
+            position: absolute; top: 5px; right: 10px;
+            font-size: 2rem; cursor: pointer; color: #000; line-height: 1;
+            font-family: monospace;
+        }
+        .mini-word { font-size: 3rem; font-weight: 900; margin: 10px 0; line-height: 1; }
+        .mini-zh { font-size: 1.5rem; color: #666; font-weight: bold; margin-bottom: 15px; }
+        .mini-sent { background: #eee; padding: 10px; border-radius: 6px; text-align: left; border: 2px solid #ccc; margin-top: 10px; }
+        .mini-sent-en { font-family: 'VT323'; font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
+        .mini-sent-zh { font-size: 0.9rem; color: #555; }
+        .mini-btn-speak { 
+            background: var(--primary); color: white; border: 3px solid #000; 
+            padding: 5px 15px; font-size: 1.2rem; font-weight: bold; cursor: pointer; 
+            box-shadow: 3px 3px 0 #000; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .mini-btn-speak:active { transform: translate(2px, 2px); box-shadow: 0 0 0; }
 
     </style>
 </head>
@@ -326,7 +353,7 @@
         <div style="text-align:center; padding-bottom:50px; width:100%; max-width:600px;">
             <span class="app-logo-big">👾</span>
             <div class="app-title">VOCAB MASTER</div>
-            <div class="app-subtitle">智慧單字小考官</div>
+            <div class="app-subtitle">智慧單字小考官 v50.0</div>
             
             <button class="btn-student-hero" onclick="enterStudentMode()">
                 <span class="icon">🎮</span> START GAME (學生)
@@ -362,70 +389,42 @@
 
         <div id="dashboardScreen" class="screen active">
             <h2 style="color:var(--text-main); margin-bottom:10px; font-size:1.5rem;">👋 Hello Teacher!</h2>
-            
             <div class="dash-section-title">📝 QUIZ ZONE</div>
             <div class="dashboard-grid">
                 <div class="dash-card purple" onclick="showCustomQuizScreen()">
-                    <span class="dash-icon">🎯</span>
-                    <div class="dash-title">指定測驗</div>
-                    <div class="dash-desc">Manual Select</div>
+                    <span class="dash-icon">🎯</span><div class="dash-title">指定測驗</div><div class="dash-desc">Manual Select</div>
                 </div>
                 <div class="dash-card primary" onclick="showScreen('setupScreen')">
-                    <span class="dash-icon">🤖</span>
-                    <div class="dash-title">AI 隨機測驗</div>
-                    <div class="dash-desc">Auto Generator</div>
+                    <span class="dash-icon">🤖</span><div class="dash-title">AI 隨機測驗</div><div class="dash-desc">Auto Generator</div>
                 </div>
             </div>
-
             <div class="dash-section-title">📊 DATA CENTER</div>
             <div class="dashboard-grid">
                 <div class="dash-card accent" onclick="showStudentStats()">
-                    <span class="dash-icon">🧑‍🎓</span>
-                    <div class="dash-title">個別弱點</div>
-                    <div class="dash-desc">Student Stats</div>
+                    <span class="dash-icon">🧑‍🎓</span><div class="dash-title">個別弱點</div><div class="dash-desc">Student Stats</div>
                 </div>
                 <div class="dash-card danger" onclick="showClassStats()">
-                    <span class="dash-icon">🏫</span>
-                    <div class="dash-title">全班分析</div>
-                    <div class="dash-desc">Class Overview</div>
+                    <span class="dash-icon">🏫</span><div class="dash-title">全班分析</div><div class="dash-desc">Class Overview</div>
                 </div>
                 <div class="dash-card success" onclick="renderFullWordList(); showScreen('wordListScreen')">
-                    <span class="dash-icon">📖</span>
-                    <div class="dash-title">單字庫</div>
-                    <div class="dash-desc">Word List</div>
+                    <span class="dash-icon">📖</span><div class="dash-title">單字庫</div><div class="dash-desc">Word List</div>
                 </div>
             </div>
-
-            <div class="page-bottom-actions">
-                <button class="btn-safe-exit" onclick="exitTeacherMode()">🚪 LOGOUT</button>
-            </div>
+            <div class="page-bottom-actions"><button class="btn-safe-exit" onclick="exitTeacherMode()">🚪 LOGOUT</button></div>
         </div>
 
         <div id="customQuizScreen" class="screen">
-            <div class="section-header">
-                <span class="section-title">🎯 指定單字測驗</span>
-                <button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 常錯 Top 30</button>
-            </div>
+            <div class="section-header"><span class="section-title">🎯 指定單字測驗</span><button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 常錯 Top 30</button></div>
             <div class="session-panel">
                 <label style="font-weight:bold; display:block; margin-bottom:10px;">手動選擇單元</label>
                 <select id="customSessionSelect" onchange="renderCustomWordSelection()"></select>
-                
                 <div style="margin-top:20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <label style="font-weight:bold;">勾選單字</label>
-                        <button class="btn-pixel" style="font-size:0.8rem; padding:5px 10px;" onclick="clearCustomSelection()">清除</button>
-                    </div>
-
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;"><label style="font-weight:bold;">勾選單字</label><button class="btn-pixel" style="font-size:0.8rem; padding:5px 10px;" onclick="clearCustomSelection()">清除</button></div>
                     <div style="background:#eee; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; align-items:center; gap:10px;">
-                        <span>選</span> <input type="number" id="dailyCount" value="3" style="width:50px; text-align:center;"> <span>新字，考</span>
-                        <input type="number" id="dailyTestCount" value="3" style="width:50px; text-align:center;"> <span>題</span>
+                        <span>選</span> <input type="number" id="dailyCount" value="3" style="width:50px; text-align:center;"> <span>新字，考</span><input type="number" id="dailyTestCount" value="3" style="width:50px; text-align:center;"> <span>題</span>
                         <button class="btn-pixel btn-primary" style="margin-left:auto; font-size:0.9rem;" onclick="autoSelectAndStart()">▶ GO</button>
                     </div>
-
-                    <div style="font-size:0.9rem; color:var(--primary); font-weight:bold; margin-bottom:5px; text-align:right;">
-                        <span id="customSelectionCount">已選 0 題</span>
-                    </div>
-
+                    <div style="font-size:0.9rem; color:var(--primary); font-weight:bold; margin-bottom:5px; text-align:right;"><span id="customSelectionCount">已選 0 題</span></div>
                     <div id="customWordGrid" class="custom-word-grid"></div>
                 </div>
             </div>
@@ -436,20 +435,12 @@
         <div id="setupScreen" class="screen">
             <div class="section-header"><span class="section-title">1. 選擇範圍</span></div>
             <div class="session-panel">
-                <div class="quick-select-bar">
-                    <button class="btn-pill" onclick="selectAllSessions()">全選 (ALL)</button>
-                    <button class="btn-pill" onclick="clearSelection()" style="background:#ffcccc;">清除</button>
-                </div>
+                <div class="quick-select-bar"><button class="btn-pill" onclick="selectAllSessions()">全選 (ALL)</button><button class="btn-pill" onclick="clearSelection()" style="background:#ffcccc;">清除</button></div>
                 <div id="sessionGrid" class="session-grid"></div>
             </div>
             <div class="section-header"><span class="section-title">2. 題數</span></div>
-            <select id="wordCount">
-                <option value="5">5 題</option><option value="10" selected>10 題</option>
-                <option value="20">20 題</option><option value="30">30 題</option><option value="50">50 題</option>
-            </select>
-            <div style="margin-top:20px; padding:15px; background:#e0f7fa; border:2px solid #00bcd4; border-radius:8px; color:#006064; font-weight:bold;">
-                💡 系統會自動加重「常錯字」的出現機率。
-            </div>
+            <select id="wordCount"><option value="5">5 題</option><option value="10" selected>10 題</option><option value="20">20 題</option><option value="30">30 題</option><option value="50">50 題</option></select>
+            <div style="margin-top:20px; padding:15px; background:#e0f7fa; border:2px solid #00bcd4; border-radius:8px; color:#006064; font-weight:bold;">💡 系統會自動加重「常錯字」的出現機率。</div>
             <button id="startBtn" class="btn-pixel btn-primary btn-big" onclick="startRandomTest()" disabled>START QUIZ ▶</button>
             <div class="page-bottom-actions"><button class="btn-pixel" onclick="showScreen('dashboardScreen')">🏠 HOME</button></div>
         </div>
@@ -457,18 +448,15 @@
         <div id="testScreen" class="screen">
             <div class="pixel-card" style="text-align:center;">
                 <div style="font-size:1.2rem; font-weight:bold; margin-bottom:10px;">Q <span id="currentNum">1</span> / <span id="totalNum">10</span></div>
-                
                 <div class="flash-card" id="quizCard" style="margin-bottom:20px;">
                     <button class="btn-pixel btn-warning" onclick="playQuestionSequence()" style="margin-bottom:15px;">🔊 播放 (字-句-字)</button>
                     <div style="display:flex;align-items:center;justify-content:center;margin-bottom:10px;"><div class="word-display" id="displayWord">...</div><button class="btn-icon" onclick="speakText('word')">🔊</button></div>
                     <div style="display:flex;align-items:center;justify-content:center;"><div class="sentence-display" id="displaySentence">...</div><button class="btn-icon" onclick="speakText('sentence')">🔊</button></div>
                 </div>
-
                 <div class="timer-wrapper" style="margin-bottom:20px;">
                     <button class="timer-btn" id="timerBtn" onclick="manualStartTimer()">8</button>
                     <div class="switch-wrapper"><label class="switch"><input type="checkbox" id="autoTimerSwitch"><span class="slider"></span></label><span>倒數</span></div>
                 </div>
-
                 <div style="text-align:left; font-weight:bold; margin-bottom:5px;">👇 誰答錯了？(點擊標記)</div>
                 <div class="student-grid">
                     <div class="btn-student" id="btn-s1" onclick="toggleStudent(1)"><span class="avatar">🐃</span><span class="name">1</span></div>
@@ -486,9 +474,7 @@
                 <div style="font-size:4rem; margin-bottom:10px;">📊</div>
                 <h2 style="font-size:2.5rem; margin:0;">測驗結束</h2>
                 <p style="font-size:1.2rem; color:#666; margin-bottom:20px;">本次測驗檢討</p>
-                
                 <div id="battleReportList" class="report-grid"></div>
-                
                 <div style="display:flex; gap:10px; margin-top:20px;">
                     <button class="btn-pixel btn-primary" style="flex:1;" onclick="showClassStats()">查看全班統計</button>
                     <button class="btn-pixel" style="flex:1;" onclick="showScreen('dashboardScreen')">回首頁</button>
@@ -510,22 +496,16 @@
                 <span class="section-title">🏫 全班弱點</span>
                 <button class="btn-compact-action" onclick="startTopErrorTest()">⚡ 測驗 Top30</button>
             </div>
-            
             <div class="pixel-card" style="margin-bottom:20px;">
                 <h4 style="margin:0 0 10px 0;">⚠️ 錯誤熱點 (Session Rank)</h4>
                 <div id="sessionRankGrid" class="session-rank-grid"></div>
             </div>
-            
             <div id="sessionBreakdownGrid" class="session-breakdown-grid" style="margin-bottom:20px;"></div>
-            
             <div class="pixel-card">
                 <h4 style="margin:0 0 10px 0;">🚨 總排行 (Global Top 50)</h4>
                 <div id="globalStatsTable" class="table-container"></div>
             </div>
-
-            <div style="text-align:right; margin-top:20px;">
-                <button class="btn-compact-action" style="color:red; border-color:red;" onclick="clearHistory()">🗑️ 清空紀錄</button>
-            </div>
+            <div style="text-align:right; margin-top:20px;"><button class="btn-compact-action" style="color:red; border-color:red;" onclick="clearHistory()">🗑️ 清空紀錄</button></div>
             <div class="page-bottom-actions"><button class="btn-pixel" onclick="showScreen('dashboardScreen')">🏠 HOME</button></div>
         </div>
 
@@ -542,6 +522,17 @@
             <div class="page-bottom-actions"><button class="btn-pixel" onclick="showScreen('dashboardScreen')">🏠 HOME</button></div>
         </div>
 
+    </div>
+
+    <div id="miniFlashcard" class="mini-flashcard">
+        <span class="mini-close-btn" onclick="closeMiniCard()">×</span>
+        <div class="mini-word" id="miniWord">Apple</div>
+        <button class="mini-btn-speak" onclick="speakMiniCard()">🔊</button>
+        <div class="mini-zh" id="miniZh">蘋果</div>
+        <div class="mini-sent">
+            <div class="mini-sent-en" id="miniSentEn">I eat an apple.</div>
+            <div class="mini-sent-zh" id="miniSentZh">我吃一顆蘋果。</div>
+        </div>
     </div>
 
     <div id="helpModal" class="modal">
@@ -585,17 +576,42 @@
         const item = testList[currentIndex]; 
         const text = (type === 'word' ? item.word : item.sentence);
         window.speechSynthesis.cancel();
+        
+        if (availableVoices.length === 0) { initVoices(); setTimeout(()=>speakText(type), 100); return; }
+
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'en-US';
-        u.rate = 0.6; // Slower rate
+        u.rate = 0.6; // Apple fix
         const v = getBestVoice();
         if(v) u.voice = v;
+        window.speechSynthesis.speak(u);
+    }
+    
+    // Mini Card Logic
+    let currentMiniWord = null;
+    function showMiniCard(item) {
+        currentMiniWord = item;
+        document.getElementById('miniWord').innerText = item.word;
+        document.getElementById('miniZh').innerText = item.word_zh || '';
+        document.getElementById('miniSentEn').innerText = item.sentence;
+        document.getElementById('miniSentZh').innerText = item.sentence_zh || '';
+        document.getElementById('miniFlashcard').style.display = 'block';
+    }
+    function closeMiniCard() {
+        document.getElementById('miniFlashcard').style.display = 'none';
+        window.speechSynthesis.cancel();
+    }
+    function speakMiniCard() {
+        if(!currentMiniWord) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(currentMiniWord.word);
+        u.lang = 'en-US'; u.rate = 0.6;
+        const v = getBestVoice(); if(v) u.voice = v;
         window.speechSynthesis.speak(u);
     }
 
     window.onload = function() { 
         if (typeof masterWordList !== 'undefined') db = masterWordList; 
-        
         // Load Daily Preferences
         const savedDailyPick = localStorage.getItem('dailyPickCount');
         if(savedDailyPick) document.getElementById('dailyCount').value = savedDailyPick;
@@ -798,6 +814,9 @@
         const item = testList[currentIndex]; 
         window.speechSynthesis.cancel();
         
+        // Wait for voices
+        if(availableVoices.length === 0) { initVoices(); setTimeout(playQuestionSequence, 100); return; }
+
         const u1 = new SpeechSynthesisUtterance(item.word); u1.lang='en-US'; u1.rate=0.6;
         const u2 = new SpeechSynthesisUtterance(item.sentence); u2.lang='en-US'; u2.rate=0.6;
         const u3 = new SpeechSynthesisUtterance(item.word); u3.lang='en-US'; u3.rate=0.6;
@@ -867,7 +886,7 @@
             let badges = "";
             if (log.wrongCount > 0) {
                 log.students.forEach(sid => {
-                    badges += `<span class="badge-student">${sid}</span>`;
+                    badges += `<span class="badge-student">${sid}號</span>`;
                 });
             } else {
                 badges = "<span style='color:var(--student); font-weight:bold;'>全對 ✅</span>";
@@ -887,7 +906,7 @@
     function saveMistake(sid, w, d) { let h = JSON.parse(localStorage.getItem('spellingHistory')) || []; h.push({ student: sid, word: w.word, session: w.session, sentence: w.sentence, date: d }); localStorage.setItem('spellingHistory', JSON.stringify(h)); }
     function saveTestLog(word, errCount, totalStudents) { let logs = JSON.parse(localStorage.getItem('spellingTestLogs')) || []; logs.push({ word: word, timestamp: Date.now(), accuracy: (totalStudents - errCount) / totalStudents }); localStorage.setItem('spellingTestLogs', JSON.stringify(logs)); }
 
-    // --- Restored & Fixed Functions ---
+    // --- High Contrast & Big Data Fixes ---
 
     function renderAllStudentOverview() {
         const container = document.getElementById('studentAnalysisGrid'); container.innerHTML = "";
@@ -904,17 +923,16 @@
             let listHtml = "";
             if (sortedErrors.length === 0) listHtml = `<div class="no-weakness">🎉 表現優異！</div>`;
             else {
-                sortedErrors.slice(0, 5).forEach(item => { listHtml += `<span class="weak-word-tag">${item.word} (x${item.count})</span>`; });
-                if(sortedErrors.length > 5) listHtml += `<span style="font-size:0.8rem; color:#999;">...還有 ${sortedErrors.length-5} 個</span>`;
+                sortedErrors.slice(0, 5).forEach(item => { 
+                    listHtml += `
+                    <div class="weak-word-row">
+                        <span class="stat-word">${item.word}</span>
+                        <span class="stat-badge">-${item.count}</span>
+                    </div>`; 
+                });
+                if(sortedErrors.length > 5) listHtml += `<div style="text-align:center; font-size:0.8rem; color:#999; margin-top:5px;">...還有 ${sortedErrors.length-5} 個</div>`;
             }
-            
-            let detailsHtml = "";
-            if(sortedErrors.length > 0) {
-                let rows = "";
-                sortedErrors.forEach(m => { rows += `<li class="detail-row"><span>${m.word}</span> <span class="detail-err">錯 ${m.count}</span></li>`; });
-                detailsHtml = `<div style="margin-top:auto;"><details><summary>📜 詳細紀錄</summary><ul class="detail-list">${rows}</ul></details></div>`;
-            }
-            card.innerHTML = `<div class="student-card-header"><span style="font-size:1.5rem;">${animalMap[i]}</span><span style="font-weight:bold;">${i}號同學</span></div><div style="flex:1;">${listHtml}</div>${detailsHtml}`;
+            card.innerHTML = `<div class="student-card-header"><span style="font-size:1.5rem;">${animalMap[i]}</span><span style="font-weight:bold;">${i}號同學</span></div><div style="flex:1;">${listHtml}</div>`;
             container.appendChild(card);
         }
     }
@@ -925,10 +943,10 @@
         let counts={}; h.forEach(x=>{if(!counts[x.word])counts[x.word]=0;counts[x.word]++;});
         let s = Object.keys(counts).map(k=>({w:k,c:counts[k]})).sort((a,b)=>b.c-a.c).slice(0,50);
         let maxCount = s[0]?.c || 1; 
-        let html="<table><tr><th width='60%'>常錯單字 (Top 50)</th><th>錯誤次數</th></tr>";
+        let html="<table><tr><th width='60%'>Top 50 弱點</th><th>次數</th></tr>";
         s.forEach(i=>{
             const widthPct = (i.c / maxCount) * 100;
-            html+=`<tr><td>${i.w}</td><td><div style="display:flex; align-items:center;"><span class="rank-bar-bg"><span class="rank-bar-fill" style="width:${widthPct}%"></span></span><span class="rank-high">${i.c}</span></div></td></tr>`
+            html+=`<tr><td>${i.w}</td><td><div style="display:flex; align-items:center;"><span class="rank-bar-bg"><span class="rank-bar-fill" style="width:${widthPct}%"></span></span><span class="big-rank-num">${i.c}</span></div></td></tr>`
         });
         c.innerHTML = html+"</table>";
     }
@@ -960,8 +978,17 @@
         Object.keys(sessions).sort().forEach(sid => {
             const wordCounts = sessions[sid].words;
             const topWords = Object.keys(wordCounts).map(w => ({ word: w, count: wordCounts[w] })).sort((a,b) => b.count - a.count).slice(0, 10);
-            let listHtml = ""; topWords.forEach(w => { listHtml += `<li><span>${w.word}</span><span class="err-count">${w.count}</span></li>`; });
-            breakdownHtml += `<div class="session-col-card"><div class="session-col-header"><span>Unit ${sid}</span><span style="font-size:0.8rem;opacity:0.6;">(Total: ${sessions[sid].total})</span></div><ul class="word-list-mini">${listHtml}</ul></div>`;
+            
+            // New List Style
+            let listHtml = ""; 
+            topWords.forEach(w => { 
+                listHtml += `
+                <li style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dashed #ccc;">
+                    <span style="font-weight:bold; font-size:1.1rem;">${w.word}</span>
+                    <span style="background:var(--danger); color:white; padding:0 6px; border-radius:10px;">${w.count}</span>
+                </li>`; 
+            });
+            breakdownHtml += `<div class="session-col-card"><div class="session-col-header"><span>Unit ${sid}</span><span style="font-size:0.8rem;opacity:0.6;">(Total: ${sessions[sid].total})</span></div><ul class="word-list-mini" style="padding:0; list-style:none; overflow-y:auto;">${listHtml}</ul></div>`;
         });
         breakdownContainer.innerHTML = breakdownHtml;
     }
@@ -1006,12 +1033,37 @@
                 <span class="wi-word">${item.word}</span>
                 <span class="badge-unit">Unit ${item.session}</span>
             `;
+            // Add click listener for Mini Flashcard
+            div.onclick = () => showMiniCard(item);
             container.appendChild(div);
         });
     }
 
     function exportToCSV() { const h = getHistory(); if(h.length===0){alert("無資料");return;} const n = {1:"水牛",2:"水豚",3:"樹懶",4:"河馬",5:"無尾熊"}; let csv = "data:text/csv;charset=utf-8,\uFEFF日期,學生,代號,單元,單字,例句\n"; h.forEach(r => { csv+=`${r.date},${n[r.student]},${r.student},${r.session},${r.word},${(r.sentence||"").replace(/,/g,"，")}\n` }); const a = document.createElement("a"); a.href=encodeURI(csv); a.download="錯題紀錄.csv"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
     function clearHistory(){ if(confirm("確定清空所有歷史與AI學習紀錄？")) { localStorage.removeItem('spellingHistory'); localStorage.removeItem('spellingTestLogs'); showScreen('dashboardScreen'); } }
+
+    // --- Mini Card ---
+    let currentMiniWord = null;
+    function showMiniCard(item) {
+        currentMiniWord = item;
+        document.getElementById('miniWord').innerText = item.word;
+        document.getElementById('miniZh').innerText = item.word_zh || '';
+        document.getElementById('miniSentEn').innerText = item.sentence;
+        document.getElementById('miniSentZh').innerText = item.sentence_zh || '';
+        document.getElementById('miniFlashcard').style.display = 'block';
+    }
+    function closeMiniCard() {
+        document.getElementById('miniFlashcard').style.display = 'none';
+        window.speechSynthesis.cancel();
+    }
+    function speakMiniCard() {
+        if(!currentMiniWord) return;
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(currentMiniWord.word);
+        u.lang = 'en-US'; u.rate = 0.6;
+        const v = getBestVoice(); if(v) u.voice = v;
+        window.speechSynthesis.speak(u);
+    }
 
 </script>
 </body>
